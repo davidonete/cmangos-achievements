@@ -25,12 +25,12 @@ if(PCH)
 endif()
 
 #Base files
-file(GLOB achievements_source ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
-    source_group("Achievements" FILES ${achievements_source})
+file(GLOB Achievements_Source ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
+    source_group("Achievements" FILES ${Achievements_Source})
 
 #Define base source library
 set(LIBRARY_SRCS
-    ${achievements_source}
+    ${Achievements_Source}
     ${achievements_PCH}
 )
 
