@@ -25,7 +25,7 @@ if(PCH)
 endif()
 
 #Base files
-file(GLOB Achievements_Source ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
+file(GLOB achievements_source ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
     source_group("Achievements" FILES ${achievements_source})
 
 #Define base source library
