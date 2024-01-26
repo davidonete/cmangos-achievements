@@ -1,58 +1,6 @@
-/*
- * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+#include "achievementspch.h"
 
-#include "Accounts/AccountMgr.h"
-#include "AchievementMgr.h"
-// #include "ArenaTeam.h"
-// #include "ArenaTeamMgr.h"
-#include "BattleGround.h"
-// #include "BattleGroundAB.h"
-// #include "BattleGroundAV.h"
-// #include "BattleGroundWS.h"
-// #include "CellImpl.h"
-#include "Chat/Chat.h"
-// #include "ChatTextBuilder.h"
-// #include "Common.h"
-//#include "Database/DatabaseEnv.h"
-//#include "Database/QueryResult.h"
-//// #include "DBCEnums.h"
-//#include "DBCStores.h"
-// #include "DisableMgr.h"
-// #include "GameEventMgr.h"
-// #include "GridNotifiersImpl.h"
-// #include "Guild.h"
-#include "Guilds/GuildMgr.h"
-#include "Guilds/Guild.h"
-// #include "InstanceScript.h"
-// #include "Language.h"
-//#include "Map.h"
-//#include "MapManager.h"
-//#include "ItemPrototype.h"
-#include "Globals/ObjectMgr.h"
-// #include "Player.h"
-// #include "ReputationMgr.h"
-#include "AchievementScriptMgr.h"
-// #include "World.h"
-// #include "WorldPacket.h"
-#include "Spells/SpellMgr.h"
-#include "GameEvents/GameEventMgr.h"
-#include "World/World.h"
-
-#ifdef ENABLE_PLAYERBOTS
+#ifdef ENABLE_MANGOSBOTS
 #include "playerbot.h"
 #include "PlayerbotAIConfig.h"
 #endif
