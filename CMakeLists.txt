@@ -21,7 +21,7 @@ set(LIBRARY_NAME Achievements)
 #Add PCH Files
 set(Achievements_PCH "${CMAKE_CURRENT_SOURCE_DIR}/achievementspch.h")
 if(PCH)
-    LIST(APPEND Achievements_PCH "${CMAKE_CURRENT_SOURCE_DIR}/achievementspch.cpp")
+    LIST(APPEND achievements_PCH "${CMAKE_CURRENT_SOURCE_DIR}/achievementspch.cpp")
 endif()
 
 #Base files
