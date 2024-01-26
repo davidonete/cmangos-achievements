@@ -631,131 +631,133 @@ void AchievementMgr::DeleteFromDB(uint32 lowguid)
 
 void AchievementMgr::SyncAccountAcchievements()
 {
-    if (GetPlayer()->isRealPlayer())
+#ifdef ENABLE_MANGOSBOTS
+    if (!GetPlayer()->isRealPlayer())
+        return;
+#endif
+
+    // Check if its a new character
+    if (GetPlayer()->GetTotalPlayedTime() == 0)
     {
-        // Check if its a new character
-        if (GetPlayer()->GetTotalPlayedTime() == 0)
-        {
-            // Copy other characters achievements into this character
-            const uint8 newCharacterRace = GetPlayer()->getRace();
-            const uint32 newCharacterGuid = GetPlayer()->GetGUIDLow();
-            const uint32 accountId = GetPlayer()->GetSession()->GetAccountId();
-            const bool newCharacterIsAlliance = newCharacterRace == 1 || newCharacterRace == 3 || newCharacterRace == 4 || newCharacterRace == 7 || newCharacterRace == 11;
+        // Copy other characters achievements into this character
+        const uint8 newCharacterRace = GetPlayer()->getRace();
+        const uint32 newCharacterGuid = GetPlayer()->GetGUIDLow();
+        const uint32 accountId = GetPlayer()->GetSession()->GetAccountId();
+        const bool newCharacterIsAlliance = newCharacterRace == 1 || newCharacterRace == 3 || newCharacterRace == 4 || newCharacterRace == 7 || newCharacterRace == 11;
             
-            std::vector<uint32> accountCharacterGuids;
-            auto result = CharacterDatabase.PQuery("SELECT guid, race FROM `characters` WHERE `account` = '%u' ORDER BY guid", accountId);
-            if (result)
-            {
-                do
-                {
-                    Field* fields = result->Fetch();
-                    const uint32 characterGuid = fields[0].GetUInt32();
-                    const uint8 characterRace = fields[1].GetUInt8();
-                    if (characterGuid != newCharacterGuid)
-                    {
-                        accountCharacterGuids.push_back(characterGuid);
-                    }
-                } 
-                while (result->NextRow());
-            }
-
-            for (const uint32& characterGuid : accountCharacterGuids)
-            {
-                result = CharacterDatabase.PQuery("SELECT achievement, date FROM `character_achievement` WHERE `guid` = '%u'", characterGuid);
-                if (result)
-                {
-                    do
-                    {
-                        Field* fields = result->Fetch();
-                        const uint32 achievementId = fields[0].GetUInt32();
-                        const uint32 achievementDate = fields[1].GetUInt32();
-                        const AchievementEntry* achievement = sAchievementStore.LookupEntry<AchievementEntry>(achievementId);
-                        if (achievement)
-                        {
-                            // Check if the achievement is valid for the character's faction
-                            if (achievement->requiredFaction == -1 ||
-                               (newCharacterIsAlliance && achievement->requiredFaction == 1) ||
-                               (!newCharacterIsAlliance && achievement->requiredFaction == 0))
-                            {
-                                CharacterDatabase.PExecute("DELETE FROM `character_achievement` WHERE `achievement` = '%u' AND `guid` = '%u'",
-                                    achievementId,
-                                    newCharacterGuid
-                                );
-
-                                CharacterDatabase.PExecute("INSERT INTO `character_achievement` (`guid`, `achievement`, `date`) VALUES ('%u', '%u', '%u')",
-                                    newCharacterGuid,
-                                    achievementId,
-                                    achievementDate
-                                );
-                            }
-                        }
-
-                    } 
-                    while (result->NextRow());
-                }
-            }
-        }
-        else
+        std::vector<uint32> accountCharacterGuids;
+        auto result = CharacterDatabase.PQuery("SELECT guid, race FROM `characters` WHERE `account` = '%u' ORDER BY guid", accountId);
+        if (result)
         {
-            // Copy the character achievement to other characters in the account
-            std::vector<std::pair<uint32, bool>> accountCharacterGuids;
-            const uint32 currentCharacterGuid = GetPlayer()->GetGUIDLow();
-            const uint32 accountId = GetPlayer()->GetSession()->GetAccountId();
-            auto result = CharacterDatabase.PQuery("SELECT guid, race FROM `characters` WHERE `account` = '%u'", accountId);
+            do
+            {
+                Field* fields = result->Fetch();
+                const uint32 characterGuid = fields[0].GetUInt32();
+                const uint8 characterRace = fields[1].GetUInt8();
+                if (characterGuid != newCharacterGuid)
+                {
+                    accountCharacterGuids.push_back(characterGuid);
+                }
+            } 
+            while (result->NextRow());
+        }
+
+        for (const uint32& characterGuid : accountCharacterGuids)
+        {
+            result = CharacterDatabase.PQuery("SELECT achievement, date FROM `character_achievement` WHERE `guid` = '%u'", characterGuid);
             if (result)
             {
                 do
                 {
                     Field* fields = result->Fetch();
-                    const uint32 characterGuid = fields[0].GetUInt32();
-                    const uint8 characterRace = fields[1].GetUInt8();
-                    if (characterGuid != currentCharacterGuid)
-                    {
-                        const bool isAlliance = characterRace == 1 || characterRace == 3 || characterRace == 4 || characterRace == 7 || characterRace == 11;
-                        accountCharacterGuids.push_back(std::make_pair(characterGuid, isAlliance));
-                    }
-                } 
-                while (result->NextRow());
-            }
-
-            // Sync earned achievements
-            if (!m_completedAchievements.empty())
-            {
-                for (CompletedAchievementMap::iterator iter = m_completedAchievements.begin(); iter != m_completedAchievements.end(); ++iter)
-                {
-                    const AchievementEntry* achievement = sAchievementStore.LookupEntry<AchievementEntry>(iter->first);
+                    const uint32 achievementId = fields[0].GetUInt32();
+                    const uint32 achievementDate = fields[1].GetUInt32();
+                    const AchievementEntry* achievement = sAchievementStore.LookupEntry<AchievementEntry>(achievementId);
                     if (achievement)
                     {
-                        for (const auto& pair : accountCharacterGuids)
+                        // Check if the achievement is valid for the character's faction
+                        if (achievement->requiredFaction == -1 ||
+                            (newCharacterIsAlliance && achievement->requiredFaction == 1) ||
+                            (!newCharacterIsAlliance && achievement->requiredFaction == 0))
                         {
-                            const uint32 characterGuid = pair.first;
-                            const bool isAlliance = pair.second;
+                            CharacterDatabase.PExecute("DELETE FROM `character_achievement` WHERE `achievement` = '%u' AND `guid` = '%u'",
+                                achievementId,
+                                newCharacterGuid
+                            );
 
-                            // Check if the achievement is valid for the character's faction
-                            if (achievement->requiredFaction == -1 ||
-                               (isAlliance && achievement->requiredFaction == 1) ||
-                               (!isAlliance && achievement->requiredFaction == 0))
-                            {
-                                CharacterDatabase.PExecute("DELETE FROM `character_achievement` WHERE `achievement` = '%u' AND `guid` = '%u'",
-                                    iter->first,
-                                    characterGuid
-                                );
+                            CharacterDatabase.PExecute("INSERT INTO `character_achievement` (`guid`, `achievement`, `date`) VALUES ('%u', '%u', '%u')",
+                                newCharacterGuid,
+                                achievementId,
+                                achievementDate
+                            );
+                        }
+                    }
 
-                                CharacterDatabase.PExecute("INSERT INTO `character_achievement` (`guid`, `achievement`, `date`) VALUES ('%u', '%u', '%u')",
-                                    characterGuid,
-                                    iter->first,
-                                    uint32(iter->second.date)
-                                );
-                            }
+                } 
+                while (result->NextRow());
+            }
+        }
+    }
+    else
+    {
+        // Copy the character achievement to other characters in the account
+        std::vector<std::pair<uint32, bool>> accountCharacterGuids;
+        const uint32 currentCharacterGuid = GetPlayer()->GetGUIDLow();
+        const uint32 accountId = GetPlayer()->GetSession()->GetAccountId();
+        auto result = CharacterDatabase.PQuery("SELECT guid, race FROM `characters` WHERE `account` = '%u'", accountId);
+        if (result)
+        {
+            do
+            {
+                Field* fields = result->Fetch();
+                const uint32 characterGuid = fields[0].GetUInt32();
+                const uint8 characterRace = fields[1].GetUInt8();
+                if (characterGuid != currentCharacterGuid)
+                {
+                    const bool isAlliance = characterRace == 1 || characterRace == 3 || characterRace == 4 || characterRace == 7 || characterRace == 11;
+                    accountCharacterGuids.push_back(std::make_pair(characterGuid, isAlliance));
+                }
+            } 
+            while (result->NextRow());
+        }
+
+        // Sync earned achievements
+        if (!m_completedAchievements.empty())
+        {
+            for (CompletedAchievementMap::iterator iter = m_completedAchievements.begin(); iter != m_completedAchievements.end(); ++iter)
+            {
+                const AchievementEntry* achievement = sAchievementStore.LookupEntry<AchievementEntry>(iter->first);
+                if (achievement)
+                {
+                    for (const auto& pair : accountCharacterGuids)
+                    {
+                        const uint32 characterGuid = pair.first;
+                        const bool isAlliance = pair.second;
+
+                        // Check if the achievement is valid for the character's faction
+                        if (achievement->requiredFaction == -1 ||
+                            (isAlliance && achievement->requiredFaction == 1) ||
+                            (!isAlliance && achievement->requiredFaction == 0))
+                        {
+                            CharacterDatabase.PExecute("DELETE FROM `character_achievement` WHERE `achievement` = '%u' AND `guid` = '%u'",
+                                iter->first,
+                                characterGuid
+                            );
+
+                            CharacterDatabase.PExecute("INSERT INTO `character_achievement` (`guid`, `achievement`, `date`) VALUES ('%u', '%u', '%u')",
+                                characterGuid,
+                                iter->first,
+                                uint32(iter->second.date)
+                            );
                         }
                     }
                 }
             }
         }
-
-        // TO DO: Sync achievement progress
-        // ...
     }
+
+    // TO DO: Sync achievement progress
+    // ...
 }
 
 void AchievementMgr::SaveToDB() 
@@ -1213,7 +1215,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
     if (m_player->IsGameMaster())
         return;
 
-#ifdef ENABLE_PLAYERBOTS
+#ifdef ENABLE_MANGOSBOTS
     uint32 accId = GetPlayer()->GetSession()->GetAccountId();
     if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_FOR_BOTS))
         return;
@@ -2382,7 +2384,7 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
         if (sAchievementMgr.IsRealmCompleted(achievement))
             return false;
 
-#ifdef ENABLE_PLAYERBOTS
+#ifdef ENABLE_MANGOSBOTS
         uint32 accId = GetPlayer()->GetSession()->GetAccountId();
         if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_REALM_FIRST_FOR_BOTS))
             return false;
@@ -3118,6 +3120,7 @@ uint8 AchievementMgr::GetPlayerLocale() const
         {
             localeIndex = 9;
         }
+        /*
         else if (playerLocaleIndex == sObjectMgr.GetStorageLocaleIndexFor(LOCALE_esMX))
         {
             localeIndex = 10;
@@ -3126,6 +3129,7 @@ uint8 AchievementMgr::GetPlayerLocale() const
         {
             localeIndex = 11;
         }
+        */
     }
 
     return localeIndex;
@@ -3137,7 +3141,7 @@ bool AchievementGlobalMgr::hasAchiever(WorldSession* session) const
     if (!plr)
         return false;
 
-#ifdef ENABLE_PLAYERBOTS
+#ifdef ENABLE_MANGOSBOTS
     if(!plr->isRealPlayer())
         return false;
 #endif
@@ -3156,7 +3160,7 @@ void AchievementGlobalMgr::enableAchiever(WorldSession* session, uint32 version)
     if (!plr)
         return;
 
-#ifdef ENABLE_PLAYERBOTS
+#ifdef ENABLE_MANGOSBOTS
     if (!plr->isRealPlayer())
         return;
 #endif
@@ -3228,7 +3232,7 @@ void AchievementGlobalMgr::getAllCategories(WorldSession* session, uint32 versio
     if (!sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_ENABLED))
         return;
 
-#ifdef ENABLE_PLAYERBOTS
+#ifdef ENABLE_MANGOSBOTS
     Player* plr = session->GetPlayer();
     if (!plr || !plr->isRealPlayer())
         return;
@@ -3273,7 +3277,7 @@ void AchievementGlobalMgr::getAllAchievements(WorldSession* session, uint32 vers
     if (!sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_ENABLED))
         return;
 
-#ifdef ENABLE_PLAYERBOTS
+#ifdef ENABLE_MANGOSBOTS
     Player* plr = session->GetPlayer();
     if (!plr || !plr->isRealPlayer())
         return;
@@ -3336,7 +3340,7 @@ void AchievementGlobalMgr::getAllCriteria(WorldSession* session, uint32 version)
     if (!sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_ENABLED))
         return;
 
-#ifdef ENABLE_PLAYERBOTS
+#ifdef ENABLE_MANGOSBOTS
     Player* plr = session->GetPlayer();
     if (!plr || !plr->isRealPlayer())
         return;
@@ -3391,7 +3395,7 @@ void AchievementGlobalMgr::getCharacterCriteria(WorldSession* session) const
     const auto playerGuid = session->GetPlayer()->GetGUIDLow();
     Player* plr = session->GetPlayer();
 
-#ifdef ENABLE_PLAYERBOTS
+#ifdef ENABLE_MANGOSBOTS
     if (!plr || !plr->isRealPlayer())
         return;
 #endif
@@ -3490,7 +3494,7 @@ void AchievementGlobalMgr::getCharacterAchievements(WorldSession* session) const
     if (!sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_ENABLED))
         return;
 
-#ifdef ENABLE_PLAYERBOTS
+#ifdef ENABLE_MANGOSBOTS
     Player* plr = session->GetPlayer();
     if (!plr || !plr->isRealPlayer())
         return;
@@ -4170,6 +4174,7 @@ uint8 AchievementGlobalMgr::GetPlayerLocale(WorldSession* session) const
         {
             localeIndex = 9;
         }
+        /*
         else if (playerLocaleIndex == sObjectMgr.GetStorageLocaleIndexFor(LOCALE_esMX))
         {
             localeIndex = 10;
@@ -4178,6 +4183,7 @@ uint8 AchievementGlobalMgr::GetPlayerLocale(WorldSession* session) const
         {
             localeIndex = 11;
         }
+        */
     }
 
     return localeIndex;
