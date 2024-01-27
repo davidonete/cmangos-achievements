@@ -4203,7 +4203,7 @@ void AchievementMgr::OnPlayerAdded(Player* player)
 
 #ifdef ENABLE_MANGOSBOTS
             // Check if randombots can use the achievement system
-            uint32 accId = GetSession()->GetAccountId();
+            uint32 accId = player->GetSession()->GetAccountId();
             if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_FOR_BOTS))
                 return nullptr;
 #endif
@@ -4257,12 +4257,35 @@ void AchievementMgr::UpdateAchievementCriteria(Player* player, AchievementCriter
     }
 }
 
+void AchievementMgr::UpdateLootAchievements(Player* player, LootItem* item, Loot* loot)
+{
+    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+    if (playerMgr)
+    {
+        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM, item->itemId, item->count);
+        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE, loot->GetLootType(), item->count);
+        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_EPIC_ITEM, item->itemId, item->count);
+    }
+}
+
 void AchievementMgr::StartTimedAchievement(Player* player, AchievementCriteriaTimedTypes type, uint32 entry, uint32 timeLost /*= 0*/)
 {
     PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
     if (playerMgr)
     {
         playerMgr->StartTimedAchievement(type, entry, timeLost);
+    }
+}
+
+void AchievementMgr::StartTimedAchievement(BattleGround* bg, AchievementCriteriaTimedTypes type, uint32 entry)
+{
+    if (bg)
+    {
+        for (auto itr = bg->GetPlayers().begin(); itr != bg->GetPlayers().end(); ++itr)
+        {
+            Player* player = sObjectMgr.GetPlayer(itr->first);
+            StartTimedAchievement(player, type, entry);
+        }
     }
 }
 
@@ -4381,6 +4404,13 @@ PlayerAchievementMgr* AchievementMgr::GetPlayerAchievementMgr(Player* player)
             }
         }
 
+#ifdef ENABLE_MANGOSBOTS
+        // Check if randombots can use the achievement system
+        uint32 accId = player->GetSession()->GetAccountId();
+        if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_FOR_BOTS))
+            return nullptr;
+#endif
+
         MANGOS_ASSERT(playerMgr);
         return playerMgr;
     }
@@ -4402,6 +4432,13 @@ const PlayerAchievementMgr* AchievementMgr::GetPlayerAchievementMgr(const Player
                 playerMgr = &playerMgrIt->second;
             }
         }
+
+#ifdef ENABLE_MANGOSBOTS
+        // Check if randombots can use the achievement system
+        uint32 accId = player->GetSession()->GetAccountId();
+        if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_FOR_BOTS))
+            return nullptr;
+#endif
 
         MANGOS_ASSERT(playerMgr);
         return playerMgr;

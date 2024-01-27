@@ -1123,7 +1123,8 @@ public:
     void OnPlayerSavedToDB(Player* player);
 
     void UpdateAchievementCriteria(Player* player, AchievementCriteriaTypes type, uint32 miscValue1 = 0, uint32 miscValue2 = 0, Unit* unit = nullptr);
-    
+    void UpdateLootAchievements(Player* player, LootItem* item, Loot* loot);
+
     void StartTimedAchievement(Player* player, AchievementCriteriaTimedTypes type, uint32 entry, uint32 timeLost = 0);
     void UpdateTimedAchievements(Player* player, const uint32 diff);
 
@@ -1139,6 +1140,10 @@ public:
 private:
     PlayerAchievementMgr* GetPlayerAchievementMgr(Player* player);
     const PlayerAchievementMgr* GetPlayerAchievementMgr(const Player* player) const;
+
+public:
+    // Battleground wrapper methods
+    void StartTimedAchievement(BattleGround* bg, AchievementCriteriaTimedTypes type, uint32 entry);
 
 private:
     AchievementCriteriaDataMap m_criteriaDataMap;
