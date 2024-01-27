@@ -2985,7 +2985,7 @@ void AchievementScriptMgr::SetRealmCompleted(AchievementEntry const* achievement
     FOREACH_SCRIPT(AchievementScript)->SetRealmCompleted(achievement);
 }
 
-bool AchievementScriptMgr::IsCompletedCriteria(AchievementMgr* mgr, AchievementCriteriaEntry const* achievementCriteria, AchievementEntry const* achievement, CriteriaProgress const* progress)
+bool AchievementScriptMgr::IsCompletedCriteria(PlayerAchievementMgr* mgr, AchievementCriteriaEntry const* achievementCriteria, AchievementEntry const* achievement, CriteriaProgress const* progress)
 {
     bool ret = true;
 
@@ -2996,7 +2996,7 @@ bool AchievementScriptMgr::IsCompletedCriteria(AchievementMgr* mgr, AchievementC
     return ret;
 }
 
-bool AchievementScriptMgr::IsRealmCompleted(AchievementGlobalMgr const* globalmgr, AchievementEntry const* achievement, std::chrono::system_clock::time_point completionTime)
+bool AchievementScriptMgr::IsRealmCompleted(AchievementMgr const* globalmgr, AchievementEntry const* achievement, std::chrono::system_clock::time_point completionTime)
 {
     bool ret = true;
 
@@ -3007,12 +3007,12 @@ bool AchievementScriptMgr::IsRealmCompleted(AchievementGlobalMgr const* globalmg
     return ret;
 }
 
-void AchievementScriptMgr::OnBeforeCheckCriteria(AchievementMgr* mgr, AchievementCriteriaEntryList const* achievementCriteriaList)
+void AchievementScriptMgr::OnBeforeCheckCriteria(PlayerAchievementMgr* mgr, AchievementCriteriaEntryList const* achievementCriteriaList)
 {
     FOREACH_SCRIPT(AchievementScript)->OnBeforeCheckCriteria(mgr, achievementCriteriaList);
 }
 
-bool AchievementScriptMgr::CanCheckCriteria(AchievementMgr* mgr, AchievementCriteriaEntry const* achievementCriteria)
+bool AchievementScriptMgr::CanCheckCriteria(PlayerAchievementMgr* mgr, AchievementCriteriaEntry const* achievementCriteria)
 {
     bool ret = true;
 

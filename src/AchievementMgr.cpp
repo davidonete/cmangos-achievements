@@ -5,7 +5,7 @@
 #include "PlayerbotAIConfig.h"
 #endif
 
-INSTANTIATE_SINGLETON_1(AchievementGlobalMgr);
+INSTANTIATE_SINGLETON_1(AchievementMgr);
 
 char constexpr Achievementfmt[] = "iiiissssssssssssssssissssssssssssssssiiiiiissssssssssssssssiiii";
 SQLStorage sAchievementStore(Achievementfmt, "ID", "achievement_dbc");
@@ -547,18 +547,18 @@ bool AchievementCriteriaDataSet::Meets(Player const* source, Unit const* target,
     return true;
 }
 
-AchievementMgr::AchievementMgr(Player* player)
+PlayerAchievementMgr::PlayerAchievementMgr(Player* player)
 {
     m_player = player;
     m_hasAchiever = false;
-    m_version = sAchievementMgr.getCurrentVersion();
+    m_version = sAchievementMgr.GetCurrentVersion();
 }
 
-AchievementMgr::~AchievementMgr()
+PlayerAchievementMgr::~PlayerAchievementMgr()
 {
 }
 
-void AchievementMgr::Reset()
+void PlayerAchievementMgr::Reset()
 {
     for (CompletedAchievementMap::const_iterator iter = m_completedAchievements.begin(); iter != m_completedAchievements.end(); ++iter)
     {
@@ -583,7 +583,7 @@ void AchievementMgr::Reset()
     CheckAllAchievementCriteria();
 }
 
-void AchievementMgr::ResetAchievementCriteria(AchievementCriteriaCondition condition, uint32 value, bool evenIfCriteriaComplete)
+void PlayerAchievementMgr::ResetAchievementCriteria(AchievementCriteriaCondition condition, uint32 value, bool evenIfCriteriaComplete)
 {
     // disable for gamemasters with GM-mode enabled
     if (m_player->IsGameMaster())
@@ -610,7 +610,7 @@ void AchievementMgr::ResetAchievementCriteria(AchievementCriteriaCondition condi
     }
 }
 
-void AchievementMgr::DeleteFromDB(uint32 lowguid)
+void PlayerAchievementMgr::DeleteFromDB(uint32 lowguid)
 {
     //// CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
     CharacterDatabase.BeginTransaction();
@@ -629,7 +629,7 @@ void AchievementMgr::DeleteFromDB(uint32 lowguid)
     //// CharacterDatabase.CommitTransaction(trans);
 }
 
-void AchievementMgr::SyncAccountAcchievements()
+void PlayerAchievementMgr::SyncAccountAcchievements()
 {
 #ifdef ENABLE_MANGOSBOTS
     if (!GetPlayer()->isRealPlayer())
@@ -760,7 +760,7 @@ void AchievementMgr::SyncAccountAcchievements()
     // ...
 }
 
-void AchievementMgr::SaveToDB() 
+void PlayerAchievementMgr::SaveToDB() 
 {
     if (sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_ACCOUNT_ACHIEVEMENTS))
     {
@@ -840,7 +840,7 @@ void AchievementMgr::SaveToDB()
     }
 }
 
-void AchievementMgr::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder) 
+void PlayerAchievementMgr::LoadFromDB(SqlQueryHolder* holder) 
 {
     auto achievementResult = holder->GetResult(PLAYER_LOGIN_QUERY_LOADACHIEVEMENTS);
     auto criteriaResult = holder->GetResult(PLAYER_LOGIN_QUERY_LOAD_CRITERIA_PROGRESS);
@@ -855,7 +855,9 @@ void AchievementMgr::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
             // must not happen: cleanup at server startup in sAchievementMgr.LoadCompletedAchievements()
             AchievementEntry const* achievement = sAchievementStore.LookupEntry<AchievementEntry>(achievementid);
             if (!achievement)
+            {
                 continue;
+            }
 
             CompletedAchievementData& ca = m_completedAchievements[achievementid];
             ca.date = time_t(fields[1].GetUInt32());
@@ -886,22 +888,19 @@ void AchievementMgr::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
             {
                 // we will remove not existed criteria for all characters
                 sLog.outError("achievement, Non-existing achievement criteria %u data removed from table `character_achievement_progress`.", id);
-
-                CharacterDatabase.PExecute("DELETE FROM `character_achievement_progress` WHERE `criteria` = '%u'",
-                    uint16(id)
-                );
+                CharacterDatabase.PExecute("DELETE FROM `character_achievement_progress` WHERE `criteria` = '%u'", uint16(id));
 
                 // CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INVALID_ACHIEV_PROGRESS_CRITERIA);
-
                 // stmt->setUInt16(0, uint16(id));
-
                 // CharacterDatabase.Execute(stmt);
 
                 continue;
             }
 
             if (criteria->timeLimit && time_t(date + criteria->timeLimit) < time(nullptr))
+            {
                 continue;
+            }
 
             CriteriaProgress& progress = m_criteriaProgress[id];
             progress.counter = counter;
@@ -912,13 +911,13 @@ void AchievementMgr::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     }
 }
 
-void AchievementMgr::EnableAchiever(uint32 version)
+void PlayerAchievementMgr::EnableAddon(uint32 version)
 {
     m_hasAchiever = true;
     m_version = version;
 }
 
-bool AchievementMgr::AddAchievement(const AchievementEntry* achievement)
+bool PlayerAchievementMgr::AddAchievement(const AchievementEntry* achievement)
 {
     if (achievement)
     {
@@ -970,7 +969,18 @@ bool AchievementMgr::AddAchievement(const AchievementEntry* achievement)
     return false;
 }
 
-bool AchievementMgr::RemoveAchievement(const AchievementEntry* achievement)
+bool PlayerAchievementMgr::AddAchievement(uint32 achievementId)
+{
+    const AchievementEntry* achievement = sAchievementStore.LookupEntry<AchievementEntry>(achievementId);
+    if (achievement)
+    {
+        return AddAchievement(achievement);
+    }
+
+    return false;
+}
+
+bool PlayerAchievementMgr::RemoveAchievement(const AchievementEntry* achievement)
 {
     if (achievement)
     {
@@ -1010,7 +1020,7 @@ bool AchievementMgr::RemoveAchievement(const AchievementEntry* achievement)
     return false;
 }
 
-void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) const
+void PlayerAchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) const
 {
     const auto date = m_completedAchievements.at(achievement->ID).date;
 
@@ -1120,7 +1130,7 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
     }
 
     // Don't send if no Achiever addon
-    if (sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_SEND_ADDON) && HasAchiever())
+    if (sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_SEND_ADDON) && HasAddon())
     {
         ChatHandler(m_player).PSendSysMessage(
             "ACHI|AE|%u;%u"
@@ -1152,12 +1162,12 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
     // ChatHandler(m_player).PSendSysMessage("Achievement earned: %s[%s], x%u points (%s)", breadCrumbs.c_str(), achievement->name[0], achievement->points, achievement->description[0]);
 }
 
-void AchievementMgr::SendCriteriaUpdate(AchievementCriteriaEntry const* entry, CriteriaProgress const* progress, uint32 timeElapsed, bool timedCompleted) const
+void PlayerAchievementMgr::SendCriteriaUpdate(AchievementCriteriaEntry const* entry, CriteriaProgress const* progress, uint32 timeElapsed, bool timedCompleted) const
 {
     if (!entry || !progress->changed) return;
 
     // Don't send if no Achiever addon
-    if (!HasAchiever())
+    if (!HasAddon())
         return;
 
     ChatHandler(m_player).PSendSysMessage("ACHI|ACU|%u;%u;%u;%u"
@@ -1187,11 +1197,12 @@ void AchievementMgr::SendCriteriaUpdate(AchievementCriteriaEntry const* entry, C
 /**
  * called at player login. The player might have fulfilled some achievements when the achievement system wasn't working yet.
  */
-void AchievementMgr::CheckAllAchievementCriteria()
+void PlayerAchievementMgr::CheckAllAchievementCriteria()
 {
-    // suppress sending packets
     for (uint32 i = 0; i < ACHIEVEMENT_CRITERIA_TYPE_TOTAL; ++i)
+    {
         UpdateAchievementCriteria(AchievementCriteriaTypes(i));
+    }
 }
 
 // static const uint32 achievIdByArenaSlot[MAX_ARENA_SLOT] = { 1057, 1107, 1108 };
@@ -1209,7 +1220,7 @@ static const uint32 achievIdForDungeon[][4] =
 /**
  * this function will be called whenever the user might have done a criteria relevant action
  */
-void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscValue1 /*= 0*/, uint32 miscValue2 /*= 0*/, Unit* unit /*= nullptr*/)
+void PlayerAchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscValue1 /*= 0*/, uint32 miscValue2 /*= 0*/, Unit* unit /*= nullptr*/)
 {
     // disable for gamemasters with GM-mode enabled
     if (m_player->IsGameMaster())
@@ -1455,7 +1466,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
 
                     if (challengeCompleted)
                     {
-                        sAchievementMgr.AddAchievement(GetPlayer()->GetSession(), 704);
+                        AddAchievement(704);
                     }
                 }
 
@@ -1481,7 +1492,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
             }
             case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT:
             {
-                if ((miscValue1 && achievementCriteria->complete_achievement.linkedAchievement == miscValue1) || (!miscValue1 && GetPlayer()->HasAchieved(achievementCriteria->complete_achievement.linkedAchievement)))
+                if ((miscValue1 && achievementCriteria->complete_achievement.linkedAchievement == miscValue1) || (!miscValue1 && HasAchieved(achievementCriteria->complete_achievement.linkedAchievement)))
                     SetCriteriaProgress(achievementCriteria, 1);
                 break;
             }
@@ -2372,7 +2383,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
     }
 }
 
-bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achievementCriteria, AchievementEntry const* achievement)
+bool PlayerAchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achievementCriteria, AchievementEntry const* achievement)
 {
     // counter can never complete
     if (achievement->flags & ACHIEVEMENT_FLAG_COUNTER)
@@ -2570,7 +2581,7 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
     return false;
 }
 
-void AchievementMgr::CompletedCriteriaFor(AchievementEntry const* achievement)
+void PlayerAchievementMgr::CompletedCriteriaFor(AchievementEntry const* achievement)
 {
     // counter can never complete
     if (achievement->flags & ACHIEVEMENT_FLAG_COUNTER)
@@ -2584,7 +2595,7 @@ void AchievementMgr::CompletedCriteriaFor(AchievementEntry const* achievement)
         CompletedAchievement(achievement);
 }
 
-bool AchievementMgr::IsCompletedAchievement(AchievementEntry const* entry)
+bool PlayerAchievementMgr::IsCompletedAchievement(AchievementEntry const* entry)
 {
     // counter can never complete
     if (entry->flags & ACHIEVEMENT_FLAG_COUNTER)
@@ -2646,7 +2657,7 @@ bool AchievementMgr::IsCompletedAchievement(AchievementEntry const* entry)
     return false;
 }
 
-CriteriaProgress* AchievementMgr::GetCriteriaProgress(AchievementCriteriaEntry const* entry)
+CriteriaProgress* PlayerAchievementMgr::GetCriteriaProgress(AchievementCriteriaEntry const* entry)
 {
     CriteriaProgressMap::iterator iter = m_criteriaProgress.find(entry->ID);
 
@@ -2656,7 +2667,7 @@ CriteriaProgress* AchievementMgr::GetCriteriaProgress(AchievementCriteriaEntry c
     return &(iter->second);
 }
 
-void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, uint32 changeValue, ProgressType ptype)
+void PlayerAchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, uint32 changeValue, ProgressType ptype)
 {
     // Don't allow to cheat - doing timed achievements without timer active
     TimedAchievementMap::iterator timedIter = m_timedAchievements.find(entry->ID);
@@ -2763,7 +2774,7 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, 
     sAchievementScriptMgr.OnCriteriaProgress(GetPlayer(), entry);
 }
 
-void AchievementMgr::RemoveCriteriaProgress(const AchievementCriteriaEntry* entry)
+void PlayerAchievementMgr::RemoveCriteriaProgress(const AchievementCriteriaEntry* entry)
 {
     CriteriaProgressMap::iterator criteriaProgress = m_criteriaProgress.find(entry->ID);
     if (criteriaProgress == m_criteriaProgress.end())
@@ -2776,7 +2787,7 @@ void AchievementMgr::RemoveCriteriaProgress(const AchievementCriteriaEntry* entr
     m_criteriaProgress.erase(criteriaProgress);
 }
 
-void AchievementMgr::UpdateTimedAchievements(uint32 timeDiff)
+void PlayerAchievementMgr::UpdateTimedAchievements(uint32 timeDiff)
 {
     if (!m_timedAchievements.empty())
     {
@@ -2798,7 +2809,7 @@ void AchievementMgr::UpdateTimedAchievements(uint32 timeDiff)
     }
 }
 
-void AchievementMgr::StartTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry, uint32 timeLost /*= 0*/)
+void PlayerAchievementMgr::StartTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry, uint32 timeLost /*= 0*/)
 {
     AchievementCriteriaEntryList const& achievementCriteriaList = sAchievementMgr.GetTimedAchievementCriteriaByType(type);
     for (AchievementCriteriaEntryList::const_iterator i = achievementCriteriaList.begin(); i != achievementCriteriaList.end(); ++i)
@@ -2821,7 +2832,7 @@ void AchievementMgr::StartTimedAchievement(AchievementCriteriaTimedTypes type, u
     }
 }
 
-void AchievementMgr::RemoveTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry)
+void PlayerAchievementMgr::RemoveTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry)
 {
     AchievementCriteriaEntryList const& achievementCriteriaList = sAchievementMgr.GetTimedAchievementCriteriaByType(type);
     for (AchievementCriteriaEntryList::const_iterator i = achievementCriteriaList.begin(); i != achievementCriteriaList.end(); ++i)
@@ -2842,7 +2853,7 @@ void AchievementMgr::RemoveTimedAchievement(AchievementCriteriaTimedTypes type, 
     }
 }
 
-void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
+void PlayerAchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
 {
     // disable for gamemasters with GM-mode enabled
     if (m_player->IsGameMaster())
@@ -2997,14 +3008,14 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
     }
 }
 
-void AchievementMgr::SendAllAchievementData() const
+void PlayerAchievementMgr::SendAllAchievementData() const
 {
     // WorldPacket data(SMSG_ALL_ACHIEVEMENT_DATA, m_completedAchievements.size() * 8 + 4 + m_criteriaProgress.size() * 38 + 4);
     // BuildAllDataPacket(&data);
     // GetPlayer()->GetSession()->SendPacket(&data);
 }
 
-void AchievementMgr::SendRespondInspectAchievements(Player* player) const
+void PlayerAchievementMgr::SendRespondInspectAchievements(Player* player) const
 {
     // WorldPacket data(SMSG_RESPOND_INSPECT_ACHIEVEMENTS, 9 + m_completedAchievements.size() * 8 + 4 + m_criteriaProgress.size() * 38 + 4);
     // data << GetPlayer()->GetPackGUID();
@@ -3044,18 +3055,18 @@ void AchievementMgr::SendRespondInspectAchievements(Player* player) const
 //     *data << int32(-1);
 // }
 
-bool AchievementMgr::HasAchieved(uint32 achievementId) const
+bool PlayerAchievementMgr::HasAchieved(uint32 achievementId) const
 {
     return m_completedAchievements.find(achievementId) != m_completedAchievements.end();
 }
 
-bool AchievementMgr::CanUpdateCriteria(AchievementCriteriaEntry const* criteria, AchievementEntry const* achievement)
+bool PlayerAchievementMgr::CanUpdateCriteria(AchievementCriteriaEntry const* criteria, AchievementEntry const* achievement)
 {
     // TODO: research disable manager
     // if (DisableMgr::IsDisabledFor(DISABLE_TYPE_ACHIEVEMENT_CRITERIA, criteria->ID, nullptr))
     //     return false;
 
-    if (achievement->patch != sAchievementMgr.getCurrentPatch())
+    if (achievement->patch != sAchievementMgr.GetCurrentPatch())
         return false;
 
     if (achievement->mapID != -1 && GetPlayer()->GetMapId() != uint32(achievement->mapID))
@@ -3090,7 +3101,7 @@ bool AchievementMgr::CanUpdateCriteria(AchievementCriteriaEntry const* criteria,
     return true;
 }
 
-uint8 AchievementMgr::GetPlayerLocale() const
+uint8 PlayerAchievementMgr::GetPlayerLocale() const
 {
     uint8 localeIndex = 0;
     if (m_player)
@@ -3135,85 +3146,76 @@ uint8 AchievementMgr::GetPlayerLocale() const
     return localeIndex;
 }
 
-bool AchievementGlobalMgr::hasAchiever(WorldSession* session) const
+bool AchievementMgr::HasAddon(Player* player) const
 {
-    Player* plr = session->GetPlayer();
-    if (!plr)
+    if (!player)
         return false;
 
 #ifdef ENABLE_MANGOSBOTS
-    if(!plr->isRealPlayer())
+    if(!player->isRealPlayer())
         return false;
 #endif
 
-    //sLog.outBasic("AchievementGlobalMgr: checking if sending data enabled...");
-    const AchievementMgr* aMgr = plr->GetAchievementMgr();
-    return aMgr && aMgr->HasAchiever();
+    const PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+    return playerMgr && playerMgr->HasAddon();
 }
 
-void AchievementGlobalMgr::enableAchiever(WorldSession* session, uint32 version) const
+void AchievementMgr::EnableAddon(Player* player, uint32 version)
 {
     if (!sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_ENABLED))
         return;
 
-    Player* plr = session->GetPlayer();
-    if (!plr)
+    if (!player)
         return;
 
 #ifdef ENABLE_MANGOSBOTS
-    if (!plr->isRealPlayer())
+    if (!player->isRealPlayer())
         return;
 #endif
 
     //sLog.outBasic("AchievementGlobalMgr: enabling sending data...");
 
-    AchievementMgr* aMgr = plr->GetAchievementMgr();
-    if (aMgr)
+    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+    if (playerMgr)
     {
-        if (!aMgr->HasAchiever())
+        if (!playerMgr->HasAddon())
         {
-            getAllCategories(session, version);
-            getAllAchievements(session, version);
-            getAllCriteria(session, version);
-            getCharacterCriteria(session);
-            getCharacterAchievements(session);
+            GetAllCategories(player, version);
+            GetAllAchievements(player, version);
+            GetAllCriteria(player, version);
+            GetCharacterCriteria(player);
+            GetCharacterAchievements(player);
         }
 
-        aMgr->EnableAchiever(version);
+        playerMgr->EnableAddon(version);
     }
 }
 
-bool AchievementGlobalMgr::AddAchievement(WorldSession* session, uint32 achievementId)
+bool AchievementMgr::AddAchievement(Player* player, uint32 achievementId)
 {
     if (!sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_ENABLED))
         return false;
 
-    Player* player = session->GetPlayer();
     if (player)
     {
-        AchievementMgr* achievementMgr = player->GetAchievementMgr();
+        PlayerAchievementMgr* achievementMgr = GetPlayerAchievementMgr(player);
         if (achievementMgr)
         {
-            const AchievementEntry* achievement = sAchievementStore.LookupEntry<AchievementEntry>(achievementId);
-            if (achievement)
-            {
-                return achievementMgr->AddAchievement(achievement);
-            }
+            return achievementMgr->AddAchievement(achievementId);
         }
     }
 
     return false;
 }
 
-bool AchievementGlobalMgr::RemoveAchievement(WorldSession* session, uint32 achievementId)
+bool AchievementMgr::RemoveAchievement(Player* player, uint32 achievementId)
 {
     if (!sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_ENABLED))
         return false;
 
-    Player* player = session->GetPlayer();
     if (player)
     {
-        AchievementMgr* achievementMgr = player->GetAchievementMgr();
+        PlayerAchievementMgr* achievementMgr = GetPlayerAchievementMgr(player);
         if (achievementMgr)
         {
             const AchievementEntry* achievement = sAchievementStore.LookupEntry<AchievementEntry>(achievementId);
@@ -3227,18 +3229,20 @@ bool AchievementGlobalMgr::RemoveAchievement(WorldSession* session, uint32 achie
     return false;
 }
 
-void AchievementGlobalMgr::getAllCategories(WorldSession* session, uint32 version) const
+void AchievementMgr::GetAllCategories(Player* player, uint32 version) const
 {
     if (!sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_ENABLED))
         return;
 
+    if (!player)
+        return;
+
 #ifdef ENABLE_MANGOSBOTS
-    Player* plr = session->GetPlayer();
-    if (!plr || !plr->isRealPlayer())
+    if (!player->isRealPlayer())
         return;
 #endif
 
-    if (version >= getCurrentVersion())
+    if (version >= GetCurrentVersion())
         return;
 
     const auto maxId = sAchievementCategoryStore.GetMaxEntry();
@@ -3251,13 +3255,13 @@ void AchievementGlobalMgr::getAllCategories(WorldSession* session, uint32 versio
         if (!category)
             continue;
 
-        if (category->patch > getCurrentPatch())
+        if (category->patch > GetCurrentPatch())
             continue;
 
-        const char* categoryName = category->GetName(GetPlayerLocale(session));
+        const char* categoryName = category->GetName(GetPlayerLocale(player->GetSession()));
         const auto* name = std::strlen(categoryName) <= 2 ? "_" : categoryName;
 
-        ChatHandler(session).PSendSysMessage
+        ChatHandler(player).PSendSysMessage
         (
             "ACHI|CA|%u;%i;%s;%i;%u;%u"
             , category->ID
@@ -3269,21 +3273,23 @@ void AchievementGlobalMgr::getAllCategories(WorldSession* session, uint32 versio
         );
     }
 
-    ChatHandler(session).PSendSysMessage("ACHI|CAV|1");
+    ChatHandler(player).PSendSysMessage("ACHI|CAV|1");
 }
 
-void AchievementGlobalMgr::getAllAchievements(WorldSession* session, uint32 version) const
+void AchievementMgr::GetAllAchievements(Player* player, uint32 version) const
 {
     if (!sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_ENABLED))
         return;
 
+    if (!player)
+        return;
+
 #ifdef ENABLE_MANGOSBOTS
-    Player* plr = session->GetPlayer();
-    if (!plr || !plr->isRealPlayer())
+    if (!player->isRealPlayer())
         return;
 #endif
 
-    if (version >= getCurrentVersion())
+    if (version >= GetCurrentVersion())
         return;
 
     const auto maxId = sAchievementStore.GetMaxEntry();
@@ -3295,14 +3301,14 @@ void AchievementGlobalMgr::getAllAchievements(WorldSession* session, uint32 vers
         if (!achievement)
             continue;
 
-        if (achievement->patch > getCurrentPatch())
+        if (achievement->patch > GetCurrentPatch())
             continue;
 
-        if ((achievement->requiredFaction == ACHIEVEMENT_FACTION_HORDE && session->GetPlayer()->GetTeamId() != TEAM_INDEX_HORDE) ||
-            (achievement->requiredFaction == ACHIEVEMENT_FACTION_ALLIANCE && session->GetPlayer()->GetTeamId() != TEAM_INDEX_ALLIANCE))
+        if ((achievement->requiredFaction == ACHIEVEMENT_FACTION_HORDE && player->GetTeamId() != TEAM_INDEX_HORDE) ||
+            (achievement->requiredFaction == ACHIEVEMENT_FACTION_ALLIANCE && player->GetTeamId() != TEAM_INDEX_ALLIANCE))
             continue;
 
-        const uint8 playerLocale = GetPlayerLocale(session);
+        const uint8 playerLocale = GetPlayerLocale(player->GetSession());
         const char* achievementName = achievement->GetName(playerLocale);
         const char* achievementDescription = achievement->GetDescription(playerLocale);
         const char* achievementTitleReward = achievement->GetTitleReward(playerLocale);
@@ -3311,7 +3317,7 @@ void AchievementGlobalMgr::getAllAchievements(WorldSession* session, uint32 vers
         const auto* description = std::strlen(achievementDescription) <= 2 ? "_" : achievementDescription;
         const auto* titleReward = std::strlen(achievementTitleReward) <= 2 ? "_" : achievementTitleReward;
 
-        ChatHandler(session).PSendSysMessage
+        ChatHandler(player).PSendSysMessage
         (
             "ACHI|AC|%u;%i;%i;%s;%s;%u;%u;%u;%i;%u;%s;%i;%u;%u;%u"
             , achievement->ID
@@ -3332,21 +3338,23 @@ void AchievementGlobalMgr::getAllAchievements(WorldSession* session, uint32 vers
         );
     }
 
-    ChatHandler(session).PSendSysMessage("ACHI|ACV|1");
+    ChatHandler(player).PSendSysMessage("ACHI|ACV|1");
 }
 
-void AchievementGlobalMgr::getAllCriteria(WorldSession* session, uint32 version) const
+void AchievementMgr::GetAllCriteria(Player* player, uint32 version) const
 {
     if (!sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_ENABLED))
         return;
 
+    if (!player)
+        return;
+
 #ifdef ENABLE_MANGOSBOTS
-    Player* plr = session->GetPlayer();
-    if (!plr || !plr->isRealPlayer())
+    if (!player->isRealPlayer())
         return;
 #endif
 
-    if (version >= getCurrentVersion())
+    if (version >= GetCurrentVersion())
         return;
 
     const auto maxId = sAchievementCriteriaStore.GetMaxEntry();
@@ -3358,10 +3366,10 @@ void AchievementGlobalMgr::getAllCriteria(WorldSession* session, uint32 version)
         if (!criteria)
             continue;
 
-        const char* criteriaName = criteria->GetName(GetPlayerLocale(session));
+        const char* criteriaName = criteria->GetName(GetPlayerLocale(player->GetSession()));
         const auto* name = std::strlen(criteriaName) <= 2 ? "_" : criteriaName;
 
-        ChatHandler(session).PSendSysMessage
+        ChatHandler(player).PSendSysMessage
         (
             "ACHI|CR|%u;%i;%i;%i;%i;%i;%i;%i;%i;%s;%i;%i;%i;%i;%i;%u;%u"
             , criteria->ID
@@ -3384,35 +3392,35 @@ void AchievementGlobalMgr::getAllCriteria(WorldSession* session, uint32 version)
         );
     }
 
-    ChatHandler(session).PSendSysMessage("ACHI|CRV|1");
+    ChatHandler(player).PSendSysMessage("ACHI|CRV|1");
 }
 
-void AchievementGlobalMgr::getCharacterCriteria(WorldSession* session) const 
+void AchievementMgr::GetCharacterCriteria(Player* player) const
 {
     if (!sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_ENABLED))
         return;
 
-    const auto playerGuid = session->GetPlayer()->GetGUIDLow();
-    Player* plr = session->GetPlayer();
+    if (!player)
+        return;
 
 #ifdef ENABLE_MANGOSBOTS
-    if (!plr || !plr->isRealPlayer())
+    if (!player->isRealPlayer())
         return;
 #endif
 
-    const AchievementMgr* aMgr = plr->GetAchievementMgr();
+    const PlayerAchievementMgr* aMgr = GetPlayerAchievementMgr(player);
     if(aMgr)
     {
         std::vector<uint32> sentCriterias;
-        std::unique_ptr<QueryResult> criteriaResult(CharacterDatabase.PQuery("SELECT `criteria`, `counter`, `date` FROM `character_achievement_progress` WHERE `guid` = '%u'", playerGuid));
+        std::unique_ptr<QueryResult> criteriaResult(CharacterDatabase.PQuery("SELECT `criteria`, `counter`, `date` FROM `character_achievement_progress` WHERE `guid` = '%u'", player->GetGUIDLow()));
         if (criteriaResult) 
         {
             do 
             {
-                Field* fields = criteriaResult->Fetch();
-                uint32 id      = fields[0].GetUInt16();
-                uint32 counter = fields[1].GetUInt32();
-                const auto  date    = time_t(fields[2].GetUInt32());
+                Field* fields   = criteriaResult->Fetch();
+                uint32 id       = fields[0].GetUInt16();
+                uint32 counter  = fields[1].GetUInt32();
+                const auto date = time_t(fields[2].GetUInt32());
 
                 AchievementCriteriaEntry const* criteria = sAchievementCriteriaStore.LookupEntry<AchievementCriteriaEntry>(id);
                 if (!criteria) 
@@ -3425,7 +3433,7 @@ void AchievementGlobalMgr::getCharacterCriteria(WorldSession* session) const
                     continue;
                 }
 
-                ChatHandler(session).PSendSysMessage
+                ChatHandler(player).PSendSysMessage
                 (
                     "ACHI|CH_CR|%u;%i;%u"
                     , id
@@ -3448,11 +3456,11 @@ void AchievementGlobalMgr::getCharacterCriteria(WorldSession* session) const
             if (!achievement)
                 continue;
 
-            if (achievement->patch > getCurrentPatch())
+            if (achievement->patch > GetCurrentPatch())
                 continue;
 
-            if ((achievement->requiredFaction == ACHIEVEMENT_FACTION_HORDE && session->GetPlayer()->GetTeamId() != TEAM_INDEX_HORDE) ||
-                (achievement->requiredFaction == ACHIEVEMENT_FACTION_ALLIANCE && session->GetPlayer()->GetTeamId() != TEAM_INDEX_ALLIANCE))
+            if ((achievement->requiredFaction == ACHIEVEMENT_FACTION_HORDE && player->GetTeamId() != TEAM_INDEX_HORDE) ||
+                (achievement->requiredFaction == ACHIEVEMENT_FACTION_ALLIANCE && player->GetTeamId() != TEAM_INDEX_ALLIANCE))
                 continue;
 
             // for achievement with referenced achievement criterias get from referenced and counter from self
@@ -3476,7 +3484,7 @@ void AchievementGlobalMgr::getCharacterCriteria(WorldSession* session) const
                     if (std::find(sentCriterias.begin(), sentCriterias.end(), achievementCriteria->ID) != sentCriterias.end())
                         continue;
 
-                    ChatHandler(session).PSendSysMessage
+                    ChatHandler(player).PSendSysMessage
                     (
                         "ACHI|CH_CR|%u;%i;%u"
                         , achievementCriteria->ID
@@ -3489,19 +3497,20 @@ void AchievementGlobalMgr::getCharacterCriteria(WorldSession* session) const
     }
 }
 
-void AchievementGlobalMgr::getCharacterAchievements(WorldSession* session) const 
+void AchievementMgr::GetCharacterAchievements(Player* player) const
 {
     if (!sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_ENABLED))
         return;
 
+    if (!player)
+        return;
+
 #ifdef ENABLE_MANGOSBOTS
-    Player* plr = session->GetPlayer();
-    if (!plr || !plr->isRealPlayer())
+    if (!player->isRealPlayer())
         return;
 #endif
 
-    const auto playerGuid = session->GetPlayer()->GetGUIDLow();
-    std::unique_ptr<QueryResult> achievementResult(CharacterDatabase.PQuery("SELECT `achievement`, `date` FROM `character_achievement` WHERE `guid` = '%u'", playerGuid));
+    std::unique_ptr<QueryResult> achievementResult(CharacterDatabase.PQuery("SELECT `achievement`, `date` FROM `character_achievement` WHERE `guid` = '%u'", player->GetGUIDLow()));
     if (achievementResult) 
     {
         do 
@@ -3518,7 +3527,7 @@ void AchievementGlobalMgr::getCharacterAchievements(WorldSession* session) const
             const auto date = time_t(fields[1].GetUInt32());
 
 
-            ChatHandler(session).PSendSysMessage
+            ChatHandler(player).PSendSysMessage
             (
                 "ACHI|CH_AC|%u;%u"
                 , achievementid
@@ -3530,18 +3539,12 @@ void AchievementGlobalMgr::getCharacterAchievements(WorldSession* session) const
     }
 }
 
-//AchievementGlobalMgr* AchievementGlobalMgr::instance()
-//{
-//    static AchievementGlobalMgr instance;
-//    return &instance;
-//}
-
-bool AchievementGlobalMgr::IsStatisticCriteria(AchievementCriteriaEntry const* achievementCriteria) const
+bool AchievementMgr::IsStatisticCriteria(AchievementCriteriaEntry const* achievementCriteria) const
 {
     return isStatisticAchievement(sAchievementStore.LookupEntry<AchievementEntry>(achievementCriteria->referredAchievement));
 }
 
-bool AchievementGlobalMgr::isStatisticAchievement(AchievementEntry const* achievement) const
+bool AchievementMgr::isStatisticAchievement(AchievementEntry const* achievement) const
 {
     if (!achievement)
         return false;
@@ -3565,7 +3568,7 @@ bool AchievementGlobalMgr::isStatisticAchievement(AchievementEntry const* achiev
     return false;
 }
 
-bool AchievementGlobalMgr::IsRealmCompleted(AchievementEntry const* achievement) const
+bool AchievementMgr::IsRealmCompleted(AchievementEntry const* achievement) const
 {
     auto itr = m_allCompletedAchievements.find(achievement->ID);
     if (itr == m_allCompletedAchievements.end())
@@ -3591,7 +3594,7 @@ bool AchievementGlobalMgr::IsRealmCompleted(AchievementEntry const* achievement)
     return true;
 }
 
-void AchievementGlobalMgr::SetRealmCompleted(AchievementEntry const* achievement)
+void AchievementMgr::SetRealmCompleted(AchievementEntry const* achievement)
 {
     if (IsRealmCompleted(achievement))
         return;
@@ -3600,7 +3603,7 @@ void AchievementGlobalMgr::SetRealmCompleted(AchievementEntry const* achievement
 }
 
 //==========================================================
-void AchievementGlobalMgr::LoadAchievementCriteriaList()
+void AchievementMgr::LoadAchievementCriteriaList()
 {
     uint32 oldMSTime = WorldTimer::getMSTime();
 
@@ -3748,7 +3751,7 @@ void AchievementGlobalMgr::LoadAchievementCriteriaList()
     sLog.outBasic(">> Loaded %u achievement criteria in %u ms", loaded, WorldTimer::getMSTimeDiff(oldMSTime, WorldTimer::getMSTime()));
 }
 
-void AchievementGlobalMgr::LoadAchievementReferenceList()
+void AchievementMgr::LoadAchievementReferenceList()
 {
     uint32 oldMSTime = WorldTimer::getMSTime();
 
@@ -3774,7 +3777,7 @@ void AchievementGlobalMgr::LoadAchievementReferenceList()
     sLog.outBasic(">> Loaded %u achievement references in %u ms", count, WorldTimer::getMSTimeDiff(oldMSTime, WorldTimer::getMSTime()));
 }
 
-void AchievementGlobalMgr::LoadAchievementCriteriaData()
+void AchievementMgr::LoadAchievementCriteriaData()
 {
     uint32 oldMSTime = WorldTimer::getMSTime();
 
@@ -3910,7 +3913,7 @@ void AchievementGlobalMgr::LoadAchievementCriteriaData()
     sLog.outBasic(">> Loaded %u additional achievement criteria data in %u ms", count, WorldTimer::getMSTimeDiff(oldMSTime, WorldTimer::getMSTime()));
 }
 
-void AchievementGlobalMgr::LoadCompletedAchievements()
+void AchievementMgr::LoadCompletedAchievements()
 {
     uint32 oldMSTime = WorldTimer::getMSTime();
 
@@ -3957,7 +3960,7 @@ void AchievementGlobalMgr::LoadCompletedAchievements()
     sLog.outBasic(">> Loaded %lu completed achievements in %u ms", (unsigned long)m_allCompletedAchievements.size(), WorldTimer::getMSTimeDiff(oldMSTime, WorldTimer::getMSTime()));
 }
 
-void AchievementGlobalMgr::LoadRewards()
+void AchievementMgr::LoadRewards()
 {
     uint32 oldMSTime = WorldTimer::getMSTime();
 
@@ -4080,7 +4083,7 @@ void AchievementGlobalMgr::LoadRewards()
     sLog.outBasic(">> Loaded %u achievement rewards in %u ms", count, WorldTimer::getMSTimeDiff(oldMSTime, WorldTimer::getMSTime()));
 }
 
-void AchievementGlobalMgr::LoadRewardLocales()
+void AchievementMgr::LoadRewardLocales()
 {
     uint32 oldMSTime = WorldTimer::getMSTime();
 
@@ -4120,7 +4123,7 @@ void AchievementGlobalMgr::LoadRewardLocales()
     sLog.outBasic(">> Loaded %lu Achievement Reward Locale strings in %u ms", (unsigned long)m_achievementRewardLocales.size(), WorldTimer::getMSTimeDiff(oldMSTime, WorldTimer::getMSTime()));
 }
 
-void AchievementGlobalMgr::LoadAllData()
+void AchievementMgr::LoadAllData()
 {
     if (!sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_ENABLED))
         return;
@@ -4139,12 +4142,12 @@ void AchievementGlobalMgr::LoadAllData()
     LoadCompletedAchievements();
 }
 
-AchievementEntry const* AchievementGlobalMgr::GetAchievement(uint32 achievementId) const
+AchievementEntry const* AchievementMgr::GetAchievement(uint32 achievementId) const
 {
     return sAchievementStore.LookupEntry<AchievementEntry>(achievementId);
 }
 
-uint8 AchievementGlobalMgr::GetPlayerLocale(WorldSession* session) const
+uint8 AchievementMgr::GetPlayerLocale(WorldSession* session) const
 {
     uint8 localeIndex = 0;
     if (session)
@@ -4187,6 +4190,224 @@ uint8 AchievementGlobalMgr::GetPlayerLocale(WorldSession* session) const
     }
 
     return localeIndex;
+}
+
+void AchievementMgr::OnPlayerAdded(Player* player)
+{
+    if (sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_ENABLED))
+    {
+        if (player)
+        {
+            // Create the player achievement manager
+            const uint32 playerId = player->GetObjectGuid().GetCounter();
+
+#ifdef ENABLE_MANGOSBOTS
+            // Check if randombots can use the achievement system
+            uint32 accId = GetSession()->GetAccountId();
+            if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_FOR_BOTS))
+                return nullptr;
+#endif
+            m_PlayerMgrs.insert(std::make_pair(playerId, PlayerAchievementMgr(player)));
+        }
+    }
+}
+
+void AchievementMgr::OnPlayerRemoved(Player* player)
+{
+    if (sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_ENABLED))
+    {
+        if (player)
+        {
+            // Delete the player achievement manager
+            const uint32 playerId = player->GetObjectGuid().GetCounter();
+            m_PlayerMgrs.erase(playerId);
+        }
+    }
+}
+
+void AchievementMgr::OnPlayerLoadedFromDB(Player* player, SqlQueryHolder* holder)
+{
+    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+    if (playerMgr)
+    {
+        playerMgr->LoadFromDB(holder);
+    }
+}
+
+void AchievementMgr::OnPlayerDeletedFromDB(uint32 playerId)
+{
+    PlayerAchievementMgr::DeleteFromDB(playerId);
+}
+
+void AchievementMgr::OnPlayerSavedToDB(Player* player)
+{
+    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+    if (playerMgr)
+    {
+        playerMgr->SaveToDB();
+    }
+}
+
+void AchievementMgr::UpdateAchievementCriteria(Player* player, AchievementCriteriaTypes type, uint32 miscValue1 /*= 0*/, uint32 miscValue2 /*= 0*/, Unit* unit /*= nullptr*/)
+{
+    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+    if (playerMgr)
+    {
+        playerMgr->UpdateAchievementCriteria(type, miscValue1, miscValue2, unit);
+    }
+}
+
+void AchievementMgr::StartTimedAchievement(Player* player, AchievementCriteriaTimedTypes type, uint32 entry, uint32 timeLost /*= 0*/)
+{
+    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+    if (playerMgr)
+    {
+        playerMgr->StartTimedAchievement(type, entry, timeLost);
+    }
+}
+
+void AchievementMgr::UpdateTimedAchievements(Player* player, const uint32 diff)
+{
+    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+    if (playerMgr)
+    {
+        playerMgr->UpdateTimedAchievements(diff);
+    }
+}
+
+void AchievementMgr::CheckAllAchievementCriteria(Player* player)
+{
+    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+    if (playerMgr)
+    {
+        playerMgr->CheckAllAchievementCriteria();
+    }
+}
+
+void AchievementMgr::ResetAchievementCriteria(Player* player, AchievementCriteriaCondition condition, uint32 value, bool evenIfCriteriaComplete /*= false*/)
+{
+    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+    if (playerMgr)
+    {
+        playerMgr->ResetAchievementCriteria(condition, value, evenIfCriteriaComplete);
+    }
+}
+
+void AchievementMgr::OnPlayerSpellAdded(Player* player, uint32 spellId)
+{
+    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+    if (playerMgr)
+    {
+        if (!player->GetSession()->PlayerLoading())
+        {
+            SkillLineAbilityMapBounds skill_bounds = sSpellMgr.GetSkillLineAbilityMapBoundsBySpellId(spellId);
+            for (SkillLineAbilityMap::const_iterator _spell_idx = skill_bounds.first; _spell_idx != skill_bounds.second; ++_spell_idx)
+            {
+                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LINE, _spell_idx->second->skillId);
+                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILLLINE_SPELLS, _spell_idx->second->skillId);
+            }
+
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL, spellId);
+        }
+    }
+}
+
+void AchievementMgr::OnPlayerDuelCompleted(Player* player, Player* opponent, DuelCompleteType type)
+{
+    if (type == DUEL_WON)
+    {
+        UpdateAchievementCriteria(player, ACHIEVEMENT_CRITERIA_TYPE_LOSE_DUEL, 1);
+        UpdateAchievementCriteria(opponent, ACHIEVEMENT_CRITERIA_TYPE_WIN_DUEL, 1);
+    }
+}
+
+void AchievementMgr::OnPlayerKilledMonsterCredit(Player* player, uint32 entry, ObjectGuid guid)
+{
+    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+    if (playerMgr)
+    {
+        Creature* killed = nullptr;
+        uint32 realEntry = entry;
+        if (guid)
+        {
+            killed = player->GetMap()->GetCreature(guid);
+            if (killed && killed->GetEntry())
+            {
+                realEntry = killed->GetEntry();
+            }
+        }
+
+        playerMgr->StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_CREATURE, realEntry);
+        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, realEntry, 1, killed);
+    }
+}
+
+void AchievementMgr::OnPlayerRewardSinglePlayerAtKill(Player* player, Unit* victim)
+{
+    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+    if (playerMgr)
+    {
+        if (victim && victim->IsCreature() && !player->InBattleGround() && (!player->GetGroup() || player->IsAlive() || !player->GetCorpse()))
+        {
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE_TYPE, victim->GetCreatureType(), 1, victim);
+        }
+    }
+}
+
+void AchievementMgr::OnPlayerHandleFall(Player* player, float zDiff)
+{
+    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+    if (playerMgr)
+    {
+        if (player->IsAlive())
+        {
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_FALL_WITHOUT_DYING, uint32(zDiff * 100));
+        }
+    }
+}
+
+PlayerAchievementMgr* AchievementMgr::GetPlayerAchievementMgr(Player* player)
+{
+    if (sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_ENABLED))
+    {
+        PlayerAchievementMgr* playerMgr = nullptr;
+        if (player)
+        {
+            const uint32 playerId = player->GetObjectGuid().GetCounter();
+            auto playerMgrIt = m_PlayerMgrs.find(playerId);
+            if (playerMgrIt != m_PlayerMgrs.end())
+            {
+                playerMgr = &playerMgrIt->second;
+            }
+        }
+
+        MANGOS_ASSERT(playerMgr);
+        return playerMgr;
+    }
+
+    return nullptr;
+}
+
+const PlayerAchievementMgr* AchievementMgr::GetPlayerAchievementMgr(const Player* player) const
+{
+    if (sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_ENABLED))
+    {
+        const PlayerAchievementMgr* playerMgr = nullptr;
+        if (player)
+        {
+            const uint32 playerId = player->GetObjectGuid().GetCounter();
+            auto playerMgrIt = m_PlayerMgrs.find(playerId);
+            if (playerMgrIt != m_PlayerMgrs.end())
+            {
+                playerMgr = &playerMgrIt->second;
+            }
+        }
+
+        MANGOS_ASSERT(playerMgr);
+        return playerMgr;
+    }
+
+    return nullptr;
 }
 
 const char* AchievementEntry::GetName(uint32 locale) const

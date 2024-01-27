@@ -959,15 +959,15 @@ class Unit;
 class Player;
 class WorldPacket;
 
-class AchievementMgr
+class PlayerAchievementMgr
 {
 public:
-    explicit AchievementMgr(Player* player);
-    ~AchievementMgr();
+    explicit PlayerAchievementMgr(Player* player);
+    ~PlayerAchievementMgr();
 
     void Reset();
     static void DeleteFromDB(uint32 lowguid);
-    void LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder);
+    void LoadFromDB(SqlQueryHolder* holder);
     void SaveToDB();
     // void LoadFromDB(PreparedQueryResult achievementResult, PreparedQueryResult criteriaResult);
     // void SaveToDB(CharacterDatabaseTransaction trans);
@@ -985,10 +985,11 @@ public:
 
     void RemoveCriteriaProgress(AchievementCriteriaEntry const* entry);
 
-    bool HasAchiever() const { return m_hasAchiever; }
-    void EnableAchiever(uint32 version);
+    bool HasAddon() const { return m_hasAchiever; }
+    void EnableAddon(uint32 version);
     uint32 GetVersion() { return m_version; }
 
+    bool AddAchievement(uint32 achievementId);
     bool AddAchievement(const AchievementEntry* entry);
     bool RemoveAchievement(const AchievementEntry* entry);
 
@@ -1017,32 +1018,30 @@ private:
     uint32 m_version;
 };
 
-class AchievementGlobalMgr
+class AchievementMgr
 {
 public:
-    AchievementGlobalMgr() {}
-    ~AchievementGlobalMgr() {} //= default;
+    AchievementMgr() {}
+    ~AchievementMgr() {} //= default;
 
-    //static AchievementGlobalMgr* instance();
-
-    static uint32 getCurrentPatch() { return uint32(0); }
-    static uint32 getCurrentVersion() { return uint32(1); }
+    static uint32 GetCurrentPatch() { return uint32(0); }
+    static uint32 GetCurrentVersion() { return uint32(1); }
 
     bool IsStatisticCriteria(AchievementCriteriaEntry const* achievementCriteria) const;
     bool isStatisticAchievement(AchievementEntry const* achievement) const;
 
-    void getAllCategories(WorldSession* session, uint32 version) const;
-    void getAllAchievements(WorldSession* session, uint32 version) const;
-    void getAllCriteria(WorldSession* session, uint32 version) const;
+    void GetAllCategories(Player* player, uint32 version) const;
+    void GetAllAchievements(Player* player, uint32 version) const;
+    void GetAllCriteria(Player* player, uint32 version) const;
 
-    void getCharacterCriteria(WorldSession* session) const;
-    void getCharacterAchievements(WorldSession* session) const;
+    void GetCharacterCriteria(Player* player) const;
+    void GetCharacterAchievements(Player* player) const;
 
-    bool hasAchiever(WorldSession* session) const;
-    void enableAchiever(WorldSession* session, uint32 version) const;
+    bool HasAddon(Player* player) const;
+    void EnableAddon(Player* player, uint32 version);
 
-    bool AddAchievement(WorldSession* session, uint32 achievementId);
-    bool RemoveAchievement(WorldSession* session, uint32 achievementId);
+    bool AddAchievement(Player* player, uint32 achievementId);
+    bool RemoveAchievement(Player* player, uint32 achievementId);
 
     [[nodiscard]] AchievementCriteriaEntryList const* GetAchievementCriteriaByType(AchievementCriteriaTypes type) const
     {
@@ -1114,6 +1113,33 @@ public:
 private:
     uint8 GetPlayerLocale(WorldSession* session) const;
 
+public:
+    // Player wrapper methods
+    void OnPlayerAdded(Player* player);
+    void OnPlayerRemoved(Player* player);
+
+    void OnPlayerLoadedFromDB(Player* player, SqlQueryHolder* holder);
+    void OnPlayerDeletedFromDB(uint32 playerId);
+    void OnPlayerSavedToDB(Player* player);
+
+    void UpdateAchievementCriteria(Player* player, AchievementCriteriaTypes type, uint32 miscValue1 = 0, uint32 miscValue2 = 0, Unit* unit = nullptr);
+    
+    void StartTimedAchievement(Player* player, AchievementCriteriaTimedTypes type, uint32 entry, uint32 timeLost = 0);
+    void UpdateTimedAchievements(Player* player, const uint32 diff);
+
+    void CheckAllAchievementCriteria(Player* player);
+    void ResetAchievementCriteria(Player* player, AchievementCriteriaCondition condition, uint32 value, bool evenIfCriteriaComplete = false);
+
+    void OnPlayerSpellAdded(Player* player, uint32 spellId);
+    void OnPlayerDuelCompleted(Player* player, Player* opponent, DuelCompleteType type);
+    void OnPlayerKilledMonsterCredit(Player* player, uint32 entry, ObjectGuid guid);
+    void OnPlayerRewardSinglePlayerAtKill(Player* player, Unit* victim);
+    void OnPlayerHandleFall(Player* player, float zDiff);
+
+private:
+    PlayerAchievementMgr* GetPlayerAchievementMgr(Player* player);
+    const PlayerAchievementMgr* GetPlayerAchievementMgr(const Player* player) const;
+
 private:
     AchievementCriteriaDataMap m_criteriaDataMap;
 
@@ -1131,12 +1157,12 @@ private:
     AchievementRewards m_achievementRewards;
     AchievementRewardLocales m_achievementRewardLocales;
 
-    // pussywizard:
     std::map<uint32, AchievementCriteriaEntryList> m_SpecialList[ACHIEVEMENT_CRITERIA_TYPE_TOTAL];
     std::map<uint32, AchievementCriteriaEntryList> m_AchievementCriteriasByCondition[ACHIEVEMENT_CRITERIA_CONDITION_TOTAL];
+
+    std::map<uint32, PlayerAchievementMgr> m_PlayerMgrs;
 };
 
-//MaNGOS::Singleton<AchievementGlobalMgr>::Instance()
-#define sAchievementMgr MaNGOS::Singleton<AchievementGlobalMgr>::Instance()
+#define sAchievementMgr MaNGOS::Singleton<AchievementMgr>::Instance()
 
 #endif

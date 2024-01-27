@@ -1337,13 +1337,13 @@ public:
     // After complete global acvievement
     virtual void SetRealmCompleted(AchievementEntry const* /*achievement*/) { }
 
-    [[nodiscard]] virtual bool IsCompletedCriteria(AchievementMgr* /*mgr*/, AchievementCriteriaEntry const* /*achievementCriteria*/, AchievementEntry const* /*achievement*/, CriteriaProgress const* /*progress*/) { return true; }
+    [[nodiscard]] virtual bool IsCompletedCriteria(PlayerAchievementMgr* /*mgr*/, AchievementCriteriaEntry const* /*achievementCriteria*/, AchievementEntry const* /*achievement*/, CriteriaProgress const* /*progress*/) { return true; }
 
-    [[nodiscard]] virtual bool IsRealmCompleted(AchievementGlobalMgr const* /*globalmgr*/, AchievementEntry const* /*achievement*/, std::chrono::system_clock::time_point /*completionTime*/) { return true; }
+    [[nodiscard]] virtual bool IsRealmCompleted(AchievementMgr const* /*globalmgr*/, AchievementEntry const* /*achievement*/, std::chrono::system_clock::time_point /*completionTime*/) { return true; }
 
-    virtual void OnBeforeCheckCriteria(AchievementMgr* /*mgr*/, AchievementCriteriaEntryList const* /*achievementCriteriaList*/) { }
+    virtual void OnBeforeCheckCriteria(PlayerAchievementMgr* /*mgr*/, AchievementCriteriaEntryList const* /*achievementCriteriaList*/) { }
 
-    [[nodiscard]] virtual bool CanCheckCriteria(AchievementMgr* /*mgr*/, AchievementCriteriaEntry const* /*achievementCriteria*/) { return true; }
+    [[nodiscard]] virtual bool CanCheckCriteria(PlayerAchievementMgr* /*mgr*/, AchievementCriteriaEntry const* /*achievementCriteria*/) { return true; }
 };
 
 // class PetScript : public AchievementScriptObject
@@ -1884,10 +1884,10 @@ public: /* PlayerScript */
 public: /* AchievementScript */
 
         void SetRealmCompleted(AchievementEntry const* achievement);
-        bool IsCompletedCriteria(AchievementMgr* mgr, AchievementCriteriaEntry const* achievementCriteria, AchievementEntry const* achievement, CriteriaProgress const* progress);
-        bool IsRealmCompleted(AchievementGlobalMgr const* globalmgr, AchievementEntry const* achievement, std::chrono::system_clock::time_point completionTime);
-        void OnBeforeCheckCriteria(AchievementMgr* mgr, AchievementCriteriaEntryList const* achievementCriteriaList);
-        bool CanCheckCriteria(AchievementMgr* mgr, AchievementCriteriaEntry const* achievementCriteria);
+        bool IsCompletedCriteria(PlayerAchievementMgr* mgr, AchievementCriteriaEntry const* achievementCriteria, AchievementEntry const* achievement, CriteriaProgress const* progress);
+        bool IsRealmCompleted(AchievementMgr const* globalmgr, AchievementEntry const* achievement, std::chrono::system_clock::time_point completionTime);
+        void OnBeforeCheckCriteria(PlayerAchievementMgr* mgr, AchievementCriteriaEntryList const* achievementCriteriaList);
+        bool CanCheckCriteria(PlayerAchievementMgr* mgr, AchievementCriteriaEntry const* achievementCriteria);
 
     // public: /* PetScript */
 
