@@ -1125,6 +1125,7 @@ private:
 public:
     // Battleground wrapper methods
     void StartTimedAchievement(BattleGround* bg, AchievementCriteriaTimedTypes type, uint32 entry);
+    int32 GetTeamScore(BattleGround* bg, PvpTeamIndex team) const;
 
 private:
     AchievementCriteriaDataMap m_criteriaDataMap;

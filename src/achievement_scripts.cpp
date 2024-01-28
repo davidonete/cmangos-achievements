@@ -8,7 +8,21 @@ public:
     bool OnCheck(Player* source, Unit* /*target*/, uint32 /*criteria_id*/) override
     {
         BattleGround* bg = source->GetBattleGround();
-        return bg && bg->GetTypeId() == BATTLEGROUND_AB && reinterpret_cast<BattleGroundAB*>(bg)->IsTeamScores500Disadvantage(source->GetTeamId());
+        if (bg)
+        {
+            if (bg->GetTypeId() == BATTLEGROUND_AB)
+            {
+                const PvpTeamIndex team = source->GetTeamId();
+                if (team != TEAM_INDEX_NEUTRAL)
+                {
+                    const uint32 teamScore = sAchievementsMgr.GetTeamScore(bg, team);
+                    const uint32 otherTeamScore = sAchievementsMgr.GetTeamScore(bg, BattleGround::GetOtherTeamIndex(team));
+                    return teamScore > (otherTeamScore + 500);
+                }
+            }
+        }
+
+        return false;
     }
 };
 
@@ -20,7 +34,19 @@ public:
     bool OnCheck(Player* source, Unit* /*target*/, uint32 /*criteria_id*/) override
     {
         BattleGround* bg = source->GetBattleGround();
-        return bg && bg->AllNodesConrolledByTeam(source->GetTeamId());
+        if (bg)
+        {
+            if (bg->GetTypeId() == BATTLEGROUND_AB)
+            {
+                const PvpTeamIndex team = source->GetTeamId();
+                return bg->GetBgMap()->GetVariableManager().GetVariable(team == TEAM_INDEX_ALLIANCE ? BG_AB_OP_OCCUPIED_BASES_ALLY : BG_AB_OP_OCCUPIED_BASES_HORDE) == BG_AB_MAX_NODES;
+            }
+
+            // TO DO: Add other bg types
+            // ...
+        }
+
+        return false;
     }
 };
 

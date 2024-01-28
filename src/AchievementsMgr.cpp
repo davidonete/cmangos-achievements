@@ -537,11 +537,13 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_BG_LOSS_TEAM_SCORE:
         {
             BattleGround* bg = source->GetBattleGround();
-            if (!bg)
-                return false;
+            if (bg)
+            {
+                const uint32 score = sAchievementsMgr.GetTeamScore(bg, source->GetTeamId());
+                return score >= bg_loss_team_score.min_score && score <= bg_loss_team_score.max_score;
+            }
 
-            uint32 score = bg->GetTeamScore(source->GetTeamId());
-            return score >= bg_loss_team_score.min_score && score <= bg_loss_team_score.max_score;
+            return false;
         }
 
         // TODO: research instance scripts
@@ -620,8 +622,8 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
 
             const PvpTeamIndex winnerTeamIndex = winnerTeam == WINNER_ALLIANCE ? TEAM_INDEX_ALLIANCE : TEAM_INDEX_HORDE;
             const PvpTeamIndex loserTeamIndex = winnerTeam == WINNER_ALLIANCE ? TEAM_INDEX_HORDE : TEAM_INDEX_ALLIANCE;
-            uint32 winnnerScore = bg->GetTeamScore(winnerTeamIndex);
-            uint32 loserScore = bg->GetTeamScore(loserTeamIndex);
+            uint32 winnnerScore = sAchievementsMgr.GetTeamScore(bg, winnerTeamIndex);
+            uint32 loserScore = sAchievementsMgr.GetTeamScore(bg, loserTeamIndex);
             return source->GetTeamId() == winnerTeamIndex && winnnerScore == teams_scores.winner_score && loserScore == teams_scores.loser_score;
         }
 
@@ -4732,6 +4734,30 @@ void AchievementsMgr::StartTimedAchievement(BattleGround* bg, AchievementCriteri
             StartTimedAchievement(player, type, entry);
         }
     }
+}
+
+int32 AchievementsMgr::GetTeamScore(BattleGround* bg, PvpTeamIndex team) const
+{
+    if (bg)
+    {
+        if (bg->GetTypeId() == BATTLEGROUND_AB)
+        {
+            return bg->GetBgMap()->GetVariableManager().GetVariable(team == TEAM_INDEX_ALLIANCE ? BG_AB_OP_RESOURCES_ALLY : BG_AB_OP_RESOURCES_HORDE);
+        }
+        else if (bg->GetTypeId() == BATTLEGROUND_AV)
+        {
+            return bg->GetBgMap()->GetVariableManager().GetVariable(team == TEAM_INDEX_ALLIANCE ? BG_AV_STATE_SCORE_A : BG_AV_STATE_SCORE_H);
+        }
+        else if (bg->GetTypeId() == BATTLEGROUND_WS)
+        {
+            return bg->GetBgMap()->GetVariableManager().GetVariable(team == TEAM_INDEX_ALLIANCE ? BG_WS_STATE_CAPTURES_ALLIANCE : BG_WS_STATE_CAPTURES_HORDE);
+        }
+
+        // TO DO: Add other bg types
+        // ...
+    }
+    
+    return 0;
 }
 
 void AchievementsMgr::UpdateTimedAchievements(Player* player, const uint32 diff)
