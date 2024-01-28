@@ -1096,10 +1096,9 @@ private:
 
 public:
     // Player wrapper methods
-    void OnPlayerLogin(Player* player);
+    void OnPlayerLogin(Player* player, SqlQueryHolder* holder);
     void OnPlayerLogout(Player* player);
 
-    void OnPlayerLoadedFromDB(Player* player, SqlQueryHolder* holder);
     void OnPlayerDeletedFromDB(uint32 playerId);
     void OnPlayerSavedToDB(Player* player);
 

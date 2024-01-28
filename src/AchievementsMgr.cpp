@@ -4624,7 +4624,7 @@ uint8 AchievementsMgr::GetPlayerLocale(WorldSession* session) const
     return localeIndex;
 }
 
-void AchievementsMgr::OnPlayerLogin(Player* player)
+void AchievementsMgr::OnPlayerLogin(Player* player, SqlQueryHolder* holder)
 {
     if (sAchievementsConfig.enabled)
     {
@@ -4640,7 +4640,13 @@ void AchievementsMgr::OnPlayerLogin(Player* player)
                 return;
 #endif
             auto pair = m_PlayerMgrs.insert(std::make_pair(playerId, PlayerAchievementMgr(player)));
-            pair.first->second.UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_ON_LOGIN, 1);
+            
+            // Load the player achievements
+            PlayerAchievementMgr* playerMgr = &pair.first->second;
+            playerMgr->LoadFromDB(holder);
+
+            // Update all the achievements after login
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_ON_LOGIN, 1);
         }
     }
 }
@@ -4655,15 +4661,6 @@ void AchievementsMgr::OnPlayerLogout(Player* player)
             const uint32 playerId = player->GetObjectGuid().GetCounter();
             m_PlayerMgrs.erase(playerId);
         }
-    }
-}
-
-void AchievementsMgr::OnPlayerLoadedFromDB(Player* player, SqlQueryHolder* holder)
-{
-    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
-    if (playerMgr)
-    {
-        playerMgr->LoadFromDB(holder);
     }
 }
 
