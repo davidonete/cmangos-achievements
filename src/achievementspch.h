@@ -39,5 +39,5 @@
 #include "GameEventMgr.h"
 #include "World.h"
 
-#include "src/AchievementMgr.h"
-#include "src/AchievementScriptMgr.h"
+#include "AchievementMgr.h"
+#include "AchievementScriptMgr.h"

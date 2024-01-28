@@ -19,18 +19,18 @@
 set(LIBRARY_NAME Achievements)
 
 #Add PCH Files
-set(achievements_PCH "${CMAKE_CURRENT_SOURCE_DIR}/achievementspch.h")
+set(achievements_PCH "${CMAKE_CURRENT_SOURCE_DIR}/src/achievementspch.h")
 if(PCH)
-    LIST(APPEND achievements_PCH "${CMAKE_CURRENT_SOURCE_DIR}/achievementspch.cpp")
+    LIST(APPEND achievements_PCH "${CMAKE_CURRENT_SOURCE_DIR}/src/achievementspch.cpp")
 endif()
 
 #Base files
-file(GLOB Achievements_Source ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
-    source_group("Achievements" FILES ${Achievements_Source})
+file(GLOB achievements_source ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
+    source_group("Achievements" FILES ${achievements_source})
 
 #Define base source library
 set(LIBRARY_SRCS
-    ${Achievements_Source}
+    ${achievements_source}
     ${achievements_PCH}
 )
 
@@ -138,9 +138,9 @@ if(PCH)
 		ADD_CXX_PCH(Achievements ${achievements_PCH})
 	elseif (MSVC)
 		set(PCHBaseName "pchdef")
-		set(PrecompiledBinary "${CMAKE_CURRENT_SOURCE_DIR}/achievementspch.pch")
-		set(PrecompiledHeader "${CMAKE_CURRENT_SOURCE_DIR}/achievementspch.h")
-		set(PrecompiledSource "${CMAKE_CURRENT_SOURCE_DIR}/achievementspch.cpp")
+		set(PrecompiledBinary "${CMAKE_CURRENT_SOURCE_DIR}/src/achievementspch.pch")
+		set(PrecompiledHeader "${CMAKE_CURRENT_SOURCE_DIR}/src/achievementspch.h")
+		set(PrecompiledSource "${CMAKE_CURRENT_SOURCE_DIR}/src/achievementspch.cpp")
 		set_target_properties(${LIBRARY_NAME} PROPERTIES COMPILE_FLAGS " /Yu\"${PrecompiledHeader}\" /FI\"${PrecompiledHeader}\" /Fp\"${PrecompiledBinary}\" /bigobj")
 		set_source_files_properties(${PrecompiledSource} PROPERTIES COMPILE_FLAGS "/Yc\"${PrecompiledHeader}\" /Fp\"${PrecompiledBinary}\"")
 		set_target_properties(${LIBRARY_NAME} PROPERTIES PROJECT_LABEL "Achievements")
