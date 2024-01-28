@@ -712,11 +712,8 @@ void PlayerAchievementMgr::ResetAchievementCriteria(AchievementCriteriaCondition
 void PlayerAchievementMgr::DeleteFromDB(uint32 lowguid)
 {
     CharacterDatabase.BeginTransaction();
-
     CharacterDatabase.PExecute("DELETE FROM `character_achievement` WHERE `guid` = '%u'", lowguid);
-
     CharacterDatabase.PExecute("DELETE FROM `character_achievement_progress` WHERE `guid` = '%u'", lowguid);
-
     CharacterDatabase.CommitTransaction();
 }
 
@@ -728,7 +725,8 @@ void PlayerAchievementMgr::SyncAccountAcchievements()
 #endif
 
     // Check if its a new character
-    if (GetPlayer()->GetTotalPlayedTime() == 0)
+    const bool newCharacter = GetPlayer()->GetTotalPlayedTime() == 0;
+    if (newCharacter)
     {
         // Copy other characters achievements into this character
         const uint8 newCharacterRace = GetPlayer()->getRace();
@@ -791,30 +789,30 @@ void PlayerAchievementMgr::SyncAccountAcchievements()
     }
     else
     {
-        // Copy the character achievement to other characters in the account
-        std::vector<std::pair<uint32, bool>> accountCharacterGuids;
-        const uint32 currentCharacterGuid = GetPlayer()->GetGUIDLow();
-        const uint32 accountId = GetPlayer()->GetSession()->GetAccountId();
-        auto result = CharacterDatabase.PQuery("SELECT guid, race FROM `characters` WHERE `account` = '%u'", accountId);
-        if (result)
-        {
-            do
-            {
-                Field* fields = result->Fetch();
-                const uint32 characterGuid = fields[0].GetUInt32();
-                const uint8 characterRace = fields[1].GetUInt8();
-                if (characterGuid != currentCharacterGuid)
-                {
-                    const bool isAlliance = characterRace == 1 || characterRace == 3 || characterRace == 4 || characterRace == 7 || characterRace == 11;
-                    accountCharacterGuids.push_back(std::make_pair(characterGuid, isAlliance));
-                }
-            } 
-            while (result->NextRow());
-        }
-
         // Sync earned achievements
         if (!m_completedAchievements.empty())
         {
+            // Copy the character achievement to other characters in the account
+            std::vector<std::pair<uint32, bool>> accountCharacterGuids;
+            const uint32 currentCharacterGuid = GetPlayer()->GetGUIDLow();
+            const uint32 accountId = GetPlayer()->GetSession()->GetAccountId();
+            auto result = CharacterDatabase.PQuery("SELECT guid, race FROM `characters` WHERE `account` = '%u'", accountId);
+            if (result)
+            {
+                do
+                {
+                    Field* fields = result->Fetch();
+                    const uint32 characterGuid = fields[0].GetUInt32();
+                    const uint8 characterRace = fields[1].GetUInt8();
+                    if (characterGuid != currentCharacterGuid)
+                    {
+                        const bool isAlliance = characterRace == 1 || characterRace == 3 || characterRace == 4 || characterRace == 7 || characterRace == 11;
+                        accountCharacterGuids.push_back(std::make_pair(characterGuid, isAlliance));
+                    }
+                } 
+                while (result->NextRow());
+            }
+
             for (CompletedAchievementMap::iterator iter = m_completedAchievements.begin(); iter != m_completedAchievements.end(); ++iter)
             {
                 const AchievementEntry* achievement = sAchievementStore.LookupEntry<AchievementEntry>(iter->first);
