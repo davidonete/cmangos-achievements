@@ -27,14 +27,14 @@ bool AchievementsConfig::Initialize()
         return false;
     }
 
-    enabled = config.GetBoolDefault("Immersive.Enable", false);
-    sendMessage = config.GetBoolDefault("Immersive.SendMessage", false);
-    sendAddon = config.GetBoolDefault("Immersive.SendAddon", false);
-    sendVisual = config.GetBoolDefault("Immersive.SendVisual", false);
-    randomBots = config.GetBoolDefault("Immersive.RandomBots", false);
-    randomBotsRealmFirst = config.GetBoolDefault("Immersive.RandomBotsRealmFirst", false);
-    accountAchievements = config.GetBoolDefault("Immersive.AccountAchievenemts", false);
-    effectId = config.GetIntDefault("Immersive.EffectId", 0);
+    enabled = config.GetBoolDefault("Achievements.Enable", false);
+    sendMessage = config.GetBoolDefault("Achievements.SendMessage", false);
+    sendAddon = config.GetBoolDefault("Achievements.SendAddon", false);
+    sendVisual = config.GetBoolDefault("Achievements.SendVisual", false);
+    randomBots = config.GetBoolDefault("Achievements.RandomBots", false);
+    randomBotsRealmFirst = config.GetBoolDefault("Achievements.RandomBotsRealmFirst", false);
+    accountAchievements = config.GetBoolDefault("Achievements.AccountAchievenemts", false);
+    effectId = config.GetIntDefault("Achievements.EffectId", 0);
 
     sLog.outString("Achievements configuration loaded");
     return true;
