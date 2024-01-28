@@ -2548,12 +2548,12 @@ bool PlayerAchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* a
 
 #ifdef ENABLE_MANGOSBOTS
         uint32 accId = GetPlayer()->GetSession()->GetAccountId();
-        if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_REALM_FIRST_FOR_BOTS))
+        if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !sAchievementsConfig.randomBotsRealmFirst)
             return false;
 #endif
     }
 
-    // pussywizard: progress will be deleted after getting the achievement (optimization)
+    // progress will be deleted after getting the achievement (optimization)
     // finished achievement should indicate criteria completed, since not finding progress would start some timed achievements and probably other things
     if (HasAchieved(achievement->ID))
     {
@@ -3216,7 +3216,7 @@ void PlayerAchievementMgr::CompletedAchievement(AchievementEntry const* achievem
 
     sAchievementScriptMgr.OnAchievementComplete(GetPlayer(), achievement);
 
-    // pussywizard: set all progress counters to 0, so progress will be deleted from db during save
+    // set all progress counters to 0, so progress will be deleted from db during save
     {
         bool allRefsCompleted = true;
         uint32 achiCheckId = achievement->refAchievement ? achievement->refAchievement : achievement->ID;
