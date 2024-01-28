@@ -1,21 +1,10 @@
 #ifndef _ACHIEVEMENT_MGR_H
 #define _ACHIEVEMENT_MGR_H
 
-//#include "SharedDefines.h"
-
 #include <map>
 #include <unordered_map>
 #include <string>
 #include <chrono>
-
-//#include "Common.h"
-// #include "DatabaseEnv.h"
-//#include "DBCEnums.h"
-//#include "DBCStores.h"
-//#include "ObjectGuid.h"
-//#include "Database/SQLStorage.h"
-//#include "Map.h"
-//#include "Policies/Singleton.h"
 
 extern SQLStorage sAchievementCriteriaStore;
 extern SQLStorage sAchievementStore;
@@ -24,15 +13,9 @@ extern SQLStorage sAchievementCategoryStore;
 enum Difficulty
 {
     REGULAR_DIFFICULTY           = 0,
-
     DUNGEON_DIFFICULTY_NORMAL    = 0,
-    // DUNGEON_DIFFICULTY_HEROIC    = 1,
-    // DUNGEON_DIFFICULTY_EPIC      = 2,
-
     RAID_DIFFICULTY_25MAN_NORMAL = 0,
     RAID_DIFFICULTY_40MAN_NORMAL = 1,
-    // RAID_DIFFICULTY_10MAN_HEROIC = 2,
-    // RAID_DIFFICULTY_25MAN_HEROIC = 3,
 };
 
 #define MAX_DUNGEON_DIFFICULTY     0
@@ -208,7 +191,6 @@ enum AchievementCategory
 {
     CATEGORY_CHILDRENS_WEEK     = 163,
 };
-
 
 //// GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some platform
 #if defined(__GNUC__)
@@ -918,7 +900,8 @@ struct AchievementCriteriaDataSet
     typedef std::vector<AchievementCriteriaData> Storage;
     void Add(AchievementCriteriaData const& data) { storage.push_back(data); }
     bool Meets(Player const* source, Unit const* target, uint32 miscvalue = 0) const;
-    void SetCriteriaId(uint32 id) {criteria_id = id;}
+    void SetCriteriaId(uint32 id) { criteria_id = id; }
+
 private:
     uint32 criteria_id{0};
     Storage storage;
@@ -969,8 +952,6 @@ public:
     static void DeleteFromDB(uint32 lowguid);
     void LoadFromDB(SqlQueryHolder* holder);
     void SaveToDB();
-    // void LoadFromDB(PreparedQueryResult achievementResult, PreparedQueryResult criteriaResult);
-    // void SaveToDB(CharacterDatabaseTransaction trans);
     void ResetAchievementCriteria(AchievementCriteriaCondition condition, uint32 value, bool evenIfCriteriaComplete = false);
     void UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscValue1 = 0, uint32 miscValue2 = 0, Unit* unit = nullptr);
     void CompletedAchievement(AchievementEntry const* entry);
@@ -1003,7 +984,6 @@ private:
     bool IsCompletedCriteria(AchievementCriteriaEntry const* achievementCriteria, AchievementEntry const* achievement);
     bool IsCompletedAchievement(AchievementEntry const* entry);
     bool CanUpdateCriteria(AchievementCriteriaEntry const* criteria, AchievementEntry const* achievement);
-    // void BuildAllDataPacket(WorldPacket* data) const;
 
     uint8 GetPlayerLocale() const;
     void SyncAccountAcchievements();
@@ -1018,11 +998,11 @@ private:
     uint32 m_version;
 };
 
-class AchievementMgr
+class AchievementsMgr
 {
 public:
-    AchievementMgr() {}
-    ~AchievementMgr() {} //= default;
+    AchievementsMgr() {}
+    ~AchievementsMgr() {}
 
     static uint32 GetCurrentPatch() { return uint32(0); }
     static uint32 GetCurrentVersion() { return uint32(1); }
@@ -1168,6 +1148,6 @@ private:
     std::map<uint32, PlayerAchievementMgr> m_PlayerMgrs;
 };
 
-#define sAchievementMgr MaNGOS::Singleton<AchievementMgr>::Instance()
+#define sAchievementsMgr MaNGOS::Singleton<AchievementsMgr>::Instance()
 
 #endif
