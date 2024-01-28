@@ -4549,12 +4549,18 @@ void AchievementsMgr::LoadRewardLocales()
     sLog.outBasic(">> Loaded %lu Achievement Reward Locale strings in %u ms", (unsigned long)m_achievementRewardLocales.size(), WorldTimer::getMSTimeDiff(oldMSTime, WorldTimer::getMSTime()));
 }
 
-void AchievementsMgr::LoadAllData()
+void AchievementsMgr::Init()
 {
+    sAchievementsConfig.Initialize();
+
     if (!sAchievementsConfig.enabled)
         return;
 
     sLog.outString("Loading Achievements...");
+    sAchievementStore.Load();
+    sAchievementCategoryStore.Load();
+    sAchievementCriteriaStore.Load();
+
     LoadAchievementReferenceList();
     sLog.outString("Loading Achievement Criteria Lists...");
     LoadAchievementCriteriaList();

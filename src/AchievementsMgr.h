@@ -1080,17 +1080,18 @@ public:
     bool IsRealmCompleted(AchievementEntry const* achievement) const;
     void SetRealmCompleted(AchievementEntry const* achievement);
 
+    void Init();
+
+    [[nodiscard]] AchievementEntry const* GetAchievement(uint32 achievementId) const;
+
+private:
     void LoadAchievementCriteriaList();
     void LoadAchievementCriteriaData();
     void LoadAchievementReferenceList();
     void LoadCompletedAchievements();
     void LoadRewards();
     void LoadRewardLocales();
-    void LoadAllData();
 
-    [[nodiscard]] AchievementEntry const* GetAchievement(uint32 achievementId) const;
-
-private:
     uint8 GetPlayerLocale(WorldSession* session) const;
 
 public:
