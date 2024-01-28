@@ -1240,7 +1240,7 @@ void PlayerAchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes ty
 
 #ifdef ENABLE_MANGOSBOTS
     uint32 accId = GetPlayer()->GetSession()->GetAccountId();
-    if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_FOR_BOTS))
+    if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !sAchievementsConfig.randomBots)
         return;
 #endif
 
@@ -4633,7 +4633,7 @@ void AchievementsMgr::OnPlayerCharacterCreated(Player* player)
 #ifdef ENABLE_MANGOSBOTS
             // Check if randombots can use the achievement system
             uint32 accId = player->GetSession()->GetAccountId();
-            if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_FOR_BOTS))
+            if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !sAchievementsConfig.randomBots)
                 return;
 #endif
             // Create the player achievement manager
@@ -4652,7 +4652,7 @@ void AchievementsMgr::OnPlayerLogin(Player* player, uint32 playerId, SqlQueryHol
 #ifdef ENABLE_MANGOSBOTS
             // Check if randombots can use the achievement system
             uint32 accId = player->GetSession()->GetAccountId();
-            if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_FOR_BOTS))
+            if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !sAchievementsConfig.randomBots)
                 return;
 #endif
             // Create the player achievement manager
@@ -4853,7 +4853,7 @@ PlayerAchievementMgr* AchievementsMgr::GetPlayerAchievementMgr(Player* player)
 #ifdef ENABLE_MANGOSBOTS
             // Check if randombots can use the achievement system
             uint32 accId = player->GetSession()->GetAccountId();
-            if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_FOR_BOTS))
+            if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !sAchievementsConfig.randomBots)
                 return nullptr;
 #endif
 
@@ -4882,7 +4882,7 @@ const PlayerAchievementMgr* AchievementsMgr::GetPlayerAchievementMgr(const Playe
 #ifdef ENABLE_MANGOSBOTS
             // Check if randombots can use the achievement system
             uint32 accId = player->GetSession()->GetAccountId();
-            if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_FOR_BOTS))
+            if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !sAchievementsConfig.randomBots)
                 return nullptr;
 #endif
 
