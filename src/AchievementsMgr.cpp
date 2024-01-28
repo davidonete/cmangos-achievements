@@ -4624,21 +4624,38 @@ uint8 AchievementsMgr::GetPlayerLocale(WorldSession* session) const
     return localeIndex;
 }
 
-void AchievementsMgr::OnPlayerLogin(Player* player, SqlQueryHolder* holder)
+void AchievementsMgr::OnPlayerCharacterCreated(Player* player)
 {
     if (sAchievementsConfig.enabled)
     {
         if (player)
         {
-            // Create the player achievement manager
-            const uint32 playerId = player->GetObjectGuid().GetCounter();
-
 #ifdef ENABLE_MANGOSBOTS
             // Check if randombots can use the achievement system
             uint32 accId = player->GetSession()->GetAccountId();
             if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_FOR_BOTS))
                 return;
 #endif
+            // Create the player achievement manager
+            const uint32 playerId = player->GetObjectGuid().GetCounter();
+            m_PlayerMgrs.insert(std::make_pair(playerId, PlayerAchievementMgr(player)));
+        }
+    }
+}
+
+void AchievementsMgr::OnPlayerLogin(Player* player, uint32 playerId, SqlQueryHolder* holder)
+{
+    if (sAchievementsConfig.enabled)
+    {
+        if (player)
+        {
+#ifdef ENABLE_MANGOSBOTS
+            // Check if randombots can use the achievement system
+            uint32 accId = player->GetSession()->GetAccountId();
+            if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_FOR_BOTS))
+                return;
+#endif
+            // Create the player achievement manager
             auto pair = m_PlayerMgrs.insert(std::make_pair(playerId, PlayerAchievementMgr(player)));
             
             // Load the player achievements
