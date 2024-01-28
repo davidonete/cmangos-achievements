@@ -102,6 +102,20 @@ include_directories(
     ${Boost_INCLUDE_DIRS}
 )
 
+# Define ENABLE_PLAYERBOTS if need
+if (BUILD_MANGOSBOTS OR BUILD_IKE3_BOTS)
+	include_directories(
+		${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot
+		${CMAKE_SOURCE_DIR}/src/modules/Bots/ahbot
+	)
+
+	add_definitions(-DENABLE_MANGOSBOTS)
+	
+	if (BUILD_IKE3_BOTS)
+		add_definitions(-DENABLE_PLAYERBOTS)
+	endif()
+endif()
+
 # Define ENABLE_Achievements if need
 if (BUILD_ACHIEVEMENTS)
 	add_definitions(-DENABLE_ACHIEVEMENTS)
