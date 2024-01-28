@@ -4624,7 +4624,7 @@ uint8 AchievementsMgr::GetPlayerLocale(WorldSession* session) const
     return localeIndex;
 }
 
-void AchievementsMgr::OnPlayerAdded(Player* player)
+void AchievementsMgr::OnPlayerLogin(Player* player)
 {
     if (sAchievementsConfig.enabled)
     {
@@ -4637,14 +4637,15 @@ void AchievementsMgr::OnPlayerAdded(Player* player)
             // Check if randombots can use the achievement system
             uint32 accId = player->GetSession()->GetAccountId();
             if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !sWorld.getConfig(CONFIG_BOOL_ACHIEVEMENTS_FOR_BOTS))
-                return nullptr;
+                return;
 #endif
-            m_PlayerMgrs.insert(std::make_pair(playerId, PlayerAchievementMgr(player)));
+            auto pair = m_PlayerMgrs.insert(std::make_pair(playerId, PlayerAchievementMgr(player)));
+            pair.first->second.UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_ON_LOGIN, 1);
         }
     }
 }
 
-void AchievementsMgr::OnPlayerRemoved(Player* player)
+void AchievementsMgr::OnPlayerLogout(Player* player)
 {
     if (sAchievementsConfig.enabled)
     {
