@@ -60,6 +60,8 @@ void AchievementScriptMgr::LoadDatabase()
 
     ScriptRegistry<AchievementCriteriaScript>::AddALScripts();
 
+    ScriptRegistry<AchievementCriteriaScript>::MatchScriptIDs();
+
     CheckIfScriptsInDatabaseExist();
 
     sLog.outBasic("server.loading, >> Loaded %u C++ scripts in %u ms", GetScriptCount(), WorldTimer::getMSTimeDiff(oldMSTime, WorldTimer::getMSTime()));
@@ -100,7 +102,7 @@ void AchievementScriptMgr::CheckIfScriptsInDatabaseExist()
             if (!ScriptRegistry<AchievementCriteriaScript>::GetScriptById(sid) &&
                 !ScriptRegistry<AchievementScript>::GetScriptById(sid))
             {
-                sLog.outBasic("sql.sql, Script named '%s' is assigned in the database, but has no code!", scriptName.c_str());
+                sLog.outError("Script named '%s' is assigned in the database, but has no code!", scriptName.c_str());
             }
         }
     }

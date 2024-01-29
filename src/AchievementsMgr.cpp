@@ -491,7 +491,6 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
 
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_SCRIPT:
         {
-            // TODO: research scripts for criteria checks
             return sAchievementScriptMgr.OnCriteriaCheck(ScriptId, const_cast<Player*>(source), const_cast<Unit*>(target), criteria_id);
         }
 
@@ -4561,10 +4560,12 @@ void AchievementsMgr::Init()
     sAchievementCategoryStore.Load();
     sAchievementCriteriaStore.Load();
 
-    LoadAchievementReferenceList();
-    sLog.outString("Loading Achievement Criteria Lists...");
-    LoadAchievementCriteriaList();
+    sLog.outString("Loading Achievement Scripts...");
+    sAchievementScriptMgr.Initialize();
+    sAchievementScriptMgr.LoadDatabase();
     sLog.outString("Loading Achievement Criteria Data...");
+    LoadAchievementReferenceList();
+    LoadAchievementCriteriaList();
     LoadAchievementCriteriaData();
     sLog.outString("Loading Achievement Rewards...");
     LoadRewards();

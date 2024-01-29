@@ -65,8 +65,27 @@ public:
             BattleGround* bg = source->GetBattleGround();
             return bg && bg->GetTypeId() == BATTLEGROUND_WS && bg->IsActiveEvent(WS_EVENT_FLAG_A, player->GetTeamId());
         }
+
         return false;
     }
+};
+
+class achievement_arena_by_type : public AchievementCriteriaScript
+{
+public:
+    achievement_arena_by_type(char const* name, uint8 arenaType) : AchievementCriteriaScript(name), arenaType(arenaType) {}
+
+    bool OnCheck(Player* source, Unit* /*target*/, uint32 /*criteria_id*/) override
+    {
+#if defined(MANGOSBOT_ONE) || defined(MANGOSBOT_TWO) || MAX_EXPANSION >= 1
+        return source->InArena() && source->GetBattleground()->GetArenaType() == arenaType;
+#else
+        return false;
+#endif
+    }
+
+private:
+    const uint8 arenaType;
 };
 
 class achievement_sickly_gazelle : public AchievementCriteriaScript
@@ -134,108 +153,34 @@ public:
                 const PvpTeamIndex team = source->GetTeamId();
                 if (team != TEAM_INDEX_NEUTRAL)
                 {
-                    BattleGroundAV* bgAV = static_cast<BattleGroundAV*>(bg);
-                    const auto& nodes = bgAV->GetNodes();
-                    if (team == TEAM_INDEX_ALLIANCE)
+                    constexpr uint8 MAX_TOWERS = 8;
+                    const uint32 towers[MAX_TOWERS] =
                     {
-                        // alliance towers controlled
-                        for (uint8 i = BG_AV_NODES_DUNBALDAR_SOUTH; i <= BG_AV_NODES_STONEHEART_BUNKER; ++i)
-                        {
-                            if (nodes[i].state == POINT_CONTROLLED)
-                            {
-                                if (nodes[i].owner != TEAM_INDEX_ALLIANCE)
-                                    return false;
-                            }
-                            else
-                            {
-                                return false;
-                            }
-                        }
+                        team == TEAM_INDEX_ALLIANCE ? BG_AV_STATE_SOUTH_BUNKER_A : BG_AV_STATE_SOUTH_BUNKER_H,
+                        team == TEAM_INDEX_ALLIANCE ? BG_AV_STATE_NORTH_BUNKER_A : BG_AV_STATE_NORTH_BUNKER_H,
+                        team == TEAM_INDEX_ALLIANCE ? BG_AV_STATE_ICEWING_BUNKER_A : BG_AV_STATE_ICEWING_BUNKER_H,
+                        team == TEAM_INDEX_ALLIANCE ? BG_AV_STATE_STONE_BUNKER_A : BG_AV_STATE_STONE_BUNKER_H,
+                        team == TEAM_INDEX_ALLIANCE ? BG_AV_STATE_ICEBLOOD_TOWER_A : BG_AV_STATE_ICEBLOOD_TOWER_H,
+                        team == TEAM_INDEX_ALLIANCE ? BG_AV_STATE_TOWER_POINT_A : BG_AV_STATE_TOWER_POINT_H,
+                        team == TEAM_INDEX_ALLIANCE ? BG_AV_STATE_FROSTWOLF_EAST_A : BG_AV_STATE_FROSTWOLF_EAST_H,
+                        team == TEAM_INDEX_ALLIANCE ? BG_AV_STATE_FROSTWOLF_WEST_A : BG_AV_STATE_FROSTWOLF_WEST_H
+                    };
 
-                        // horde towers destroyed
-                        for (uint8 i = BG_AV_NODES_ICEBLOOD_TOWER; i <= BG_AV_NODES_FROSTWOLF_WTOWER; ++i)
-                        {
-                            if (nodes[i].state != POINT_ASSAULTED)
-                            {
-                                return false;
-                            }
-                        }
-
-                        return bgAV->IsActiveEvent(BG_AV_NODE_CAPTAIN_DEAD_A, 0);
-                    }
-                    else
+                    for (uint8 i = 0; i <= MAX_TOWERS; ++i)
                     {
-                        // horde towers controlled
-                        for (uint8 i = BG_AV_NODES_ICEBLOOD_TOWER; i <= BG_AV_NODES_FROSTWOLF_WTOWER; ++i)
+                        const bool isTowerControlled = bg->GetBgMap()->GetVariableManager().GetVariable(towers[i]);
+                        if (!isTowerControlled)
                         {
-                            if (nodes[i].state == POINT_CONTROLLED)
-                            {
-                                if (nodes[i].owner != TEAM_INDEX_HORDE)
-                                {
-                                    return false;
-                                }
-                            }
-                            else
-                            {
-                                return false;
-                            }
+                            return false;
                         }
-
-                        // alliance towers destroyed
-                        for (uint8 i = BG_AV_NODES_DUNBALDAR_SOUTH; i <= BG_AV_NODES_STONEHEART_BUNKER; ++i)
-                        {
-                            if (nodes[i].state != POINT_ASSAULTED)
-                            {
-                                return false;
-                            }
-                        }
-
-                        return bgAV->IsActiveEvent(BG_AV_NODE_CAPTAIN_DEAD_H, 0);
                     }
+
+                    const uint32 captainState = team == TEAM_INDEX_ALLIANCE ? BG_AV_NODE_CAPTAIN_DEAD_A : BG_AV_NODE_CAPTAIN_DEAD_H;
+                    return !bg->IsActiveEvent(BG_AV_NODE_CAPTAIN_DEAD_A, 0);
                 }
             }
         }
         
-        return false;
-    }
-};
-
-class achievement_tilted : public AchievementCriteriaScript
-{
-public:
-    achievement_tilted() : AchievementCriteriaScript("achievement_tilted") {}
-
-    bool OnCheck(Player* player, Unit* /*target*/, uint32 /*criteria_id*/) override
-    {
-        if (!player)
-            return false;
-
-        uint32 areaid = player->GetAreaId();
-        // bool checkArea =    areaid == AREA_ARGENT_TOURNAMENT_FIELDS ||
-        //                     areaid == AREA_RING_OF_ASPIRANTS ||
-        //                     areaid == AREA_RING_OF_ARGENT_VALIANTS ||
-        //                     areaid == AREA_RING_OF_ALLIANCE_VALIANTS ||
-        //                     areaid == AREA_RING_OF_HORDE_VALIANTS ||
-        //                     areaid == AREA_RING_OF_CHAMPIONS;
-
-        bool checkArea = false;
-
-        return checkArea && player->duel;// && player->duel->isMounted;
-    }
-};
-
-class achievement_not_even_a_scratch : public AchievementCriteriaScript
-{
-public:
-    achievement_not_even_a_scratch() : AchievementCriteriaScript("achievement_not_even_a_scratch") { }
-
-    bool OnCheck(Player* source, Unit* /*target*/, uint32 /*criteria_id*/) override
-    {
-        if (!source)
-            return false;
-
-        BattleGround* battleground = source->GetBattleGround();
-        // return battleground && battleground->GetTypeID() == BATTLEGROUND_SA && battleground->ToBattleGroundSA()->notEvenAScratch(source->GetTeamId());
         return false;
     }
 };
@@ -259,7 +204,14 @@ void AddSC_achievement_scripts()
     new achievement_sickly_gazelle();
     new achievement_everything_counts();
     new achievement_bg_av_perfection();
-    new achievement_tilted();
-    new achievement_not_even_a_scratch();
+#if defined(MANGOSBOT_ONE) || defined(MANGOSBOT_TWO) || MAX_EXPANSION >= 1
+    new achievement_arena_by_type("achievement_arena_2v2_check", ARENA_TYPE_2v2);
+    new achievement_arena_by_type("achievement_arena_3v3_check", ARENA_TYPE_3v3);
+    new achievement_arena_by_type("achievement_arena_5v5_check", ARENA_TYPE_5v5);
+#else
+    new achievement_arena_by_type("achievement_arena_2v2_check", 0);
+    new achievement_arena_by_type("achievement_arena_3v3_check", 0);
+    new achievement_arena_by_type("achievement_arena_5v5_check", 0);
+#endif
     new achievement_killed_exp_or_honor_target();
 }

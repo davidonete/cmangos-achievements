@@ -197,7 +197,40 @@ public:
 
     static void AddALScripts()
     {
+        for (auto script : ALScripts)
+        {
+            script->checkValidity();
 
+            // We're dealing with a code-only script; just add it.
+            ScriptPointerList[_scriptIdCounter++] = script;
+            sAchievementScriptMgr.IncrementScriptCount();
+        }
+
+        ALScripts.clear();
+    }
+
+    static void MatchScriptIDs()
+    {
+        // This is needed to match the id of the registry with the id of the AchievementScriptMgr
+        ScriptMap matchedScriptPointerList;
+        for (const auto& pair : ScriptPointerList)
+        {
+            TScript* script = pair.second;
+            const uint32 scriptId = sAchievementScriptMgr.getScriptId(script->GetName());
+            if (scriptId)
+            {
+                matchedScriptPointerList[scriptId] = script;
+            }
+            else
+            {
+                sLog.outError("Failed to match script '%s' with the DB loaded scripts.", script->GetName().c_str());
+            }
+        }
+
+        if (!matchedScriptPointerList.empty())
+        {
+            ScriptPointerList = matchedScriptPointerList;
+        }
     }
 
     // Gets a script by its ID (assigned by ObjectMgr).
