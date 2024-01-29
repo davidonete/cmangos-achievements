@@ -80,8 +80,12 @@ public:
             return false;
 
         if (Player* victim = static_cast<Player*>(target))
+        {
             if (victim->IsMounted())
+            {
                 return true;
+            }
+        }
 
         return false;
     }
@@ -95,7 +99,23 @@ public:
     bool OnCheck(Player* source, Unit* /*target*/, uint32 /*criteria_id*/) override
     {
         BattleGround* bg = source->GetBattleGround();
-        return bg && bg->GetTypeId() == BATTLEGROUND_AV && reinterpret_cast<BattleGroundAV*>(bg)->IsBothMinesControlledByTeam(source->GetTeamId());
+        if (bg)
+        {
+            if (bg->GetTypeId() == BATTLEGROUND_AV)
+            {
+                const PvpTeamIndex team = source->GetTeamId();
+                if (team != TEAM_INDEX_NEUTRAL)
+                {
+                    const uint32 irondeepMine = team == TEAM_INDEX_ALLIANCE ? BG_AV_STATE_IRONDEEP_MINE_A : BG_AV_STATE_IRONDEEP_MINE_H;
+                    const uint32 coldtoothMine = team == TEAM_INDEX_ALLIANCE ? BG_AV_STATE_COLDTOOTH_MINE_A : BG_AV_STATE_COLDTOOTH_MINE_H;    
+                    const bool irondeepMineOwned = bg->GetBgMap()->GetVariableManager().GetVariable(irondeepMine);
+                    const bool coldtoothMineOwned = bg->GetBgMap()->GetVariableManager().GetVariable(coldtoothMine);
+                    return irondeepMineOwned && coldtoothMineOwned;
+                }
+            }
+        }
+
+        return false;
     }
 };
 
@@ -107,7 +127,76 @@ public:
     bool OnCheck(Player* source, Unit* /*target*/, uint32 /*criteria_id*/) override
     {
         BattleGround* bg = source->GetBattleGround();
-        return bg && bg->GetTypeId() == BATTLEGROUND_AV && reinterpret_cast<BattleGroundAV*>(bg)->IsAllTowersControlledAndCaptainAlive(source->GetTeamId());
+        if (bg)
+        {
+            if (bg->GetTypeId() == BATTLEGROUND_AV)
+            {
+                const PvpTeamIndex team = source->GetTeamId();
+                if (team != TEAM_INDEX_NEUTRAL)
+                {
+                    BattleGroundAV* bgAV = static_cast<BattleGroundAV*>(bg);
+                    const auto& nodes = bgAV->GetNodes();
+                    if (team == TEAM_INDEX_ALLIANCE)
+                    {
+                        // alliance towers controlled
+                        for (uint8 i = BG_AV_NODES_DUNBALDAR_SOUTH; i <= BG_AV_NODES_STONEHEART_BUNKER; ++i)
+                        {
+                            if (nodes[i].state == POINT_CONTROLLED)
+                            {
+                                if (nodes[i].owner != TEAM_INDEX_ALLIANCE)
+                                    return false;
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                        }
+
+                        // horde towers destroyed
+                        for (uint8 i = BG_AV_NODES_ICEBLOOD_TOWER; i <= BG_AV_NODES_FROSTWOLF_WTOWER; ++i)
+                        {
+                            if (nodes[i].state != POINT_ASSAULTED)
+                            {
+                                return false;
+                            }
+                        }
+
+                        return bgAV->IsActiveEvent(BG_AV_NODE_CAPTAIN_DEAD_A, 0);
+                    }
+                    else
+                    {
+                        // horde towers controlled
+                        for (uint8 i = BG_AV_NODES_ICEBLOOD_TOWER; i <= BG_AV_NODES_FROSTWOLF_WTOWER; ++i)
+                        {
+                            if (nodes[i].state == POINT_CONTROLLED)
+                            {
+                                if (nodes[i].owner != TEAM_INDEX_HORDE)
+                                {
+                                    return false;
+                                }
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                        }
+
+                        // alliance towers destroyed
+                        for (uint8 i = BG_AV_NODES_DUNBALDAR_SOUTH; i <= BG_AV_NODES_STONEHEART_BUNKER; ++i)
+                        {
+                            if (nodes[i].state != POINT_ASSAULTED)
+                            {
+                                return false;
+                            }
+                        }
+
+                        return bgAV->IsActiveEvent(BG_AV_NODE_CAPTAIN_DEAD_H, 0);
+                    }
+                }
+            }
+        }
+        
+        return false;
     }
 };
 
