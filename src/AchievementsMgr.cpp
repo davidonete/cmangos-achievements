@@ -4856,6 +4856,21 @@ void AchievementsMgr::OnPlayerHandleFall(Player* player, float zDiff)
     }
 }
 
+void AchievementsMgr::OnPlayerHandlePageTextQuery(Player* player, WorldPacket& recv_data)
+{
+    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+    if (playerMgr)
+    {
+        ObjectGuid bookGuid;
+        recv_data >> bookGuid;
+
+        if (!bookGuid.IsEmpty() && bookGuid.IsGameObject())
+        {
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_USE_GAMEOBJECT, bookGuid.GetEntry());
+        }
+    }
+}
+
 PlayerAchievementMgr* AchievementsMgr::GetPlayerAchievementMgr(Player* player)
 {
     if (sAchievementsConfig.enabled)

@@ -1129,6 +1129,7 @@ public:
     void OnPlayerKilledMonsterCredit(Player* player, uint32 entry, ObjectGuid guid);
     void OnPlayerRewardSinglePlayerAtKill(Player* player, Unit* victim);
     void OnPlayerHandleFall(Player* player, float zDiff);
+    void OnPlayerHandlePageTextQuery(Player* player, WorldPacket& recv_data);
 
 private:
     PlayerAchievementMgr* GetPlayerAchievementMgr(Player* player);
