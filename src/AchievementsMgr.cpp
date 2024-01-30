@@ -427,7 +427,7 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
                 return false;
             if (classRace.race_id && classRace.race_id != ((Player*)(source))->getRace())
                 return false;
-
+                 
             return true;
         }
 
@@ -442,10 +442,16 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_DEAD:
         {
             if (target && !target->IsAlive())
+            {
                 if (const Player* player = ((Player*)(target)))
+                {
                     if (player->GetDeathTimer() != 0)
+                    {
                         // flag set == must be same team, not set == different team
-                        return (player->GetTeamId() == source->GetTeamId()) == (player_dead.own_team_flag != 0);
+                        return (player->GetTeam() == source->GetTeam()) == (player_dead.own_team_flag != 0);
+                    }
+                }
+            }
 
             return false;
         }
@@ -519,8 +525,7 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
                 return false;
 
             // DB data compatibility...
-            uint32 teamOld = ((Player*)(target))->GetTeamId() == TEAM_INDEX_ALLIANCE ? ALLIANCE : HORDE;
-            return teamOld == team.team;
+            return ((Player*)(target))->GetTeam() == team.team;
         }
 
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_DRUNK:
@@ -538,7 +543,7 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
             BattleGround* bg = source->GetBattleGround();
             if (bg)
             {
-                const uint32 score = sAchievementsMgr.GetTeamScore(bg, source->GetTeamId());
+                const uint32 score = sAchievementsMgr.GetTeamScore(bg, source->GetTeam());
                 return score >= bg_loss_team_score.min_score && score <= bg_loss_team_score.max_score;
             }
 
@@ -613,17 +618,17 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
                 return false;
             }
 
-            BattleGroundWinner winnerTeam = bg->GetWinner();
-            if (winnerTeam == WINNER_NONE)
+            BattleGroundWinner bgWinnerTeam = bg->GetWinner();
+            if (bgWinnerTeam == WINNER_NONE)
             {
                 return false;
             }
 
-            const PvpTeamIndex winnerTeamIndex = winnerTeam == WINNER_ALLIANCE ? TEAM_INDEX_ALLIANCE : TEAM_INDEX_HORDE;
-            const PvpTeamIndex loserTeamIndex = winnerTeam == WINNER_ALLIANCE ? TEAM_INDEX_HORDE : TEAM_INDEX_ALLIANCE;
-            uint32 winnnerScore = sAchievementsMgr.GetTeamScore(bg, winnerTeamIndex);
-            uint32 loserScore = sAchievementsMgr.GetTeamScore(bg, loserTeamIndex);
-            return source->GetTeamId() == winnerTeamIndex && winnnerScore == teams_scores.winner_score && loserScore == teams_scores.loser_score;
+            const Team winnerTeam = bgWinnerTeam == WINNER_ALLIANCE ? ALLIANCE : HORDE;
+            const Team loserTeam = bgWinnerTeam == WINNER_ALLIANCE ? HORDE : ALLIANCE;
+            const uint32 winnnerScore = sAchievementsMgr.GetTeamScore(bg, winnerTeam);
+            const uint32 loserScore = sAchievementsMgr.GetTeamScore(bg, loserTeam);
+            return source->GetTeam() == winnerTeam && winnnerScore == teams_scores.winner_score && loserScore == teams_scores.loser_score;
         }
 
         default: break;
@@ -1734,7 +1739,7 @@ void PlayerAchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes ty
                     continue;
 
                 // if team check required: must kill by opposition faction
-                if (achievement->ID == 318 && miscValue2 == GetPlayer()->GetTeamId())
+                if (achievement->ID == 318 && miscValue2 == GetTeamIndexByTeamId(GetPlayer()->GetTeam()))
                     continue;
 
                 SetCriteriaProgress(achievementCriteria, 1, PROGRESS_ACCUMULATE);
@@ -3351,8 +3356,8 @@ bool PlayerAchievementMgr::CanUpdateCriteria(AchievementCriteriaEntry const* cri
     if (achievement->mapID != -1 && GetPlayer()->GetMapId() != uint32(achievement->mapID))
         return false;
 
-    if ((achievement->requiredFaction == ACHIEVEMENT_FACTION_HORDE && GetPlayer()->GetTeamId() != TEAM_INDEX_HORDE) ||
-        (achievement->requiredFaction == ACHIEVEMENT_FACTION_ALLIANCE && GetPlayer()->GetTeamId() != TEAM_INDEX_ALLIANCE))
+    if ((achievement->requiredFaction == ACHIEVEMENT_FACTION_HORDE && GetPlayer()->GetTeam() != HORDE) ||
+        (achievement->requiredFaction == ACHIEVEMENT_FACTION_ALLIANCE && GetPlayer()->GetTeam() != ALLIANCE))
     {
         return false;
     }
@@ -3592,8 +3597,8 @@ void AchievementsMgr::GetAllAchievements(Player* player, uint32 version) const
         if (achievement->patch > GetCurrentPatch())
             continue;
 
-        if ((achievement->requiredFaction == ACHIEVEMENT_FACTION_HORDE && player->GetTeamId() != TEAM_INDEX_HORDE) ||
-            (achievement->requiredFaction == ACHIEVEMENT_FACTION_ALLIANCE && player->GetTeamId() != TEAM_INDEX_ALLIANCE))
+        if ((achievement->requiredFaction == ACHIEVEMENT_FACTION_HORDE && player->GetTeam() != HORDE) ||
+            (achievement->requiredFaction == ACHIEVEMENT_FACTION_ALLIANCE && player->GetTeam() != ALLIANCE))
             continue;
 
         const uint8 playerLocale = GetPlayerLocale(player->GetSession());
@@ -3747,8 +3752,8 @@ void AchievementsMgr::GetCharacterCriteria(Player* player) const
             if (achievement->patch > GetCurrentPatch())
                 continue;
 
-            if ((achievement->requiredFaction == ACHIEVEMENT_FACTION_HORDE && player->GetTeamId() != TEAM_INDEX_HORDE) ||
-                (achievement->requiredFaction == ACHIEVEMENT_FACTION_ALLIANCE && player->GetTeamId() != TEAM_INDEX_ALLIANCE))
+            if ((achievement->requiredFaction == ACHIEVEMENT_FACTION_HORDE && player->GetTeam() != HORDE) ||
+                (achievement->requiredFaction == ACHIEVEMENT_FACTION_ALLIANCE && player->GetTeam() != ALLIANCE))
                 continue;
 
             // for achievement with referenced achievement criterias get from referenced and counter from self
@@ -4735,21 +4740,21 @@ void AchievementsMgr::StartTimedAchievement(BattleGround* bg, AchievementCriteri
     }
 }
 
-int32 AchievementsMgr::GetTeamScore(BattleGround* bg, PvpTeamIndex team) const
+int32 AchievementsMgr::GetTeamScore(BattleGround* bg, Team team) const
 {
     if (bg)
     {
         if (bg->GetTypeId() == BATTLEGROUND_AB)
         {
-            return bg->GetBgMap()->GetVariableManager().GetVariable(team == TEAM_INDEX_ALLIANCE ? BG_AB_OP_RESOURCES_ALLY : BG_AB_OP_RESOURCES_HORDE);
+            return bg->GetBgMap()->GetVariableManager().GetVariable(team == ALLIANCE ? BG_AB_OP_RESOURCES_ALLY : BG_AB_OP_RESOURCES_HORDE);
         }
         else if (bg->GetTypeId() == BATTLEGROUND_AV)
         {
-            return bg->GetBgMap()->GetVariableManager().GetVariable(team == TEAM_INDEX_ALLIANCE ? BG_AV_STATE_SCORE_A : BG_AV_STATE_SCORE_H);
+            return bg->GetBgMap()->GetVariableManager().GetVariable(team == ALLIANCE ? BG_AV_STATE_SCORE_A : BG_AV_STATE_SCORE_H);
         }
         else if (bg->GetTypeId() == BATTLEGROUND_WS)
         {
-            return bg->GetBgMap()->GetVariableManager().GetVariable(team == TEAM_INDEX_ALLIANCE ? BG_WS_STATE_CAPTURES_ALLIANCE : BG_WS_STATE_CAPTURES_HORDE);
+            return bg->GetBgMap()->GetVariableManager().GetVariable(team == ALLIANCE ? BG_WS_STATE_CAPTURES_ALLIANCE : BG_WS_STATE_CAPTURES_HORDE);
         }
 
         // TO DO: Add other bg types
@@ -5007,7 +5012,7 @@ bool ChatHandler::HandleAchievementsCommand(char* args)
         return result;
     };
 
-    auto IsValidNumberString = [](const std::string& input) -> bool
+    auto GetNumberFromString = [](const std::string& input, int32& number) -> bool
     {
         bool valid = !input.empty();
         if (valid)
@@ -5031,6 +5036,33 @@ bool ChatHandler::HandleAchievementsCommand(char* args)
             }
         }
 
+        if (valid)
+        {
+            number = std::stoi(input);
+        }
+
+        return valid;
+    };
+
+    auto GetAchievementIdFromString = [&GetNumberFromString](const std::string& input, int32& achievementId) -> bool
+    {
+        bool valid = !input.empty();
+        if (valid)
+        {
+            valid = false;
+            size_t startPos = input.find("|Hachievement:");
+            if (startPos != std::string::npos)
+            {
+                startPos += 14;
+                size_t endPos = input.find('|', startPos);
+                const std::string achievementIdStr = input.substr(startPos, endPos - startPos);
+                if (GetNumberFromString(achievementIdStr, achievementId))
+                {
+                    valid = true;
+                }
+            }
+        }
+
         return valid;
     };
 
@@ -5044,60 +5076,60 @@ bool ChatHandler::HandleAchievementsCommand(char* args)
     const std::string command = ExtractFirstWord(fullCommand);
     if (!command.empty())
     {
-        if (command.find("enableAchiever"))
+        if (command == "enableAchiever")
         {
+            int32 version = 0;
             const std::string arg = ExtractFirstWord(fullCommand);
-            if (IsValidNumberString(arg))
+            if (GetNumberFromString(arg, version))
             {
                 if (!sAchievementsMgr.HasAddon(player))
                 {
-                    const uint32 version = std::stoi(arg);
                     sAchievementsMgr.EnableAddon(player, version);
                 }
 
                 return true;
             }
         }
-        else if (command.find("getCategoties"))
+        else if (command == "getCategoties")
         {
             if (m_session->GetSecurity() >= SEC_GAMEMASTER)
             {
+                int32 version = 0;
                 const std::string arg = ExtractFirstWord(fullCommand);
-                if (IsValidNumberString(arg))
+                if (GetNumberFromString(arg, version))
                 {
-                    const uint32 version = std::stoi(arg);
                     sAchievementsMgr.GetAllCategories(player, version);
                     return true;
                 }
             }
         }
-        else if (command.find("getAchievements"))
+        else if (command == "getAchievements")
         {
             if (m_session->GetSecurity() >= SEC_GAMEMASTER)
             {
+                int32 version = 0;
                 const std::string arg = ExtractFirstWord(fullCommand);
-                if (IsValidNumberString(arg))
+                if (GetNumberFromString(arg, version))
                 {
-                    const uint32 version = std::stoi(arg);
                     sAchievementsMgr.GetAllAchievements(player, version);
                     return true;
                 }
             }
         }
-        else if (command.find("getCriteria"))
+        else if (command == "getCriteria")
         {
             if (m_session->GetSecurity() >= SEC_GAMEMASTER)
             {
+                int32 version = 0;
                 const std::string arg = ExtractFirstWord(fullCommand);
-                if (IsValidNumberString(arg))
+                if (GetNumberFromString(arg, version))
                 {
-                    const uint32 version = std::stoi(arg);
                     sAchievementsMgr.GetAllCriteria(player, version);
                     return true;
                 }
             }
         }
-        else if (command.find("getCharacterCriteria"))
+        else if (command == "getCharacterCriteria")
         {
             if (m_session->GetSecurity() >= SEC_GAMEMASTER)
             {
@@ -5105,51 +5137,35 @@ bool ChatHandler::HandleAchievementsCommand(char* args)
                 return true;
             }
         }
-        else if (command.find("add"))
+        else if (command == "add")
         {
             if (m_session->GetSecurity() >= SEC_GAMEMASTER)
             {
+                int32 achievementId = 0;
                 const std::string arg = ExtractFirstWord(fullCommand);
-                if (IsValidNumberString(arg))
+                if (GetAchievementIdFromString(arg, achievementId) || GetNumberFromString(arg, achievementId))
                 {
-                    // Get the selected player (if any)
+                    // Get the selected player or self
                     Player* target;
-                    ObjectGuid target_guid;
-                    std::string target_name;
-                    WorldSession* session = m_session;
-                    if (ExtractPlayerTarget(&args, &target, &target_guid, &target_name))
+                    if (ExtractPlayerTarget(nullptr, &target))
                     {
-                        if (target && target->GetSession())
-                        {
-                            session = target->GetSession();
-                        }
+                        return sAchievementsMgr.AddAchievement(target, achievementId);
                     }
-
-                    const uint32 avhievementId = std::stoi(arg);
-                    return sAchievementsMgr.AddAchievement(player, avhievementId);
                 }
             }
         }
-        else if (command.find("remove"))
+        else if (command == "remove")
         {
+            int32 achievementId = 0;
             const std::string arg = ExtractFirstWord(fullCommand);
-            if (IsValidNumberString(arg))
+            if (GetAchievementIdFromString(arg, achievementId) || GetNumberFromString(arg, achievementId))
             {
-                // Get the selected player (if any)
+                // Get the selected player or self
                 Player* target;
-                ObjectGuid target_guid;
-                std::string target_name;
-                WorldSession* session = m_session;
-                if (ExtractPlayerTarget(&args, &target, &target_guid, &target_name))
+                if (ExtractPlayerTarget(nullptr, &target))
                 {
-                    if (target && target->GetSession())
-                    {
-                        session = target->GetSession();
-                    }
+                    return sAchievementsMgr.RemoveAchievement(target, achievementId);
                 }
-
-                const uint32 avhievementId = std::stoi(arg);
-                return sAchievementsMgr.RemoveAchievement(player, avhievementId);
             }
         }
     }

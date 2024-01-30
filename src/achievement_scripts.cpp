@@ -12,11 +12,11 @@ public:
         {
             if (bg->GetTypeId() == BATTLEGROUND_AB)
             {
-                const PvpTeamIndex team = source->GetTeamId();
+                const PvpTeamIndex team = GetTeamIndexByTeamId(source->GetTeam());
                 if (team != TEAM_INDEX_NEUTRAL)
                 {
-                    const uint32 teamScore = sAchievementsMgr.GetTeamScore(bg, team);
-                    const uint32 otherTeamScore = sAchievementsMgr.GetTeamScore(bg, BattleGround::GetOtherTeamIndex(team));
+                    const uint32 teamScore = sAchievementsMgr.GetTeamScore(bg, source->GetTeam());
+                    const uint32 otherTeamScore = sAchievementsMgr.GetTeamScore(bg, BattleGround::GetOtherTeam(source->GetTeam()));
                     return teamScore > (otherTeamScore + 500);
                 }
             }
@@ -38,7 +38,7 @@ public:
         {
             if (bg->GetTypeId() == BATTLEGROUND_AB)
             {
-                const PvpTeamIndex team = source->GetTeamId();
+                const PvpTeamIndex team = GetTeamIndexByTeamId(source->GetTeam());
                 return bg->GetBgMap()->GetVariableManager().GetVariable(team == TEAM_INDEX_ALLIANCE ? BG_AB_OP_OCCUPIED_BASES_ALLY : BG_AB_OP_OCCUPIED_BASES_HORDE) == BG_AB_MAX_NODES;
             }
 
@@ -63,7 +63,7 @@ public:
         if (Player const* player = static_cast<Player*>(target))
         {
             BattleGround* bg = source->GetBattleGround();
-            return bg && bg->GetTypeId() == BATTLEGROUND_WS && bg->IsActiveEvent(WS_EVENT_FLAG_A, player->GetTeamId());
+            return bg && bg->GetTypeId() == BATTLEGROUND_WS && bg->IsActiveEvent(WS_EVENT_FLAG_A, GetTeamIndexByTeamId(player->GetTeam()));
         }
 
         return false;
@@ -122,7 +122,7 @@ public:
         {
             if (bg->GetTypeId() == BATTLEGROUND_AV)
             {
-                const PvpTeamIndex team = source->GetTeamId();
+                const PvpTeamIndex team = GetTeamIndexByTeamId(source->GetTeam());
                 if (team != TEAM_INDEX_NEUTRAL)
                 {
                     const uint32 irondeepMine = team == TEAM_INDEX_ALLIANCE ? BG_AV_STATE_IRONDEEP_MINE_A : BG_AV_STATE_IRONDEEP_MINE_H;
@@ -150,11 +150,11 @@ public:
         {
             if (bg->GetTypeId() == BATTLEGROUND_AV)
             {
-                const PvpTeamIndex team = source->GetTeamId();
+                const PvpTeamIndex team = GetTeamIndexByTeamId(source->GetTeam());
                 if (team != TEAM_INDEX_NEUTRAL)
                 {
                     constexpr uint8 MAX_TOWERS = 8;
-                    const uint32 towers[MAX_TOWERS] =
+                    const AVWorldStates towers[MAX_TOWERS] =
                     {
                         team == TEAM_INDEX_ALLIANCE ? BG_AV_STATE_SOUTH_BUNKER_A : BG_AV_STATE_SOUTH_BUNKER_H,
                         team == TEAM_INDEX_ALLIANCE ? BG_AV_STATE_NORTH_BUNKER_A : BG_AV_STATE_NORTH_BUNKER_H,
@@ -166,7 +166,7 @@ public:
                         team == TEAM_INDEX_ALLIANCE ? BG_AV_STATE_FROSTWOLF_WEST_A : BG_AV_STATE_FROSTWOLF_WEST_H
                     };
 
-                    for (uint8 i = 0; i <= MAX_TOWERS; ++i)
+                    for (uint8 i = 0; i < MAX_TOWERS; ++i)
                     {
                         const bool isTowerControlled = bg->GetBgMap()->GetVariableManager().GetVariable(towers[i]);
                         if (!isTowerControlled)
@@ -176,7 +176,7 @@ public:
                     }
 
                     const uint32 captainState = team == TEAM_INDEX_ALLIANCE ? BG_AV_NODE_CAPTAIN_DEAD_A : BG_AV_NODE_CAPTAIN_DEAD_H;
-                    return !bg->IsActiveEvent(BG_AV_NODE_CAPTAIN_DEAD_A, 0);
+                    return !bg->IsActiveEvent(captainState, 0);
                 }
             }
         }
