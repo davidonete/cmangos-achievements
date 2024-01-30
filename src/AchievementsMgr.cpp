@@ -3463,8 +3463,6 @@ void AchievementsMgr::EnableAddon(Player* player, uint32 version)
         return;
 #endif
 
-    //sLog.outBasic("AchievementGlobalMgr: enabling sending data...");
-
     PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
     if (playerMgr)
     {
@@ -4987,4 +4985,174 @@ const char* AchievementCriteriaEntry::GetName(uint32 locale) const
     }
 
     return output;
+}
+
+bool ChatHandler::HandleAchievementsCommand(char* args)
+{
+    auto ExtractFirstWord = [](std::string& input) -> std::string
+    {
+        if (!input.empty())
+        {
+            size_t pos = input.find(" ");
+            if (pos != std::string::npos)
+            {
+                std::string result = input.substr(0, pos);
+                input.erase(0, pos + 1);
+                return result;
+            }
+        }
+
+        std::string result = input;
+        input = "";
+        return result;
+    };
+
+    auto IsValidNumberString = [](const std::string& input) -> bool
+    {
+        bool valid = !input.empty();
+        if (valid)
+        {
+            // Check for sign character at the beginning
+            size_t start = 0;
+            if (input[0] == '+' || input[0] == '-')
+            {
+                start = 1;
+            }
+
+            // Loop through each character to check if it's a digit
+            for (size_t i = start; i < input.size(); ++i)
+            {
+                if (!std::isdigit(input[i]))
+                {
+                    // Non-numeric character found
+                    valid = false;
+                    break;
+                }
+            }
+        }
+
+        return valid;
+    };
+
+    Player* player = m_session ? m_session->GetPlayer() : nullptr;
+    if (!player)
+    {
+        return false;
+    }
+
+    std::string fullCommand = args;
+    const std::string command = ExtractFirstWord(fullCommand);
+    if (!command.empty())
+    {
+        if (command.find("enableAchiever"))
+        {
+            const std::string arg = ExtractFirstWord(fullCommand);
+            if (IsValidNumberString(arg))
+            {
+                if (!sAchievementsMgr.HasAddon(player))
+                {
+                    const uint32 version = std::stoi(arg);
+                    sAchievementsMgr.EnableAddon(player, version);
+                }
+
+                return true;
+            }
+        }
+        else if (command.find("getCategoties"))
+        {
+            if (m_session->GetSecurity() >= SEC_GAMEMASTER)
+            {
+                const std::string arg = ExtractFirstWord(fullCommand);
+                if (IsValidNumberString(arg))
+                {
+                    const uint32 version = std::stoi(arg);
+                    sAchievementsMgr.GetAllCategories(player, version);
+                    return true;
+                }
+            }
+        }
+        else if (command.find("getAchievements"))
+        {
+            if (m_session->GetSecurity() >= SEC_GAMEMASTER)
+            {
+                const std::string arg = ExtractFirstWord(fullCommand);
+                if (IsValidNumberString(arg))
+                {
+                    const uint32 version = std::stoi(arg);
+                    sAchievementsMgr.GetAllAchievements(player, version);
+                    return true;
+                }
+            }
+        }
+        else if (command.find("getCriteria"))
+        {
+            if (m_session->GetSecurity() >= SEC_GAMEMASTER)
+            {
+                const std::string arg = ExtractFirstWord(fullCommand);
+                if (IsValidNumberString(arg))
+                {
+                    const uint32 version = std::stoi(arg);
+                    sAchievementsMgr.GetAllCriteria(player, version);
+                    return true;
+                }
+            }
+        }
+        else if (command.find("getCharacterCriteria"))
+        {
+            if (m_session->GetSecurity() >= SEC_GAMEMASTER)
+            {
+                sAchievementsMgr.GetCharacterCriteria(player);
+                return true;
+            }
+        }
+        else if (command.find("add"))
+        {
+            if (m_session->GetSecurity() >= SEC_GAMEMASTER)
+            {
+                const std::string arg = ExtractFirstWord(fullCommand);
+                if (IsValidNumberString(arg))
+                {
+                    // Get the selected player (if any)
+                    Player* target;
+                    ObjectGuid target_guid;
+                    std::string target_name;
+                    WorldSession* session = m_session;
+                    if (ExtractPlayerTarget(&args, &target, &target_guid, &target_name))
+                    {
+                        if (target && target->GetSession())
+                        {
+                            session = target->GetSession();
+                        }
+                    }
+
+                    const uint32 avhievementId = std::stoi(arg);
+                    return sAchievementsMgr.AddAchievement(player, avhievementId);
+                }
+            }
+        }
+        else if (command.find("remove"))
+        {
+            const std::string arg = ExtractFirstWord(fullCommand);
+            if (IsValidNumberString(arg))
+            {
+                // Get the selected player (if any)
+                Player* target;
+                ObjectGuid target_guid;
+                std::string target_name;
+                WorldSession* session = m_session;
+                if (ExtractPlayerTarget(&args, &target, &target_guid, &target_name))
+                {
+                    if (target && target->GetSession())
+                    {
+                        session = target->GetSession();
+                    }
+                }
+
+                const uint32 avhievementId = std::stoi(arg);
+                return sAchievementsMgr.RemoveAchievement(player, avhievementId);
+            }
+        }
+    }
+    
+    return false;
 }
