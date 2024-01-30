@@ -4700,17 +4700,6 @@ void AchievementsMgr::UpdateAchievementCriteria(Player* player, AchievementCrite
     }
 }
 
-void AchievementsMgr::UpdateLootAchievements(Player* player, LootItem* item, Loot* loot)
-{
-    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
-    if (playerMgr)
-    {
-        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM, item->itemId, item->count);
-        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE, loot->GetLootType(), item->count);
-        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_EPIC_ITEM, item->itemId, item->count);
-    }
-}
-
 void AchievementsMgr::StartTimedAchievement(Player* player, AchievementCriteriaTimedTypes type, uint32 entry, uint32 timeLost /*= 0*/)
 {
     PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
@@ -4947,6 +4936,119 @@ void AchievementsMgr::OnUnitDealHeal(Unit* dealer, Unit* victim, int32 gain, uin
                 playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_TOTAL_HEALING_RECEIVED, gain);
                 playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HEALING_RECEIVED, addHealth);
             }
+        }
+    }
+}
+
+void AchievementsMgr::OnHandleLootMasterGive(Player* target, LootItem* item, Loot* loot, InventoryResult result)
+{
+    if (result == EQUIP_ERR_OK)
+    {
+        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(target);
+        if (playerMgr)
+        {
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM, item->itemId, item->count);
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE, loot->GetLootType(), item->count);
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_EPIC_ITEM, item->itemId, item->count);
+        }
+    }
+}
+
+void AchievementsMgr::OnHandleLootRoll(Player* player, RollVote rollType)
+{
+    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+    if (playerMgr)
+    {
+        switch (rollType)
+        {
+            case ROLL_NEED:
+            {
+                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_ROLL_NEED, 1);
+                break;
+            }
+
+            case ROLL_GREED:
+            {
+                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED, 1);
+                break;
+            }
+
+            default: break;
+        }
+    }
+}
+
+void AchievementsMgr::OnGroupLootRollFinish(Player* player, Loot* loot, RollVote rollType, uint8 amount, uint32 itemSlot, InventoryResult result)
+{
+    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+    if (playerMgr)
+    {
+        LootItem* item = loot->GetLootItemInSlot(itemSlot);
+        playerMgr->UpdateAchievementCriteria(rollType == ROLL_NEED ? ACHIEVEMENT_CRITERIA_TYPE_ROLL_NEED_ON_LOOT : ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED_ON_LOOT, lootItem->itemId, amount);
+        
+        if (result == EQUIP_ERR_OK)
+        {
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM, item->itemId, item->count);
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE, loot->GetLootType(), item->count);
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_EPIC_ITEM, item->itemId, item->count);
+        }
+    }
+}
+
+void AchievementsMgr::OnSetOneFactionReputation(Player* player, uint32 factionEntryId)
+{
+    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+    if (playerMgr)
+    {
+        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KNOWN_FACTIONS, factionEntryId);
+        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION, factionEntryId);
+        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GAIN_EXALTED_REPUTATION, factionEntryId);
+        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GAIN_REVERED_REPUTATION, factionEntryId);
+        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GAIN_HONORED_REPUTATION, factionEntryId);
+    }
+}
+
+void AchievementsMgr::OnDoSpellHitOnUnit(Unit* caster, Unit* target, uint32 spellId)
+{
+    if (caster && target)
+    {
+        if (target->IsPlayer())
+        {
+            PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr((Player*)target);
+            if (playerMgr)
+            {
+                playerMgr->StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_SPELL_TARGET, spellId);
+                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, spellId, 0, caster);
+                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, spellId, 0, caster);
+            }
+        }
+
+        if (caster->IsPlayer())
+        {
+            PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr((Player*)caster);
+            if (playerMgr)
+            {
+                playerMgr->StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_SPELL_CASTER, spellId);
+                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2, spellId, 0, target);
+            }
+        }
+    }
+}
+
+void AchievementsMgr::OnSpellCast(Unit* caster, Unit* target, Item* castItem, uint32 spellId, uint32 castItemId)
+{
+    if (caster && caster->IsPlayer())
+    {
+        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr((Player*)caster);
+        if (playerMgr)
+        {
+            if (castItem)
+            {
+                playerMgr->StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_ITEM, castItem->GetEntry());
+                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM, castItem->GetEntry());
+            }
+
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL, spellId, 0, (target ? target : caster));
         }
     }
 }

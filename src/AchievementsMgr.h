@@ -1116,8 +1116,6 @@ public:
     void OnPlayerSavedToDB(Player* player);
 
     void UpdateAchievementCriteria(Player* player, AchievementCriteriaTypes type, uint32 miscValue1 = 0, uint32 miscValue2 = 0, Unit* unit = nullptr);
-    void UpdateLootAchievements(Player* player, LootItem* item, Loot* loot);
-
     void StartTimedAchievement(Player* player, AchievementCriteriaTimedTypes type, uint32 entry, uint32 timeLost = 0);
     void UpdateTimedAchievements(Player* player, const uint32 diff);
 
@@ -1135,6 +1133,18 @@ public:
     void OnUnitDealDamage(Unit* dealer, Unit* victim, uint32 health, uint32 damage);
     void OnUnitKill(Unit* killer, Player* responsiblePlayer, Player* playerVictim);
     void OnUnitDealHeal(Unit* dealer, Unit* victim, int32 gain, uint32 addHealth);
+
+    // Loot Handler wrapper methods
+    void OnHandleLootMasterGive(Player* target, LootItem* item, Loot* loot, InventoryResult result);
+    void OnHandleLootRoll(Player* player, RollVote rollType);
+    void OnGroupLootRollFinish(Player* player, Loot* loot, RollVote rollType, uint8 amount, uint32 itemSlot, InventoryResult result);
+
+    // Reputation wrapper methods
+    void OnSetOneFactionReputation(Player* player, uint32 factionEntryId);
+
+    // Spell wrapper methods
+    void OnDoSpellHitOnUnit(Unit* caster, Unit* target, uint32 spellId);
+    void OnSpellCast(Unit* caster, Unit* target, Item* castItem, uint32 spellId);
 
 private:
     PlayerAchievementMgr* GetPlayerAchievementMgr(Player* player);
