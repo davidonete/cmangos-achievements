@@ -5138,8 +5138,8 @@ bool ChatHandler::HandleAchievementsCommand(char* args)
                 if (GetAchievementIdFromString(arg, achievementId) || GetNumberFromString(arg, achievementId))
                 {
                     // Get the selected player or self
-                    Player* target;
-                    if (ExtractPlayerTarget(nullptr, &target))
+                    Player* target = getSelectedPlayer();
+                    if (target)
                     {
                         return sAchievementsMgr.AddAchievement(target, achievementId);
                     }
@@ -5153,8 +5153,8 @@ bool ChatHandler::HandleAchievementsCommand(char* args)
             if (GetAchievementIdFromString(arg, achievementId) || GetNumberFromString(arg, achievementId))
             {
                 // Get the selected player or self
-                Player* target;
-                if (ExtractPlayerTarget(nullptr, &target))
+                Player* target = getSelectedPlayer();
+                if (target)
                 {
                     return sAchievementsMgr.RemoveAchievement(target, achievementId);
                 }
