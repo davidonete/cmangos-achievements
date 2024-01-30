@@ -81,6 +81,19 @@ enum AchievementCriteriaTimedTypes
     ACHIEVEMENT_TIMED_TYPE_MAX,
 };
 
+enum AchievementCriteriaAssetsIds
+{
+    ACHIEVEMENT_CRITERIA_ASSET_ID_BG_WS_OBJECTIVE_CAPTURE_FLAG = 42,
+    ACHIEVEMENT_CRITERIA_ASSET_ID_BG_WS_OBJECTIVE_RETURN_FLAG  = 44
+};
+
+enum AchievementCriteriaTimedAssetsIds
+{
+    ACHIEVEMENT_CRITERIA_TIMED_ASSET_ID_BG_WS_EVENT_START_BATTLE            = 8563,
+    ACHIEVEMENT_CRITERIA_TIMED_ASSET_ID_BG_WS_SPELL_SILVERWING_FLAG_PICKED  = 61265, // fake spell, does not exist but used as timer start event
+    ACHIEVEMENT_CRITERIA_TIMED_ASSET_ID_BG_WS_SPELL_WARSONG_FLAG_PICKED     = 61266  // fake spell, does not exist but used as timer start event
+};
+
 enum AchievementCriteriaTypes
 {
     ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE                 = 0,
@@ -696,7 +709,6 @@ public:
 #else
 #pragma pack(pop)
 #endif
-
 
 typedef std::list<AchievementCriteriaEntry const*> AchievementCriteriaEntryList;
 typedef std::list<AchievementEntry const*>         AchievementEntryList;
