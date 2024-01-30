@@ -916,44 +916,36 @@ void PlayerAchievementMgr::SaveToDB()
     }
 }
 
-void PlayerAchievementMgr::LoadFromDB(SqlQueryHolder* holder) 
+void PlayerAchievementMgr::LoadFromDB(uint32 playerId)
 {
-    auto achievementResult = holder->GetResult(PLAYER_LOGIN_QUERY_LOADACHIEVEMENTS);
-    auto criteriaResult = holder->GetResult(PLAYER_LOGIN_QUERY_LOAD_CRITERIA_PROGRESS);
-
-    if (achievementResult) 
+    auto playerAchievementsResult = CharacterDatabase.PQuery("SELECT `achievement`, `date` FROM `character_achievement` WHERE `guid` = '%u'", playerId);
+    if (playerAchievementsResult)
     {
         do 
         {
-            Field* fields = achievementResult->Fetch();
-            uint32 achievementid = fields[0].GetUInt16();
+            Field* fields = playerAchievementsResult->Fetch();
+            uint32 achievementId = fields[0].GetUInt16();
 
             // must not happen: cleanup at server startup in sAchievementsMgr.LoadCompletedAchievements()
-            AchievementEntry const* achievement = sAchievementStore.LookupEntry<AchievementEntry>(achievementid);
+            AchievementEntry const* achievement = sAchievementStore.LookupEntry<AchievementEntry>(achievementId);
             if (!achievement)
             {
                 continue;
             }
 
-            CompletedAchievementData& ca = m_completedAchievements[achievementid];
+            CompletedAchievementData& ca = m_completedAchievements[achievementId];
             ca.date = time_t(fields[1].GetUInt32());
             ca.changed = false;
-
-            // TODO: research titles
-            // if (AchievementReward const* reward = sAchievementsMgr.GetAchievementReward(achievement))
-            //     if (uint32 titleId = reward->titleId[Player::TeamIdForRace(GetPlayer()->getRace())])
-            //         if (CharTitlesEntry const* titleEntry = sCharTitlesStore.LookupEntry(titleId))
-            //             if (!GetPlayer()->HasTitle(titleEntry))
-            //                 GetPlayer()->SetTitle(titleEntry);
         } 
-        while (achievementResult->NextRow());
+        while (playerAchievementsResult->NextRow());
     }
 
-    if (criteriaResult) 
+    auto playerAchievementsCriteriaResult = CharacterDatabase.PQuery("SELECT `criteria`, `counter`, `date` FROM `character_achievement_progress` WHERE `guid` = '%u'", playerId);
+    if (playerAchievementsCriteriaResult)
     {
         do 
         {
-            Field* fields = criteriaResult->Fetch();
+            Field* fields = playerAchievementsCriteriaResult->Fetch();
             uint32 id      = fields[0].GetUInt16();
             uint32 counter = fields[1].GetUInt32();
             time_t date    = time_t(fields[2].GetUInt32());
@@ -977,7 +969,7 @@ void PlayerAchievementMgr::LoadFromDB(SqlQueryHolder* holder)
             progress.date    = date;
             progress.changed = false;
         } 
-        while (criteriaResult->NextRow());
+        while (playerAchievementsCriteriaResult->NextRow());
     }
 }
 
@@ -4647,7 +4639,7 @@ void AchievementsMgr::OnPlayerCharacterCreated(Player* player)
     }
 }
 
-void AchievementsMgr::OnPlayerLogin(Player* player, uint32 playerId, SqlQueryHolder* holder)
+void AchievementsMgr::OnPlayerLogin(Player* player, uint32 playerId)
 {
     if (sAchievementsConfig.enabled)
     {
@@ -4664,7 +4656,7 @@ void AchievementsMgr::OnPlayerLogin(Player* player, uint32 playerId, SqlQueryHol
             
             // Load the player achievements
             PlayerAchievementMgr* playerMgr = &pair.first->second;
-            playerMgr->LoadFromDB(holder);
+            playerMgr->LoadFromDB(playerId);
 
             // Update all the achievements after login
             playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_ON_LOGIN, 1);

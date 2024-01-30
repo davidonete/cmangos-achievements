@@ -962,7 +962,7 @@ public:
 
     void Reset();
     static void DeleteFromDB(uint32 lowguid);
-    void LoadFromDB(SqlQueryHolder* holder);
+    void LoadFromDB(uint32 playerId);
     void SaveToDB();
     void ResetAchievementCriteria(AchievementCriteriaCondition condition, uint32 value, bool evenIfCriteriaComplete = false);
     void UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscValue1 = 0, uint32 miscValue2 = 0, Unit* unit = nullptr);
@@ -1109,7 +1109,7 @@ private:
 public:
     // Player wrapper methods
     void OnPlayerCharacterCreated(Player* player);
-    void OnPlayerLogin(Player* player, uint32 playerId, SqlQueryHolder* holder);
+    void OnPlayerLogin(Player* player, uint32 playerId);
     void OnPlayerLogout(Player* player);
 
     void OnPlayerDeletedFromDB(uint32 playerId);
