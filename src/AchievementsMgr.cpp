@@ -4871,6 +4871,86 @@ void AchievementsMgr::OnPlayerHandlePageTextQuery(Player* player, WorldPacket& r
     }
 }
 
+void AchievementsMgr::OnUnitDealDamage(Unit* dealer, Unit* victim, uint32 health, uint32 damage)
+{
+    if (dealer && victim && dealer != victim)
+    {
+        if (Player* killer = dealer->GetBeneficiaryPlayer())
+        {
+            PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(killer);
+            if (playerMgr)
+            {
+                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_DAMAGE_DONE, damage, 0, victim);
+                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HIT_DEALT, damage);
+            }
+        }
+
+        if (victim->IsPlayer())
+        {
+            PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr((Player*)victim);
+            if (playerMgr)
+            {
+                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HIT_RECEIVED, damage);
+                if (health <= damage)
+                {
+                    playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_TOTAL_DAMAGE_RECEIVED, health);
+                }
+                else
+                {
+                    playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_TOTAL_DAMAGE_RECEIVED, damage);
+                }
+            }
+        }
+    }
+}
+
+void AchievementsMgr::OnUnitKill(Unit* killer, Player* responsiblePlayer, Player* playerVictim)
+{
+    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(playerVictim);
+    if (playerMgr)
+    {
+        if (responsiblePlayer && playerVictim != responsiblePlayer)
+        {
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILLED_BY_PLAYER, GetTeamIndexByTeamId(responsiblePlayer->GetTeam()));
+        }
+        else if (killer && killer->IsUnit())
+        {
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILLED_BY_CREATURE, 1, killer->GetEntry());
+        }
+    }
+}
+
+void AchievementsMgr::OnUnitDealHeal(Unit* dealer, Unit* victim, int32 gain, uint32 addHealth)
+{
+    if (dealer && victim)
+    {
+        if (dealer->IsPlayer())
+        {
+            PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr((Player*)dealer);
+            if (playerMgr)
+            {
+                // use the actual gain, as the overhealing shall not be counted, skip gain 0 (it ignored anyway in to criteria)
+                if (gain)
+                {
+                    playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HEALING_DONE, gain, 0, victim);
+                }
+
+                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HEAL_CASTED, addHealth);
+            }
+        }
+
+        if (victim->IsPlayer())
+        {
+            PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr((Player*)victim);
+            if (playerMgr)
+            {
+                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_TOTAL_HEALING_RECEIVED, gain);
+                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HEALING_RECEIVED, addHealth);
+            }
+        }
+    }
+}
+
 PlayerAchievementMgr* AchievementsMgr::GetPlayerAchievementMgr(Player* player)
 {
     if (sAchievementsConfig.enabled)

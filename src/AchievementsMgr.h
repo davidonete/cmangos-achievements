@@ -1131,6 +1131,11 @@ public:
     void OnPlayerHandleFall(Player* player, float zDiff);
     void OnPlayerHandlePageTextQuery(Player* player, WorldPacket& recv_data);
 
+    // Unit wrapper methods
+    void OnUnitDealDamage(Unit* dealer, Unit* victim, uint32 health, uint32 damage);
+    void OnUnitKill(Unit* killer, Player* responsiblePlayer, Player* playerVictim);
+    void OnUnitDealHeal(Unit* dealer, Unit* victim, int32 gain, uint32 addHealth);
+
 private:
     PlayerAchievementMgr* GetPlayerAchievementMgr(Player* player);
     const PlayerAchievementMgr* GetPlayerAchievementMgr(const Player* player) const;
