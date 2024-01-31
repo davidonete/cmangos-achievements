@@ -1110,6 +1110,8 @@ public:
     void CheckAllAchievementCriteria(Player* player);
     void ResetAchievementCriteria(Player* player, AchievementCriteriaCondition condition, uint32 value, bool evenIfCriteriaComplete = false);
 
+    static bool IsAchievementsDBTable(const std::string& tableName);
+
     // Player wrapper methods
     void OnPlayerCharacterCreated(Player* player);
     void OnPlayerLogin(Player* player, uint32 playerId);
@@ -1118,14 +1120,20 @@ public:
     void OnPlayerSavedToDB(Player* player);
     void OnPlayerWriteDump(uint32 playerId, std::string& dump);
 
-    static bool IsAchievementsDBTable(const std::string& tableName);
-
     void OnPlayerSpellAdded(Player* player, uint32 spellId);
     void OnPlayerDuelCompleted(Player* player, Player* opponent, DuelCompleteType type);
     void OnPlayerKilledMonsterCredit(Player* player, uint32 entry, ObjectGuid guid);
     void OnPlayerRewardSinglePlayerAtKill(Player* player, Unit* victim);
     void OnPlayerHandleFall(Player* player, float zDiff);
     void OnPlayerHandlePageTextQuery(Player* player, WorldPacket& recv_data);
+    void OnPlayerSetDeathState(Player* player);
+    void OnPlayerResetTalents(Player* player, uint32 cost);
+    void OnPlayerSetSkill(Player* player, uint32 skillId);
+    void OnPlayerRewardHonor(Player* player, Player* victim);
+    void OnPlayerStoreNewItem(Player* player, uint32 itemId, uint32 count);
+    void OnPlayerEquipItem(Player* player, uint32 itemId, uint8 slot);
+    void OnPlayerMoveItemToInventory(Player* player, uint32 itemId, uint8 slot);
+    void OnPlayerRewardQuest(Player* player, const Quest* quest);
 
     // Unit wrapper methods
     void OnUnitDealDamage(Unit* dealer, Unit* victim, uint32 health, uint32 damage);
