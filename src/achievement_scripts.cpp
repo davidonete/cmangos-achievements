@@ -1,4 +1,7 @@
-#include "achievementspch.h"
+#include "AchievementScriptMgr.h"
+
+#include "BattleGround/BattleGroundAB.h"
+#include "Entities/Player.h"
 
 class achievement_resilient_victory: public AchievementCriteriaScript 
 {

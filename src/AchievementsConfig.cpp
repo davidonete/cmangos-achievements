@@ -1,6 +1,6 @@
-#include "achievementspch.h"
-#include "SystemConfig.h"
 #include "AchievementsConfig.h"
+
+#include "Log.h"
 
 AchievementsConfig::AchievementsConfig()
 : enabled(false)
