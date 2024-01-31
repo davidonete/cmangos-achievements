@@ -15,8 +15,8 @@ public:
                 const PvpTeamIndex team = GetTeamIndexByTeamId(source->GetTeam());
                 if (team != TEAM_INDEX_NEUTRAL)
                 {
-                    const uint32 teamScore = sAchievementsMgr.GetTeamScore(bg, source->GetTeam());
-                    const uint32 otherTeamScore = sAchievementsMgr.GetTeamScore(bg, BattleGround::GetOtherTeam(source->GetTeam()));
+                    const uint32 teamScore = sAchievementsMgr.GetBGTeamScore(bg, source->GetTeam());
+                    const uint32 otherTeamScore = sAchievementsMgr.GetBGTeamScore(bg, BattleGround::GetOtherTeam(source->GetTeam()));
                     return teamScore > (otherTeamScore + 500);
                 }
             }

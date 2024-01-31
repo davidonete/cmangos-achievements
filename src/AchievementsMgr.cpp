@@ -549,7 +549,7 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
             BattleGround* bg = source->GetBattleGround();
             if (bg)
             {
-                const uint32 score = sAchievementsMgr.GetTeamScore(bg, source->GetTeam());
+                const uint32 score = sAchievementsMgr.GetBGTeamScore(bg, source->GetTeam());
                 return score >= bg_loss_team_score.min_score && score <= bg_loss_team_score.max_score;
             }
 
@@ -632,8 +632,8 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
 
             const Team winnerTeam = bgWinnerTeam == WINNER_ALLIANCE ? ALLIANCE : HORDE;
             const Team loserTeam = bgWinnerTeam == WINNER_ALLIANCE ? HORDE : ALLIANCE;
-            const uint32 winnnerScore = sAchievementsMgr.GetTeamScore(bg, winnerTeam);
-            const uint32 loserScore = sAchievementsMgr.GetTeamScore(bg, loserTeam);
+            const uint32 winnnerScore = sAchievementsMgr.GetBGTeamScore(bg, winnerTeam);
+            const uint32 loserScore = sAchievementsMgr.GetBGTeamScore(bg, loserTeam);
             return source->GetTeam() == winnerTeam && winnnerScore == teams_scores.winner_score && loserScore == teams_scores.loser_score;
         }
 
