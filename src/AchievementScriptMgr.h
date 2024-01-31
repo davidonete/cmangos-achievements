@@ -1,10 +1,7 @@
 #ifndef ACHIEVEMENT_AchievementScriptMgr_H
 #define ACHIEVEMENT_AchievementScriptMgr_H
 
-struct AchievementCriteriaData;
-struct CriteriaProgress;
-class AchievementScriptMgr;
-class AchievementsMgr;
+#include "AchievementsMgr.h"
 
 class AchievementScriptObject 
 {
@@ -52,7 +49,7 @@ public:
 class PlayerScript : public AchievementScriptObject
 {
 protected:
-    PlayerScript(const char* name);
+    PlayerScript(const char* name) : AchievementScriptObject(name) {}
 
 public:
     // Called when a player complete an achievement
@@ -137,11 +134,11 @@ public: /* PlayerScript */
     void OnCriteriaSave(/*CharacterDatabaseTransaction trans, */Player* player, uint16 critId, CriteriaProgress criteriaData);
 
 public: /* AchievementScript */
-        void SetRealmCompleted(AchievementEntry const* achievement);
-        bool IsCompletedCriteria(PlayerAchievementMgr* mgr, AchievementCriteriaEntry const* achievementCriteria, AchievementEntry const* achievement, CriteriaProgress const* progress);
-        bool IsRealmCompleted(AchievementsMgr const* globalmgr, AchievementEntry const* achievement, std::chrono::system_clock::time_point completionTime);
-        void OnBeforeCheckCriteria(PlayerAchievementMgr* mgr, AchievementCriteriaEntryList const* achievementCriteriaList);
-        bool CanCheckCriteria(PlayerAchievementMgr* mgr, AchievementCriteriaEntry const* achievementCriteria);
+    void SetRealmCompleted(AchievementEntry const* achievement);
+    bool IsCompletedCriteria(PlayerAchievementMgr* mgr, AchievementCriteriaEntry const* achievementCriteria, AchievementEntry const* achievement, CriteriaProgress const* progress);
+    bool IsRealmCompleted(AchievementsMgr const* globalmgr, AchievementEntry const* achievement, std::chrono::system_clock::time_point completionTime);
+    void OnBeforeCheckCriteria(PlayerAchievementMgr* mgr, AchievementCriteriaEntryList const* achievementCriteriaList);
+    bool CanCheckCriteria(PlayerAchievementMgr* mgr, AchievementCriteriaEntry const* achievementCriteria);
 
 public:
     uint32 getScriptId(std::string const& name) const;

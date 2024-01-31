@@ -5,6 +5,28 @@
 #include <unordered_map>
 #include <string>
 #include <chrono>
+#include <array>
+
+#include "Database/SQLStorage.h"
+
+class BattleGround;
+class Item;
+class Loot;
+class ObjectGuid;
+class Player;
+class Quest;
+namespace Taxi { class Tracker; }
+class Unit;
+class WorldPacket;
+class WorldSession;
+
+struct LootItem;
+
+enum DuelCompleteType;
+enum Team;
+enum InventoryResult;
+enum RollVote;
+enum ScoreType;
 
 extern SQLStorage sAchievementCriteriaStore;
 extern SQLStorage sAchievementStore;
@@ -760,10 +782,6 @@ enum AchievementCommonCategories
     ACHIEVEMENT_CATEGORY_STATISTICS                    =  1
 };
 
-class Unit;
-class Player;
-class WorldPacket;
-
 struct AchievementCriteriaData
 {
     AchievementCriteriaDataType dataType{ACHIEVEMENT_CRITERIA_DATA_TYPE_NONE};
@@ -1123,7 +1141,7 @@ public:
 
     void OnPlayerSpellAdded(Player* player, uint32 spellId);
     void OnPlayerDuelCompleted(Player* player, Player* opponent, DuelCompleteType type);
-    void OnPlayerKilledMonsterCredit(Player* player, uint32 entry, ObjectGuid guid);
+    void OnPlayerKilledMonsterCredit(Player* player, uint32 entry, ObjectGuid& guid);
     void OnPlayerRewardSinglePlayerAtKill(Player* player, Unit* victim);
     void OnPlayerHandleFall(Player* player, float zDiff);
     void OnPlayerHandlePageTextQuery(Player* player, WorldPacket& recv_data);

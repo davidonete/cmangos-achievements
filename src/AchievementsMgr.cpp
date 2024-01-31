@@ -1,7 +1,19 @@
-#include "achievementspch.h"
+#include "AchievementsMgr.h"
+
+#include "AchievementsConfig.h"
+#include "AchievementScriptMgr.h"
+
+#include "BattleGround/BattleGroundAB.h"
+#include "BattleGround/BattleGroundAV.h"
+#include "BattleGround/BattleGroundWS.h"
+#include "GameEvents/GameEventMgr.h"
+#include "Globals/ObjectMgr.h"
+#include "Guilds/Guild.h"
+#include "Guilds/GuildMgr.h"
+#include "Spells/SpellMgr.h"
+#include "World/World.h"
 
 #ifdef ENABLE_MANGOSBOTS
-#include "playerbot.h"
 #include "PlayerbotAIConfig.h"
 #endif
 
@@ -541,7 +553,7 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
 
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_HOLIDAY:
         {
-            return IsHolidayActive(HolidayIds(holiday.id));
+            return sGameEventMgr.IsActiveHoliday(HolidayIds(holiday.id));
         }
 
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_BG_LOSS_TEAM_SCORE:
@@ -1101,9 +1113,10 @@ void PlayerAchievementMgr::SendAchievementEarned(AchievementEntry const* achieve
 
     sLog.outDetail("achievement AchievementMgr::SendAchievementEarned(%u)", achievement->ID);
 
-    //Guild* guild = sGuildMgr.GetGuildById(GetPlayer()->GetGuildId());
+    // Guild* guild = sGuildMgr.GetGuildById(GetPlayer()->GetGuildId());
     // TODO: research broadcast
-    // if (guild) {
+    // if (guild) 
+    // {
     //     Acore::BroadcastTextBuilder _builder(GetPlayer(), CHAT_MSG_GUILD_ACHIEVEMENT, BROADCAST_TEXT_ACHIEVEMENT_EARNED, GetPlayer()->GetGender(), GetPlayer(), achievement->ID);
     //     Acore::LocalizedPacketDo<Acore::BroadcastTextBuilder> _localizer(_builder);
     //     guild->BroadcastWorker(_localizer, GetPlayer());
@@ -1170,7 +1183,9 @@ void PlayerAchievementMgr::SendAchievementEarned(AchievementEntry const* achieve
     }
 
     if (!achievement || !achievementName || !achievementDescription || !achievementTitleReward) 
+    {
         return;
+    }
 
     // send visual effect
     if (sAchievementsConfig.sendVisual && sAchievementsConfig.effectId)
@@ -4882,7 +4897,7 @@ void AchievementsMgr::OnPlayerDuelCompleted(Player* player, Player* opponent, Du
     }
 }
 
-void AchievementsMgr::OnPlayerKilledMonsterCredit(Player* player, uint32 entry, ObjectGuid guid)
+void AchievementsMgr::OnPlayerKilledMonsterCredit(Player* player, uint32 entry, ObjectGuid& guid)
 {
     PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
     if (playerMgr)

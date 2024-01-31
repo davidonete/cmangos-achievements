@@ -1,4 +1,6 @@
-#include "achievementspch.h"
+#include "AchievementScriptMgr.h"
+
+#include "Util/Timer.h"
 
 INSTANTIATE_SINGLETON_1(AchievementScriptMgr);
 

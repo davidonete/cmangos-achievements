@@ -30,6 +30,8 @@ set(LIBRARY_SRCS
 # Define ENABLE_PLAYERBOTS if need
 if (BUILD_MANGOSBOTS OR BUILD_IKE3_BOTS)
 	include_directories(
+		${CMAKE_SOURCE_DIR}/src/game/Globals
+		${CMAKE_SOURCE_DIR}/src/shared/Config
 		${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot
 		${CMAKE_SOURCE_DIR}/src/modules/Bots/ahbot
 	)
