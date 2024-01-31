@@ -1,6 +1,8 @@
 #include "AchievementScriptMgr.h"
 
 #include "BattleGround/BattleGroundAB.h"
+#include "BattleGround/BattleGroundAV.h"
+#include "BattleGround/BattleGroundWS.h"
 #include "Entities/Player.h"
 
 class achievement_resilient_victory: public AchievementCriteriaScript 
