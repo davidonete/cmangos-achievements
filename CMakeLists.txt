@@ -44,15 +44,6 @@ if (BUILD_MANGOSBOTS OR BUILD_IKE3_BOTS)
 	endif()
 endif()
 
-# Define ENABLE_Achievements if need
-if (BUILD_ACHIEVEMENTS)
-	add_definitions(-DENABLE_ACHIEVEMENTS)
-endif()
-
-if(PCH)
-	include_directories(${CMAKE_CURRENT_BINARY_DIR})
-endif()
-
 add_library(${LIBRARY_NAME} STATIC ${LIBRARY_SRCS})
 
 target_link_libraries(${LIBRARY_NAME}
