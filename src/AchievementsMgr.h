@@ -1106,6 +1106,7 @@ private:
 public:
     void UpdateAchievementCriteria(Player* player, AchievementCriteriaTypes type, uint32 miscValue1 = 0, uint32 miscValue2 = 0, Unit* unit = nullptr);
     void StartTimedAchievement(Player* player, AchievementCriteriaTimedTypes type, uint32 entry, uint32 timeLost = 0);
+    void StartTimedAchievement(BattleGround* bg, AchievementCriteriaTimedTypes type, uint32 entry);
     void UpdateTimedAchievements(Player* player, const uint32 diff);
     void CheckAllAchievementCriteria(Player* player);
     void ResetAchievementCriteria(Player* player, AchievementCriteriaCondition condition, uint32 value, bool evenIfCriteriaComplete = false);
@@ -1134,6 +1135,9 @@ public:
     void OnPlayerEquipItem(Player* player, uint32 itemId, uint8 slot);
     void OnPlayerMoveItemToInventory(Player* player, uint32 itemId, uint8 slot);
     void OnPlayerRewardQuest(Player* player, const Quest* quest);
+    void OnPlayerEndBattleground(Player* player, Team winner);
+    void OnPlayerTaxiFlightRouteStart(Player* player, const Taxi::Tracker& taxiTracker, bool initial);
+    void OnPlayerTaxiFlightRouteEnd(Player* player, const Taxi::Tracker& taxiTracker, bool final);
 
     // Unit wrapper methods
     void OnUnitDealDamage(Unit* dealer, Unit* victim, uint32 health, uint32 damage);
@@ -1152,14 +1156,13 @@ public:
     void OnDoSpellHitOnUnit(Unit* caster, Unit* target, uint32 spellId);
     void OnSpellCast(Unit* caster, Unit* target, Item* castItem, uint32 spellId);
 
+    // Battleground wrapper methods
+    int32 GetBGTeamScore(BattleGround* bg, Team team) const;
+    void OnBGUpdatePlayerScore(BattleGround* bg, Player* player, ScoreType type);
+
 private:
     PlayerAchievementMgr* GetPlayerAchievementMgr(Player* player);
     const PlayerAchievementMgr* GetPlayerAchievementMgr(const Player* player) const;
-
-public:
-    // Battleground wrapper methods
-    void StartTimedAchievement(BattleGround* bg, AchievementCriteriaTimedTypes type, uint32 entry);
-    int32 GetTeamScore(BattleGround* bg, Team team) const;
 
 private:
     AchievementCriteriaDataMap m_criteriaDataMap;

@@ -4783,7 +4783,7 @@ void AchievementsMgr::StartTimedAchievement(BattleGround* bg, AchievementCriteri
     }
 }
 
-int32 AchievementsMgr::GetTeamScore(BattleGround* bg, Team team) const
+int32 AchievementsMgr::GetBGTeamScore(BattleGround* bg, Team team) const
 {
     if (bg)
     {
@@ -4805,6 +4805,26 @@ int32 AchievementsMgr::GetTeamScore(BattleGround* bg, Team team) const
     }
     
     return 0;
+}
+
+void AchievementsMgr::OnBGUpdatePlayerScore(BattleGround* bg, Player* player, ScoreType type)
+{
+    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+    if (playerMgr && bg)
+    {
+        // WS BG Flags
+        if (bg->GetTypeId() == BATTLEGROUND_WS)
+        {
+            if (type == SCORE_FLAG_CAPTURES)
+            {
+                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BG_OBJECTIVE_CAPTURE, ACHIEVEMENT_CRITERIA_ASSET_ID_BG_WS_OBJECTIVE_CAPTURE_FLAG);
+            }
+            else if (type == SCORE_FLAG_RETURNS)
+            {
+                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BG_OBJECTIVE_CAPTURE, ACHIEVEMENT_CRITERIA_ASSET_ID_BG_WS_OBJECTIVE_RETURN_FLAG);
+            }
+        }
+    }
 }
 
 void AchievementsMgr::UpdateTimedAchievements(Player* player, const uint32 diff)
@@ -5027,6 +5047,52 @@ void AchievementsMgr::OnPlayerRewardQuest(Player* player, const Quest* quest)
 
         playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST_COUNT);
         playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST, quest->GetQuestId());
+    }
+}
+
+void AchievementsMgr::OnPlayerEndBattleground(Player* player, Team winner)
+{
+    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+    if (playerMgr)
+    {
+        const uint32 mapId = player->GetMapId();
+        const Team team = player->GetTeam();
+        if (team == winner)
+        {
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_BG, mapId);
+        }
+
+        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND, mapId);
+    }
+}
+
+void AchievementsMgr::OnPlayerTaxiFlightRouteStart(Player* player, const Taxi::Tracker& taxiTracker, bool initial)
+{
+    if (initial)
+    {
+        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+        if (playerMgr)
+        {
+            // not destinations, clear source node
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GOLD_SPENT_FOR_TRAVELLING, taxiTracker.GetCost());
+        }
+    }
+}
+
+void AchievementsMgr::OnPlayerTaxiFlightRouteEnd(Player* player, const Taxi::Tracker& taxiTracker, bool final)
+{
+    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+    if (playerMgr)
+    {
+        if (final)
+        {
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_FLIGHT_PATHS_TAKEN, 1);
+        }
+        else
+        {
+            // not destinations, clear source node
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GOLD_SPENT_FOR_TRAVELLING, taxiTracker.GetCost());
+        }
     }
 }
 
