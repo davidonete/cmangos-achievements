@@ -44,6 +44,8 @@ if (BUILD_MANGOSBOTS OR BUILD_IKE3_BOTS)
 	endif()
 endif()
 
+add_definitions(-DENABLE_ACHIEVEMENTS)
+
 add_library(${LIBRARY_NAME} STATIC ${LIBRARY_SRCS})
 
 target_link_libraries(${LIBRARY_NAME}

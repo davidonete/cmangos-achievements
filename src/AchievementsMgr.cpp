@@ -10,6 +10,7 @@
 #include "Globals/ObjectMgr.h"
 #include "Guilds/Guild.h"
 #include "Guilds/GuildMgr.h"
+#include "Server/DBCStores.h"
 #include "Spells/SpellMgr.h"
 #include "World/World.h"
 
