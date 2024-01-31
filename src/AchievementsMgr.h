@@ -32,14 +32,6 @@ extern SQLStorage sAchievementCriteriaStore;
 extern SQLStorage sAchievementStore;
 extern SQLStorage sAchievementCategoryStore;
 
-enum Difficulty
-{
-    REGULAR_DIFFICULTY           = 0,
-    DUNGEON_DIFFICULTY_NORMAL    = 0,
-    RAID_DIFFICULTY_25MAN_NORMAL = 0,
-    RAID_DIFFICULTY_40MAN_NORMAL = 1,
-};
-
 #define MAX_DUNGEON_DIFFICULTY     0
 #define MAX_RAID_DIFFICULTY        1
 #define MAX_DIFFICULTY             1
