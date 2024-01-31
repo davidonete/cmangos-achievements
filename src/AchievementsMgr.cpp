@@ -16,6 +16,12 @@ SQLStorage sAchievementCategoryStore(AchievementCategoryfmt, "ID", "achievement_
 char constexpr AchievementCriteriafmt[] = "iiiiiiiiissssssssssssssssiiiiii";
 SQLStorage sAchievementCriteriaStore(AchievementCriteriafmt, "ID", "achievement_criteria_dbc");
 
+static const std::array<std::string, 2> achievementsDBTables =
+{
+    "character_achievement",
+    "character_achievement_progress"
+};
+
 enum ComparisionType
 {
     COMP_TYPE_EQ = 0,
@@ -715,11 +721,11 @@ void PlayerAchievementMgr::ResetAchievementCriteria(AchievementCriteriaCondition
     }
 }
 
-void PlayerAchievementMgr::DeleteFromDB(uint32 lowguid)
+void PlayerAchievementMgr::DeleteFromDB(uint32 playerId)
 {
     CharacterDatabase.BeginTransaction();
-    CharacterDatabase.PExecute("DELETE FROM `character_achievement` WHERE `guid` = '%u'", lowguid);
-    CharacterDatabase.PExecute("DELETE FROM `character_achievement_progress` WHERE `guid` = '%u'", lowguid);
+    CharacterDatabase.PExecute("DELETE FROM `character_achievement` WHERE `guid` = '%u'", playerId);
+    CharacterDatabase.PExecute("DELETE FROM `character_achievement_progress` WHERE `guid` = '%u'", playerId);
     CharacterDatabase.CommitTransaction();
 }
 
@@ -4691,6 +4697,62 @@ void AchievementsMgr::OnPlayerSavedToDB(Player* player)
     }
 }
 
+void AchievementsMgr::OnPlayerWriteDump(uint32 playerId, std::string& dump)
+{
+    for (const std::string& dbTable : achievementsDBTables)
+    {
+        if (!dbTable.empty())
+        {
+            auto queryResult = CharacterDatabase.PQuery("SELECT * FROM %s WHERE guid = '%u'", dbTable.c_str(), playerId);
+            if (queryResult)
+            {
+                do
+                {
+                    std::ostringstream ss;
+                    ss << "INSERT INTO " << _TABLE_SIM_ << dbTable << _TABLE_SIM_ << " VALUES (";
+                    Field* fields = queryResult->Fetch();
+                    for (uint32 i = 0; i < queryResult->GetFieldCount(); ++i)
+                    {
+                        if (i != 0)
+                        {
+                            ss << ", ";
+                        }
+
+                        if (fields[i].IsNULL())
+                        {
+                            ss << "NULL";
+                        }
+                        else
+                        {
+                            std::string s = fields[i].GetCppString();
+                            CharacterDatabase.escape_string(s);
+                            ss << "'" << s << "'";
+                        }
+                    }
+
+                    ss << ");";
+                    dump += ss.str();
+                    dump += "\n";
+                } 
+                while (queryResult->NextRow());
+            }
+        }
+    }
+}
+
+bool AchievementsMgr::IsAchievementsDBTable(const std::string& tableName)
+{
+    for (const std::string& dbTable : achievementsDBTables)
+    {
+        if (tableName == dbTable)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void AchievementsMgr::UpdateAchievementCriteria(Player* player, AchievementCriteriaTypes type, uint32 miscValue1 /*= 0*/, uint32 miscValue2 /*= 0*/, Unit* unit /*= nullptr*/)
 {
     PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
@@ -4984,13 +5046,15 @@ void AchievementsMgr::OnGroupLootRollFinish(Player* player, Loot* loot, RollVote
     if (playerMgr)
     {
         LootItem* item = loot->GetLootItemInSlot(itemSlot);
-        playerMgr->UpdateAchievementCriteria(rollType == ROLL_NEED ? ACHIEVEMENT_CRITERIA_TYPE_ROLL_NEED_ON_LOOT : ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED_ON_LOOT, lootItem->itemId, amount);
-        
-        if (result == EQUIP_ERR_OK)
+        if (item)
         {
-            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM, item->itemId, item->count);
-            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE, loot->GetLootType(), item->count);
-            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_EPIC_ITEM, item->itemId, item->count);
+            playerMgr->UpdateAchievementCriteria(rollType == ROLL_NEED ? ACHIEVEMENT_CRITERIA_TYPE_ROLL_NEED_ON_LOOT : ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED_ON_LOOT, item->itemId, amount);
+            if (result == EQUIP_ERR_OK)
+            {
+                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM, item->itemId, item->count);
+                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE, loot->GetLootType(), item->count);
+                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_EPIC_ITEM, item->itemId, item->count);
+            }
         }
     }
 }
@@ -5035,7 +5099,7 @@ void AchievementsMgr::OnDoSpellHitOnUnit(Unit* caster, Unit* target, uint32 spel
     }
 }
 
-void AchievementsMgr::OnSpellCast(Unit* caster, Unit* target, Item* castItem, uint32 spellId, uint32 castItemId)
+void AchievementsMgr::OnSpellCast(Unit* caster, Unit* target, Item* castItem, uint32 spellId)
 {
     if (caster && caster->IsPlayer())
     {

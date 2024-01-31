@@ -760,8 +760,9 @@ enum AchievementCommonCategories
     ACHIEVEMENT_CATEGORY_STATISTICS                    =  1
 };
 
-class Player;
 class Unit;
+class Player;
+class WorldPacket;
 
 struct AchievementCriteriaData
 {
@@ -950,10 +951,6 @@ struct CompletedAchievementData
 typedef std::unordered_map<uint32, CriteriaProgress> CriteriaProgressMap;
 typedef std::unordered_map<uint32, CompletedAchievementData> CompletedAchievementMap;
 
-class Unit;
-class Player;
-class WorldPacket;
-
 class PlayerAchievementMgr
 {
 public:
@@ -961,7 +958,7 @@ public:
     ~PlayerAchievementMgr();
 
     void Reset();
-    static void DeleteFromDB(uint32 lowguid);
+    static void DeleteFromDB(uint32 playerId);
     void LoadFromDB(uint32 playerId);
     void SaveToDB();
     void ResetAchievementCriteria(AchievementCriteriaCondition condition, uint32 value, bool evenIfCriteriaComplete = false);
@@ -1107,20 +1104,21 @@ private:
     uint8 GetPlayerLocale(WorldSession* session) const;
 
 public:
+    void UpdateAchievementCriteria(Player* player, AchievementCriteriaTypes type, uint32 miscValue1 = 0, uint32 miscValue2 = 0, Unit* unit = nullptr);
+    void StartTimedAchievement(Player* player, AchievementCriteriaTimedTypes type, uint32 entry, uint32 timeLost = 0);
+    void UpdateTimedAchievements(Player* player, const uint32 diff);
+    void CheckAllAchievementCriteria(Player* player);
+    void ResetAchievementCriteria(Player* player, AchievementCriteriaCondition condition, uint32 value, bool evenIfCriteriaComplete = false);
+
     // Player wrapper methods
     void OnPlayerCharacterCreated(Player* player);
     void OnPlayerLogin(Player* player, uint32 playerId);
     void OnPlayerLogout(Player* player);
-
     void OnPlayerDeletedFromDB(uint32 playerId);
     void OnPlayerSavedToDB(Player* player);
+    void OnPlayerWriteDump(uint32 playerId, std::string& dump);
 
-    void UpdateAchievementCriteria(Player* player, AchievementCriteriaTypes type, uint32 miscValue1 = 0, uint32 miscValue2 = 0, Unit* unit = nullptr);
-    void StartTimedAchievement(Player* player, AchievementCriteriaTimedTypes type, uint32 entry, uint32 timeLost = 0);
-    void UpdateTimedAchievements(Player* player, const uint32 diff);
-
-    void CheckAllAchievementCriteria(Player* player);
-    void ResetAchievementCriteria(Player* player, AchievementCriteriaCondition condition, uint32 value, bool evenIfCriteriaComplete = false);
+    static bool IsAchievementsDBTable(const std::string& tableName);
 
     void OnPlayerSpellAdded(Player* player, uint32 spellId);
     void OnPlayerDuelCompleted(Player* player, Player* opponent, DuelCompleteType type);
