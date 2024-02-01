@@ -32,9 +32,12 @@ extern SQLStorage sAchievementCriteriaStore;
 extern SQLStorage sAchievementStore;
 extern SQLStorage sAchievementCategoryStore;
 
+#if defined(MANGOSBOT_ZERO) || MAX_EXPANSION == 0
 #define MAX_DUNGEON_DIFFICULTY     0
 #define MAX_RAID_DIFFICULTY        1
 #define MAX_DIFFICULTY             1
+#endif
+
 #define MAX_ACHIEVEMENT_LOCALE     16
 
 enum AchievementFaction

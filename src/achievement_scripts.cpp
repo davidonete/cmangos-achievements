@@ -83,7 +83,7 @@ public:
     bool OnCheck(Player* source, Unit* /*target*/, uint32 /*criteria_id*/) override
     {
 #if defined(MANGOSBOT_ONE) || defined(MANGOSBOT_TWO) || MAX_EXPANSION >= 1
-        return source->InArena() && source->GetBattleground()->GetArenaType() == arenaType;
+        return source->InArena() && source->GetBattleGround()->GetArenaType() == arenaType;
 #else
         return false;
 #endif
