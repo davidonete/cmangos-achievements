@@ -20,6 +20,12 @@
 
 INSTANTIATE_SINGLETON_1(AchievementsMgr);
 
+#if EXPANSION == 0
+#define MAX_DUNGEON_DIFFICULTY     0
+#define MAX_RAID_DIFFICULTY        1
+#define MAX_DIFFICULTY             1
+#endif
+
 char constexpr Achievementfmt[] = "iiiissssssssssssssssissssssssssssssssiiiiiissssssssssssssssiiii";
 SQLStorage sAchievementStore(Achievementfmt, "ID", "achievement_dbc");
 
@@ -5394,6 +5400,11 @@ const PlayerAchievementMgr* AchievementsMgr::GetPlayerAchievementMgr(const Playe
     }
 
     return nullptr;
+}
+
+uint32 AchievementsMgr::GetCurrentPatch()
+{
+    return EXPANSION;
 }
 
 const char* AchievementEntry::GetName(uint32 locale) const

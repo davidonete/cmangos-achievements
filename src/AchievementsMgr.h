@@ -32,12 +32,6 @@ extern SQLStorage sAchievementCriteriaStore;
 extern SQLStorage sAchievementStore;
 extern SQLStorage sAchievementCategoryStore;
 
-#if EXPANSION == 0
-#define MAX_DUNGEON_DIFFICULTY     0
-#define MAX_RAID_DIFFICULTY        1
-#define MAX_DIFFICULTY             1
-#endif
-
 #define MAX_ACHIEVEMENT_LOCALE     16
 
 enum AchievementFaction
@@ -1026,7 +1020,7 @@ public:
     AchievementsMgr() {}
     ~AchievementsMgr() {}
 
-    static uint32 GetCurrentPatch() { return EXPANSION; }
+    static uint32 GetCurrentPatch();
     static uint32 GetCurrentVersion() { return 1U; }
 
     bool IsStatisticCriteria(AchievementCriteriaEntry const* achievementCriteria) const;
