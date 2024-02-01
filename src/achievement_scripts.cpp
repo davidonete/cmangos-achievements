@@ -82,7 +82,7 @@ public:
 
     bool OnCheck(Player* source, Unit* /*target*/, uint32 /*criteria_id*/) override
     {
-#if defined(MANGOSBOT_ONE) || defined(MANGOSBOT_TWO) || MAX_EXPANSION >= 1
+#if EXPANSION == 1
         return source->InArena() && source->GetBattleGround()->GetArenaType() == arenaType;
 #else
         return false;
@@ -209,7 +209,7 @@ void AddSC_achievement_scripts()
     new achievement_sickly_gazelle();
     new achievement_everything_counts();
     new achievement_bg_av_perfection();
-#if defined(MANGOSBOT_ONE) || defined(MANGOSBOT_TWO) || MAX_EXPANSION >= 1
+#if EXPANSION == 1
     new achievement_arena_by_type("achievement_arena_2v2_check", ARENA_TYPE_2v2);
     new achievement_arena_by_type("achievement_arena_3v3_check", ARENA_TYPE_3v3);
     new achievement_arena_by_type("achievement_arena_5v5_check", ARENA_TYPE_5v5);

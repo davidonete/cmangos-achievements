@@ -32,7 +32,7 @@ extern SQLStorage sAchievementCriteriaStore;
 extern SQLStorage sAchievementStore;
 extern SQLStorage sAchievementCategoryStore;
 
-#if defined(MANGOSBOT_ZERO) || MAX_EXPANSION == 0
+#if EXPANSION == 0
 #define MAX_DUNGEON_DIFFICULTY     0
 #define MAX_RAID_DIFFICULTY        1
 #define MAX_DIFFICULTY             1
@@ -1026,8 +1026,8 @@ public:
     AchievementsMgr() {}
     ~AchievementsMgr() {}
 
-    static uint32 GetCurrentPatch() { return uint32(0); }
-    static uint32 GetCurrentVersion() { return uint32(1); }
+    static uint32 GetCurrentPatch() { return EXPANSION; }
+    static uint32 GetCurrentVersion() { return 1U; }
 
     bool IsStatisticCriteria(AchievementCriteriaEntry const* achievementCriteria) const;
     bool isStatisticAchievement(AchievementEntry const* achievement) const;

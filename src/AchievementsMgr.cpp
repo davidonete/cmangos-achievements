@@ -1493,14 +1493,8 @@ void PlayerAchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes ty
                     
                 const uint8 currentLevel = GetPlayer()->GetLevel();
                 SetCriteriaProgress(achievementCriteria, currentLevel);
+                const uint8 maxLevel = 60 + (10 * EXPANSION);
 
-#if defined (MANGOSBOT_TWO) || MAX_EXPANSION == 2
-                const uint8 maxLevel = 80;
-#elif defined (MANGOSBOT_ONE) || MAX_EXPANSION == 1
-                const uint8 maxLevel = 70;
-#else
-                const uint8 maxLevel = 60;
-#endif
                 // Hardcore challenge
                 if (currentLevel == maxLevel)
                 {
@@ -1997,7 +1991,7 @@ void PlayerAchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes ty
                 if (miscValue1 && miscValue1 != achievementCriteria->gain_reputation.factionID)
                     continue;
 
-#if defined(MANGOSBOT_ONE) || defined(MANGOSBOT_TWO) || MAX_EXPANSION >= 1
+#if EXPANSION == 1
                 FactionEntry const* factionEntry = sFactionStore.LookupEntry<FactionEntry>(achievementCriteria->gain_reputation.factionID);
 #else
                 FactionEntry const* factionEntry = sFactionStore.LookupEntry(achievementCriteria->gain_reputation.factionID);
@@ -2015,13 +2009,13 @@ void PlayerAchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes ty
             case ACHIEVEMENT_CRITERIA_TYPE_GAIN_EXALTED_REPUTATION:
             {
                 uint32 exaltedCount = 0;
-#if defined(MANGOSBOT_ONE) || defined(MANGOSBOT_TWO) || MAX_EXPANSION >= 1
+#if EXPANSION == 1
                 for (unsigned int i = 1; i < sFactionStore.GetMaxEntry(); ++i)
 #else
                 for (unsigned int i = 1; i < sFactionStore.GetNumRows(); ++i)
 #endif
                 {
-#if defined(MANGOSBOT_ONE) || defined(MANGOSBOT_TWO) || MAX_EXPANSION >= 1
+#if EXPANSION == 1
                     FactionEntry const* factionEntry = sFactionStore.LookupEntry<FactionEntry>(achievementCriteria->gain_reputation.factionID);
 #else
                     FactionEntry const* factionEntry = sFactionStore.LookupEntry(achievementCriteria->gain_reputation.factionID);
@@ -2217,13 +2211,13 @@ void PlayerAchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes ty
             case ACHIEVEMENT_CRITERIA_TYPE_GAIN_REVERED_REPUTATION:
             {
                 uint32 counter = 0;
-#if defined(MANGOSBOT_ONE) || defined(MANGOSBOT_TWO) || MAX_EXPANSION >= 1
+#if EXPANSION == 1
                 for (unsigned int i = 1; i < sFactionStore.GetMaxEntry(); ++i)
 #else
                 for (unsigned int i = 1; i < sFactionStore.GetNumRows(); ++i)
 #endif
                 {
-#if defined(MANGOSBOT_ONE) || defined(MANGOSBOT_TWO) || MAX_EXPANSION >= 1
+#if EXPANSION == 1
                     FactionEntry const* factionEntry = sFactionStore.LookupEntry<FactionEntry>(achievementCriteria->gain_reputation.factionID);
 #else
                     FactionEntry const* factionEntry = sFactionStore.LookupEntry(achievementCriteria->gain_reputation.factionID);
@@ -2243,13 +2237,13 @@ void PlayerAchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes ty
             case ACHIEVEMENT_CRITERIA_TYPE_GAIN_HONORED_REPUTATION:
             {
                 uint32 counter = 0;
-#if defined(MANGOSBOT_ONE) || defined(MANGOSBOT_TWO) || MAX_EXPANSION >= 1
+#if EXPANSION == 1
                 for (unsigned int i = 1; i < sFactionStore.GetMaxEntry(); ++i)
 #else
                 for (unsigned int i = 1; i < sFactionStore.GetNumRows(); ++i)
 #endif
                 {
-#if defined(MANGOSBOT_ONE) || defined(MANGOSBOT_TWO) || MAX_EXPANSION >= 1
+#if EXPANSION == 1
                     FactionEntry const* factionEntry = sFactionStore.LookupEntry<FactionEntry>(achievementCriteria->gain_reputation.factionID);
 #else
                     FactionEntry const* factionEntry = sFactionStore.LookupEntry(achievementCriteria->gain_reputation.factionID);
@@ -2269,13 +2263,13 @@ void PlayerAchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes ty
             case ACHIEVEMENT_CRITERIA_TYPE_KNOWN_FACTIONS:
             {
                 uint32 counter = 0;
-#if defined(MANGOSBOT_ONE) || defined(MANGOSBOT_TWO) || MAX_EXPANSION >= 1
+#if EXPANSION == 1
                 for (unsigned int i = 1; i < sFactionStore.GetMaxEntry(); ++i)
 #else
                 for (unsigned int i = 1; i < sFactionStore.GetNumRows(); ++i)
 #endif
                 {
-#if defined(MANGOSBOT_ONE) || defined(MANGOSBOT_TWO) || MAX_EXPANSION >= 1
+#if EXPANSION == 1
                     FactionEntry const* factionEntry = sFactionStore.LookupEntry<FactionEntry>(achievementCriteria->gain_reputation.factionID);
 #else
                     FactionEntry const* factionEntry = sFactionStore.LookupEntry(achievementCriteria->gain_reputation.factionID);
@@ -2543,7 +2537,7 @@ void PlayerAchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes ty
 
             case ACHIEVEMENT_CRITERIA_TYPE_OWN_RANK:
             {
-#if defined(MANGOSBOT_ZERO) || MAX_EXPANSION == 0
+#if EXPANSION == 0
                 if (miscValue1 && ((miscValue1 < 4) || (miscValue1 > (HONOR_RANK_COUNT - 1)) || ((miscValue1 - 4) != achievementCriteria->own_rank.rank)))
                     continue;
 
