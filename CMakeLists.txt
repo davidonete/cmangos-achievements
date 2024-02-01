@@ -46,6 +46,17 @@ endif()
 
 add_definitions(-DENABLE_ACHIEVEMENTS)
 
+# Define Expansion
+if ( ${CMAKE_PROJECT_NAME} MATCHES "Classic")
+  add_definitions(-DMAX_EXPANSION=0)
+endif()
+if ( ${CMAKE_PROJECT_NAME} MATCHES "TBC")
+  add_definitions(-DMAX_EXPANSION=1)
+endif()
+if ( ${CMAKE_PROJECT_NAME} MATCHES "WoTLK")
+  add_definitions(-DMAX_EXPANSION=2)
+endif()
+
 add_library(${LIBRARY_NAME} STATIC ${LIBRARY_SRCS})
 
 target_link_libraries(${LIBRARY_NAME}
