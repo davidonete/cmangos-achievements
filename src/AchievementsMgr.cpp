@@ -73,6 +73,40 @@ bool CompareValues(ComparisionType type, T val1, T val2)
     }
 }
 
+void SendAchievementMessage(Player* player, const char* message)
+{
+    WorldPacket data;
+
+    char* buf = mangos_strdup(message);
+    char* pos = buf;
+
+    while (char* line = ChatHandler::LineFromMessage(pos))
+    {
+#if EXPANSION == 0
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, line, LANG_UNIVERSAL);
+#else
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, line, LANG_ADDON);
+#endif
+        player->GetSession()->SendPacket(data);
+    }
+
+    delete[] buf;
+}
+
+void PSendAchievementMessage(Player* player, const char* format, ...)
+{
+    if(player)
+    {
+        va_list ap;
+        char str[2048];
+        va_start(ap, format);
+        vsnprintf(str, 2048, format, ap);
+        va_end(ap);
+
+        SendAchievementMessage(player, str);
+    }
+}
+
 bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
 {
     if (dataType >= MAX_ACHIEVEMENT_CRITERIA_DATA_TYPE)
@@ -677,7 +711,7 @@ bool AchievementCriteriaDataSet::Meets(Player const* source, Unit const* target,
 PlayerAchievementMgr::PlayerAchievementMgr(Player* player)
 {
     m_player = player;
-    m_hasAchiever = false;
+    m_addonEnabled = false;
     m_version = sAchievementsMgr.GetCurrentVersion();
 }
 
@@ -1000,7 +1034,7 @@ void PlayerAchievementMgr::LoadFromDB(uint32 playerId)
 
 void PlayerAchievementMgr::EnableAddon(uint32 version)
 {
-    m_hasAchiever = true;
+    m_addonEnabled = true;
     m_version = version;
 }
 
@@ -1201,13 +1235,14 @@ void PlayerAchievementMgr::SendAchievementEarned(AchievementEntry const* achieve
     }
 
     // Don't send if no Achiever addon
-    if (sAchievementsConfig.sendAddon && HasAddon())
+    if (sAchievementsConfig.sendAddon && IsAddonEnabled())
     {
-        ChatHandler(m_player).PSendSysMessage
+        PSendAchievementMessage
         (
-            "ACHI|AE|%u;%u"
-            , achievement->ID
-            , uint32(date)
+            m_player,
+            "ACHI#AE#%u;%u",
+            achievement->ID,
+            uint32(date)
         );
     }
 }
@@ -1217,16 +1252,17 @@ void PlayerAchievementMgr::SendCriteriaUpdate(AchievementCriteriaEntry const* en
     if (!entry || !progress->changed) return;
 
     // Don't send if no Achiever addon
-    if (!HasAddon())
+    if (!IsAddonEnabled())
         return;
 
-    ChatHandler(m_player).PSendSysMessage
+    PSendAchievementMessage
     (
-        "ACHI|ACU|%u;%u;%u;%u"
-        , entry->ID
-        , entry->referredAchievement
-        , progress->counter
-        , uint32(progress->date)
+        m_player,
+        "ACHI#ACU#%u;%u;%u;%u",
+        entry->ID,
+        entry->referredAchievement,
+        progress->counter,
+        uint32(progress->date)
     );
 }
 
@@ -3503,7 +3539,7 @@ bool AchievementsMgr::HasAddon(Player* player) const
 #endif
 
     const PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
-    return playerMgr && playerMgr->HasAddon();
+    return playerMgr && playerMgr->IsAddonEnabled();
 }
 
 void AchievementsMgr::EnableAddon(Player* player, uint32 version)
@@ -3522,7 +3558,7 @@ void AchievementsMgr::EnableAddon(Player* player, uint32 version)
     PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
     if (playerMgr)
     {
-        if (!playerMgr->HasAddon())
+        if (!playerMgr->IsAddonEnabled())
         {
             GetAllCategories(player, version);
             GetAllAchievements(player, version);
@@ -3605,19 +3641,20 @@ void AchievementsMgr::GetAllCategories(Player* player, uint32 version) const
         const char* categoryName = category->GetName(GetPlayerLocale(player->GetSession()));
         const auto* name = std::strlen(categoryName) <= 2 ? "_" : categoryName;
 
-        ChatHandler(player).PSendSysMessage
+        PSendAchievementMessage
         (
-            "ACHI|CA|%u;%i;%s;%i;%u;%u"
-            , category->ID
-            , category->parentCategory
-            , name
-            , category->sortOrder
-            , ++i
-            , count
+            player,
+            "ACHI#CA#%u;%i;%s;%i;%u;%u",
+            category->ID,
+            category->parentCategory,
+            name,
+            category->sortOrder,
+            ++i,
+            count
         );
     }
 
-    ChatHandler(player).PSendSysMessage("ACHI|CAV|1");
+    SendAchievementMessage(player, "ACHI#CAV#1");
 }
 
 void AchievementsMgr::GetAllAchievements(Player* player, uint32 version) const
@@ -3661,28 +3698,29 @@ void AchievementsMgr::GetAllAchievements(Player* player, uint32 version) const
         const auto* description = std::strlen(achievementDescription) <= 2 ? "_" : achievementDescription;
         const auto* titleReward = std::strlen(achievementTitleReward) <= 2 ? "_" : achievementTitleReward;
 
-        ChatHandler(player).PSendSysMessage
+        PSendAchievementMessage
         (
-            "ACHI|AC|%u;%i;%i;%s;%s;%u;%u;%u;%i;%u;%s;%i;%u;%u;%u"
-            , achievement->ID
-            , achievement->requiredFaction
-            , achievement->parentAchievement
-            , name
-            , description
-            , achievement->categoryId
-            , achievement->points
-            , achievement->OrderInCategory
-            , achievement->flags
-            , achievement->icon
-            , titleReward
-            , achievement->count
-            , achievement->refAchievement
-            , ++i
-            , count
+            player,
+            "ACHI#AC#%u;%i;%i;%s;%s;%u;%u;%u;%i;%u;%s;%i;%u;%u;%u",
+            achievement->ID,
+            achievement->requiredFaction,
+            achievement->parentAchievement,
+            name,
+            description,
+            achievement->categoryId,
+            achievement->points,
+            achievement->OrderInCategory,
+            achievement->flags,
+            achievement->icon,
+            titleReward,
+            achievement->count,
+            achievement->refAchievement,
+            ++i,
+            count
         );
     }
 
-    ChatHandler(player).PSendSysMessage("ACHI|ACV|1");
+    SendAchievementMessage(player, "ACHI#ACV#1");
 }
 
 void AchievementsMgr::GetAllCriteria(Player* player, uint32 version) const
@@ -3713,30 +3751,31 @@ void AchievementsMgr::GetAllCriteria(Player* player, uint32 version) const
         const char* criteriaName = criteria->GetName(GetPlayerLocale(player->GetSession()));
         const auto* name = std::strlen(criteriaName) <= 2 ? "_" : criteriaName;
 
-        ChatHandler(player).PSendSysMessage
+        PSendAchievementMessage
         (
-            "ACHI|CR|%u;%i;%i;%i;%i;%i;%i;%i;%i;%s;%i;%i;%i;%i;%i;%u;%u"
-            , criteria->ID
-            , criteria->referredAchievement
-            , criteria->requiredType
-            , criteria->raw.field3
-            , criteria->raw.count
-            , criteria->additionalRequirements[0].additionalRequirement_type
-            , criteria->additionalRequirements[0].additionalRequirement_value
-            , criteria->additionalRequirements[1].additionalRequirement_type
-            , criteria->additionalRequirements[1].additionalRequirement_value
-            , name
-            , criteria->flags
-            , criteria->timedType
-            , criteria->timerStartEvent
-            , criteria->timeLimit
-            , criteria->showOrder
-            , ++i
-            , count
+            player,
+            "ACHI#CR#%u;%i;%i;%i;%i;%i;%i;%i;%i;%s;%i;%i;%i;%i;%i;%u;%u",
+            criteria->ID,
+            criteria->referredAchievement,
+            criteria->requiredType,
+            criteria->raw.field3,
+            criteria->raw.count,
+            criteria->additionalRequirements[0].additionalRequirement_type,
+            criteria->additionalRequirements[0].additionalRequirement_value,
+            criteria->additionalRequirements[1].additionalRequirement_type,
+            criteria->additionalRequirements[1].additionalRequirement_value,
+            name,
+            criteria->flags,
+            criteria->timedType,
+            criteria->timerStartEvent,
+            criteria->timeLimit,
+            criteria->showOrder,
+            ++i,
+            count
         );
     }
 
-    ChatHandler(player).PSendSysMessage("ACHI|CRV|1");
+    SendAchievementMessage(player, "ACHI#CRV#1");
 }
 
 void AchievementsMgr::GetCharacterCriteria(Player* player) const
@@ -3777,12 +3816,13 @@ void AchievementsMgr::GetCharacterCriteria(Player* player) const
                     continue;
                 }
 
-                ChatHandler(player).PSendSysMessage
+                PSendAchievementMessage
                 (
-                    "ACHI|CH_CR|%u;%i;%u"
-                    , id
-                    , counter
-                    , uint32(date)
+                    player,
+                    "ACHI#CH_CR#%u;%i;%u",
+                    id,
+                    counter,
+                    uint32(date)
                 );
 
                 sentCriterias.push_back(id);
@@ -3828,12 +3868,13 @@ void AchievementsMgr::GetCharacterCriteria(Player* player) const
                     if (std::find(sentCriterias.begin(), sentCriterias.end(), achievementCriteria->ID) != sentCriterias.end())
                         continue;
 
-                    ChatHandler(player).PSendSysMessage
+                    PSendAchievementMessage
                     (
-                        "ACHI|CH_CR|%u;%i;%u"
-                        , achievementCriteria->ID
-                        , std::max(uint32(1), achievementCriteria->raw.count)
-                        , uint32(time_t(time(nullptr)))
+                        player,
+                        "ACHI#CH_CR#%u;%i;%u",
+                        achievementCriteria->ID,
+                        std::max(uint32(1), achievementCriteria->raw.count),
+                        uint32(time_t(time(nullptr)))
                     );
                 }
             }
@@ -3871,11 +3912,12 @@ void AchievementsMgr::GetCharacterAchievements(Player* player) const
             const auto date = time_t(fields[1].GetUInt32());
 
 
-            ChatHandler(player).PSendSysMessage
+            PSendAchievementMessage
             (
-                "ACHI|CH_AC|%u;%u"
-                , achievementid
-                , uint32(date)
+                player,
+                "ACHI#CH_AC#%u;%u",
+                achievementid,
+                uint32(date)
             );
 
         } 

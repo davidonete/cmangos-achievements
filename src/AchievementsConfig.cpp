@@ -20,7 +20,7 @@ INSTANTIATE_SINGLETON_1(AchievementsConfig);
 
 bool AchievementsConfig::Initialize()
 {
-    sLog.outString("Initializing Achievements by ike3");
+    sLog.outString("Initializing Achievements by Tsaah");
 
     if (!config.SetSource(SYSCONFDIR"achievements.conf"))
     {

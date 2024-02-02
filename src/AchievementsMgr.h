@@ -982,7 +982,7 @@ public:
 
     void RemoveCriteriaProgress(AchievementCriteriaEntry const* entry);
 
-    bool HasAddon() const { return m_hasAchiever; }
+    bool IsAddonEnabled() const { return m_addonEnabled; }
     void EnableAddon(uint32 version);
     uint32 GetVersion() { return m_version; }
 
@@ -1010,7 +1010,7 @@ private:
     typedef std::map<uint32, uint32> TimedAchievementMap;
     TimedAchievementMap m_timedAchievements;      // Criteria id/time left in MS
 
-    bool m_hasAchiever;
+    bool m_addonEnabled;
     uint32 m_version;
 };
 
