@@ -3401,7 +3401,7 @@ bool PlayerAchievementMgr::CanUpdateCriteria(AchievementCriteriaEntry const* cri
     // if (DisableMgr::IsDisabledFor(DISABLE_TYPE_ACHIEVEMENT_CRITERIA, criteria->ID, nullptr))
     //     return false;
 
-    if (achievement->patch != sAchievementsMgr.GetCurrentPatch())
+    if (achievement->patch > sAchievementsMgr.GetCurrentPatch())
         return false;
 
     if (achievement->mapID != -1 && GetPlayer()->GetMapId() != uint32(achievement->mapID))
