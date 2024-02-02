@@ -5575,7 +5575,7 @@ bool ChatHandler::HandleAchievementsCommand(char* args)
                 return true;
             }
         }
-        else if (command == "getCategoties")
+        else if (command == "getCategories")
         {
             if (m_session->GetSecurity() >= SEC_GAMEMASTER)
             {
