@@ -22,12 +22,6 @@ class WorldSession;
 
 struct LootItem;
 
-enum DuelCompleteType;
-enum Team;
-enum InventoryResult;
-enum RollVote;
-enum ScoreType;
-
 extern SQLStorage sAchievementCriteriaStore;
 extern SQLStorage sAchievementStore;
 extern SQLStorage sAchievementCategoryStore;
@@ -1129,7 +1123,7 @@ public:
     void OnPlayerWriteDump(uint32 playerId, std::string& dump);
 
     void OnPlayerSpellAdded(Player* player, uint32 spellId);
-    void OnPlayerDuelCompleted(Player* player, Player* opponent, DuelCompleteType type);
+    void OnPlayerDuelCompleted(Player* player, Player* opponent, uint8 type);
     void OnPlayerKilledMonsterCredit(Player* player, uint32 entry, ObjectGuid& guid);
     void OnPlayerRewardSinglePlayerAtKill(Player* player, Unit* victim);
     void OnPlayerHandleFall(Player* player, float zDiff);
@@ -1142,7 +1136,7 @@ public:
     void OnPlayerEquipItem(Player* player, uint32 itemId, uint8 slot);
     void OnPlayerMoveItemToInventory(Player* player, uint32 itemId, uint8 slot);
     void OnPlayerRewardQuest(Player* player, const Quest* quest);
-    void OnPlayerEndBattleground(Player* player, Team winner);
+    void OnPlayerEndBattleground(Player* player, uint32 winner);
     void OnPlayerTaxiFlightRouteStart(Player* player, const Taxi::Tracker& taxiTracker, bool initial);
     void OnPlayerTaxiFlightRouteEnd(Player* player, const Taxi::Tracker& taxiTracker, bool final);
 
@@ -1152,9 +1146,9 @@ public:
     void OnUnitDealHeal(Unit* dealer, Unit* victim, int32 gain, uint32 addHealth);
 
     // Loot Handler wrapper methods
-    void OnHandleLootMasterGive(Player* target, LootItem* item, Loot* loot, InventoryResult result);
-    void OnHandleLootRoll(Player* player, RollVote rollType);
-    void OnGroupLootRollFinish(Player* player, Loot* loot, RollVote rollType, uint8 amount, uint32 itemSlot, InventoryResult result);
+    void OnHandleLootMasterGive(Player* target, LootItem* item, Loot* loot, uint8 result);
+    void OnHandleLootRoll(Player* player, uint8 rollType);
+    void OnGroupLootRollFinish(Player* player, Loot* loot, uint8 rollType, uint8 amount, uint32 itemSlot, uint8 result);
 
     // Reputation wrapper methods
     void OnSetOneFactionReputation(Player* player, uint32 factionEntryId);
@@ -1164,8 +1158,8 @@ public:
     void OnSpellCast(Unit* caster, Unit* target, Item* castItem, uint32 spellId);
 
     // Battleground wrapper methods
-    int32 GetBGTeamScore(BattleGround* bg, Team team) const;
-    void OnBGUpdatePlayerScore(BattleGround* bg, Player* player, ScoreType type);
+    int32 GetBGTeamScore(BattleGround* bg, uint32 team) const;
+    void OnBGUpdatePlayerScore(BattleGround* bg, Player* player, uint8 type);
 
 private:
     PlayerAchievementMgr* GetPlayerAchievementMgr(Player* player);

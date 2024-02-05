@@ -4878,7 +4878,7 @@ void AchievementsMgr::StartTimedAchievement(BattleGround* bg, AchievementCriteri
     }
 }
 
-int32 AchievementsMgr::GetBGTeamScore(BattleGround* bg, Team team) const
+int32 AchievementsMgr::GetBGTeamScore(BattleGround* bg, uint32 team) const
 {
     if (bg)
     {
@@ -4902,7 +4902,7 @@ int32 AchievementsMgr::GetBGTeamScore(BattleGround* bg, Team team) const
     return 0;
 }
 
-void AchievementsMgr::OnBGUpdatePlayerScore(BattleGround* bg, Player* player, ScoreType type)
+void AchievementsMgr::OnBGUpdatePlayerScore(BattleGround* bg, Player* player, uint8 type)
 {
     PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
     if (playerMgr && bg)
@@ -4968,7 +4968,7 @@ void AchievementsMgr::OnPlayerSpellAdded(Player* player, uint32 spellId)
     }
 }
 
-void AchievementsMgr::OnPlayerDuelCompleted(Player* player, Player* opponent, DuelCompleteType type)
+void AchievementsMgr::OnPlayerDuelCompleted(Player* player, Player* opponent, uint8 type)
 {
     if (type == DUEL_WON)
     {
@@ -5145,7 +5145,7 @@ void AchievementsMgr::OnPlayerRewardQuest(Player* player, const Quest* quest)
     }
 }
 
-void AchievementsMgr::OnPlayerEndBattleground(Player* player, Team winner)
+void AchievementsMgr::OnPlayerEndBattleground(Player* player, uint32 winner)
 {
     PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
     if (playerMgr)
@@ -5271,7 +5271,7 @@ void AchievementsMgr::OnUnitDealHeal(Unit* dealer, Unit* victim, int32 gain, uin
     }
 }
 
-void AchievementsMgr::OnHandleLootMasterGive(Player* target, LootItem* item, Loot* loot, InventoryResult result)
+void AchievementsMgr::OnHandleLootMasterGive(Player* target, LootItem* item, Loot* loot, uint8 result)
 {
     if (result == EQUIP_ERR_OK)
     {
@@ -5285,7 +5285,7 @@ void AchievementsMgr::OnHandleLootMasterGive(Player* target, LootItem* item, Loo
     }
 }
 
-void AchievementsMgr::OnHandleLootRoll(Player* player, RollVote rollType)
+void AchievementsMgr::OnHandleLootRoll(Player* player, uint8 rollType)
 {
     PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
     if (playerMgr)
@@ -5309,7 +5309,7 @@ void AchievementsMgr::OnHandleLootRoll(Player* player, RollVote rollType)
     }
 }
 
-void AchievementsMgr::OnGroupLootRollFinish(Player* player, Loot* loot, RollVote rollType, uint8 amount, uint32 itemSlot, InventoryResult result)
+void AchievementsMgr::OnGroupLootRollFinish(Player* player, Loot* loot, uint8 rollType, uint8 amount, uint32 itemSlot, uint8 result)
 {
     PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
     if (playerMgr)
