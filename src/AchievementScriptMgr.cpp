@@ -4,6 +4,8 @@
 
 INSTANTIATE_SINGLETON_1(AchievementScriptMgr);
 
+extern void AddSC_achievement_scripts();
+
 // Utility macros to refer to the script registry.
 #define SCR_REG_MAP(T) ScriptRegistry<T>::ScriptMap
 #define SCR_REG_ITR(T) ScriptRegistry<T>::ScriptMapIterator
@@ -41,6 +43,8 @@ void AchievementScriptMgr::Initialize()
     sLog.outBasic("server.loading, > Loading C++ scripts");
     sLog.outBasic("server.loading,  ");
     loadScriptNames();
+
+    AddSC_achievement_scripts();
 }
 
 void AchievementScriptMgr::Unload()
