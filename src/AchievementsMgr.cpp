@@ -3513,7 +3513,7 @@ uint8 PlayerAchievementMgr::GetPlayerLocale() const
         {
             localeIndex = 9;
         }
-        /*
+#if MAX_LOCALE == 9
         else if (playerLocaleIndex == sObjectMgr.GetStorageLocaleIndexFor(LOCALE_esMX))
         {
             localeIndex = 10;
@@ -3522,7 +3522,7 @@ uint8 PlayerAchievementMgr::GetPlayerLocale() const
         {
             localeIndex = 11;
         }
-        */
+#endif
     }
 
     return localeIndex;
