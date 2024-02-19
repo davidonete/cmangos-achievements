@@ -14,7 +14,7 @@
 #include "Spells/SpellMgr.h"
 #include "World/World.h"
 
-#ifdef ENABLE_MANGOSBOTS
+#ifdef ENABLE_PLAYERBOTS
 #include "PlayerbotAIConfig.h"
 #endif
 
@@ -784,7 +784,7 @@ void PlayerAchievementMgr::DeleteFromDB(uint32 playerId)
 
 void PlayerAchievementMgr::SyncAccountAcchievements()
 {
-#ifdef ENABLE_MANGOSBOTS
+#ifdef ENABLE_PLAYERBOTS
     if (!GetPlayer()->isRealPlayer())
         return;
 #endif
@@ -1298,7 +1298,7 @@ void PlayerAchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes ty
     if (m_player->IsGameMaster())
         return;
 
-#ifdef ENABLE_MANGOSBOTS
+#ifdef ENABLE_PLAYERBOTS
     uint32 accId = GetPlayer()->GetSession()->GetAccountId();
     if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !sAchievementsConfig.randomBots)
         return;
@@ -2639,7 +2639,7 @@ bool PlayerAchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* a
         if (sAchievementsMgr.IsRealmCompleted(achievement))
             return false;
 
-#ifdef ENABLE_MANGOSBOTS
+#ifdef ENABLE_PLAYERBOTS
         uint32 accId = GetPlayer()->GetSession()->GetAccountId();
         if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !sAchievementsConfig.randomBotsRealmFirst)
             return false;
@@ -3533,7 +3533,7 @@ bool AchievementsMgr::HasAddon(Player* player) const
     if (!player)
         return false;
 
-#ifdef ENABLE_MANGOSBOTS
+#ifdef ENABLE_PLAYERBOTS
     if(!player->isRealPlayer())
         return false;
 #endif
@@ -3550,7 +3550,7 @@ void AchievementsMgr::EnableAddon(Player* player, uint32 version)
     if (!player)
         return;
 
-#ifdef ENABLE_MANGOSBOTS
+#ifdef ENABLE_PLAYERBOTS
     if (!player->isRealPlayer())
         return;
 #endif
@@ -3617,7 +3617,7 @@ void AchievementsMgr::GetAllCategories(Player* player, uint32 version) const
     if (!player)
         return;
 
-#ifdef ENABLE_MANGOSBOTS
+#ifdef ENABLE_PLAYERBOTS
     if (!player->isRealPlayer())
         return;
 #endif
@@ -3665,7 +3665,7 @@ void AchievementsMgr::GetAllAchievements(Player* player, uint32 version) const
     if (!player)
         return;
 
-#ifdef ENABLE_MANGOSBOTS
+#ifdef ENABLE_PLAYERBOTS
     if (!player->isRealPlayer())
         return;
 #endif
@@ -3731,7 +3731,7 @@ void AchievementsMgr::GetAllCriteria(Player* player, uint32 version) const
     if (!player)
         return;
 
-#ifdef ENABLE_MANGOSBOTS
+#ifdef ENABLE_PLAYERBOTS
     if (!player->isRealPlayer())
         return;
 #endif
@@ -3786,7 +3786,7 @@ void AchievementsMgr::GetCharacterCriteria(Player* player) const
     if (!player)
         return;
 
-#ifdef ENABLE_MANGOSBOTS
+#ifdef ENABLE_PLAYERBOTS
     if (!player->isRealPlayer())
         return;
 #endif
@@ -3890,7 +3890,7 @@ void AchievementsMgr::GetCharacterAchievements(Player* player) const
     if (!player)
         return;
 
-#ifdef ENABLE_MANGOSBOTS
+#ifdef ENABLE_PLAYERBOTS
     if (!player->isRealPlayer())
         return;
 #endif
@@ -4727,7 +4727,7 @@ void AchievementsMgr::OnPlayerCharacterCreated(Player* player)
     {
         if (player)
         {
-#ifdef ENABLE_MANGOSBOTS
+#ifdef ENABLE_PLAYERBOTS
             // Check if randombots can use the achievement system
             uint32 accId = player->GetSession()->GetAccountId();
             if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !sAchievementsConfig.randomBots)
@@ -4746,7 +4746,7 @@ void AchievementsMgr::OnPlayerLogin(Player* player, uint32 playerId)
     {
         if (player)
         {
-#ifdef ENABLE_MANGOSBOTS
+#ifdef ENABLE_PLAYERBOTS
             // Check if randombots can use the achievement system
             uint32 accId = player->GetSession()->GetAccountId();
             if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !sAchievementsConfig.randomBots)
@@ -5400,7 +5400,7 @@ PlayerAchievementMgr* AchievementsMgr::GetPlayerAchievementMgr(Player* player)
                 playerMgr = &playerMgrIt->second;
             }
 
-#ifdef ENABLE_MANGOSBOTS
+#ifdef ENABLE_PLAYERBOTS
             // Check if randombots can use the achievement system
             uint32 accId = player->GetSession()->GetAccountId();
             if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !sAchievementsConfig.randomBots)
@@ -5429,7 +5429,7 @@ const PlayerAchievementMgr* AchievementsMgr::GetPlayerAchievementMgr(const Playe
                 playerMgr = &playerMgrIt->second;
             }
 
-#ifdef ENABLE_MANGOSBOTS
+#ifdef ENABLE_PLAYERBOTS
             // Check if randombots can use the achievement system
             uint32 accId = player->GetSession()->GetAccountId();
             if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !sAchievementsConfig.randomBots)
