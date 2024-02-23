@@ -4727,7 +4727,7 @@ namespace achievements_module
             {
                 localeIndex = 9;
             }
-            /*
+#if MAX_LOCALE == 9
             else if (playerLocaleIndex == sObjectMgr.GetStorageLocaleIndexFor(LOCALE_esMX))
             {
                 localeIndex = 10;
@@ -4736,7 +4736,7 @@ namespace achievements_module
             {
                 localeIndex = 11;
             }
-            */
+#endif
         }
 
         return localeIndex;
