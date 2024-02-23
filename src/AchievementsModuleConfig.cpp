@@ -1,10 +1,8 @@
-#include "AchievementsConfig.h"
+#include "AchievementsModuleConfig.h"
 
-#include "Log.h"
-#include "SystemConfig.h"
-
-AchievementsConfig::AchievementsConfig()
-: enabled(false)
+AchievementsModuleConfig::AchievementsModuleConfig()
+: ModuleConfig("achievements.conf")
+, enabled(false)
 , sendMessage(false)
 , sendAddon(false)
 , sendVisual(false)
@@ -16,18 +14,8 @@ AchievementsConfig::AchievementsConfig()
 
 }
 
-INSTANTIATE_SINGLETON_1(AchievementsConfig);
-
-bool AchievementsConfig::Initialize()
+bool AchievementsModuleConfig::OnLoad()
 {
-    sLog.outString("Initializing Achievements by Tsaah");
-
-    if (!config.SetSource(SYSCONFDIR"achievements.conf"))
-    {
-        sLog.outError("Failed to open configuration file achievements.conf");
-        return false;
-    }
-
     enabled = config.GetBoolDefault("Achievements.Enable", false);
     sendMessage = config.GetBoolDefault("Achievements.SendMessage", false);
     sendAddon = config.GetBoolDefault("Achievements.SendAddon", false);
@@ -36,7 +24,5 @@ bool AchievementsConfig::Initialize()
     randomBotsRealmFirst = config.GetBoolDefault("Achievements.RandomBotsRealmFirst", false);
     accountAchievements = config.GetBoolDefault("Achievements.AccountAchievenemts", false);
     effectId = config.GetIntDefault("Achievements.EffectId", 0);
-
-    sLog.outString("Achievements configuration loaded");
     return true;
 }
