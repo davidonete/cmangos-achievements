@@ -5349,7 +5349,7 @@ namespace achievements_module
             LootItem* item = loot->GetLootItemInSlot(itemSlot);
             if (item)
             {
-                playerMgr->UpdateAchievementCriteria(rollType == ROLL_NEED ? ACHIEVEMENT_CRITERIA_TYPE_ROLL_NEED_ON_LOOT : ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED_ON_LOOT, item->itemId, amount);
+                playerMgr->UpdateAchievementCriteria(rollType == ROLL_NEED ? ACHIEVEMENT_CRITERIA_TYPE_ROLL_NEED_ON_LOOT : ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED_ON_LOOT, item->itemId, rollAmount);
                 if (inventoryResult == EQUIP_ERR_OK)
                 {
                     playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM, item->itemId, item->count);

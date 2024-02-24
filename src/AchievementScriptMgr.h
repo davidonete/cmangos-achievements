@@ -1,7 +1,7 @@
 #ifndef ACHIEVEMENT_AchievementScriptMgr_H
 #define ACHIEVEMENT_AchievementScriptMgr_H
 
-#include "AchievementsMgr.h"
+#include "AchievementsModule.h"
 
 class AchievementScriptObject 
 {
