@@ -795,39 +795,36 @@ namespace achievements_module
         void OnStoreNewItem(Player* player, Loot* loot, Item* item) override;
         void OnMoveItemToInventory(Player* player, Item* item) override;
         void OnDeath(Player* player, Unit* killer) override;
+        bool OnHandlePageTextQuery(Player* player, const WorldPacket& packet) override;
+        void OnSetSkill(Player* player, uint16 skillId) override;
+        void OnRewardHonor(Player* player, Unit* victim) override;
+        void OnEquipItem(Player* player, Item* item);
+        void OnRewardQuest(Player* player, const Quest* quest);
+        void OnTaxiFlightRouteStart(Player* player, const Taxi::Tracker& taxiTracker, bool initial) override;
+        void OnTaxiFlightRouteEnd(Player* player, const Taxi::Tracker& taxiTracker, bool final) override;
+        void OnSetReputation(Player* player, const FactionEntry* factionEntry, int32 standing, bool incremental);
+
+        // Battleground Hooks
+        void OnEndBattleGround(BattleGround* battleground, uint32 winnerTeam) override;
+        void OnUpdatePlayerScore(BattleGround* battleground, Player* player, uint8 scoreType, uint32 value) override;
+
+        // Unit Hooks
+        void OnDealDamage(Unit* unit, Unit* victim, uint32 health, uint32 damage) override;
+        void OnKill(Unit* unit, Unit* victim) override;
+        void OnDealHeal(Unit* dealer, Unit* victim, int32 gain, uint32 addHealth) override;
+
+        // Spell Hooks
+        void OnHit(Spell* spell, Unit* caster, Unit* target) override;
+        void OnCast(Spell* spell, Unit* caster, Unit* target) override;
+
+        // Loot Hooks
+        void OnHandleLootMasterGive(Loot* loot, Player* target, LootItem* lootItem) override;
+        void OnPlayerRoll(Loot* loot, Player* player, uint32 itemSlot, uint8 rollType) override;
+        void OnPlayerWinRoll(Loot* loot, Player* player, uint8 rollType, uint8 rollAmount, uint32 itemSlot, uint8 inventoryResult) override;
 
         // Player Dump Hooks
         void OnWriteDump(uint32 playerId, std::string& dump) override;
         bool IsModuleDumpTable(const std::string& dbTableName) override;
-
-        // TO BE CONVERTED
-        void OnPlayerHandlePageTextQuery(Player* player, WorldPacket& recv_data);
-        void OnPlayerSetSkill(Player* player, uint32 skillId);
-        void OnPlayerRewardHonor(Player* player, Player* victim);
-        void OnPlayerEquipItem(Player* player, uint32 itemId, uint8 slot);
-        void OnPlayerRewardQuest(Player* player, const Quest* quest);
-        void OnPlayerEndBattleground(Player* player, uint32 winner);
-        void OnPlayerTaxiFlightRouteStart(Player* player, const Taxi::Tracker& taxiTracker, bool initial);
-        void OnPlayerTaxiFlightRouteEnd(Player* player, const Taxi::Tracker& taxiTracker, bool final);
-
-        // Unit wrapper methods
-        void OnUnitDealDamage(Unit* dealer, Unit* victim, uint32 health, uint32 damage);
-        void OnUnitKill(Unit* killer, Player* responsiblePlayer, Player* playerVictim);
-        void OnUnitDealHeal(Unit* dealer, Unit* victim, int32 gain, uint32 addHealth);
-
-        // Loot Handler wrapper methods
-        void OnHandleLootMasterGive(Player* target, LootItem* item, Loot* loot, uint8 result);
-        void OnHandleLootRoll(Player* player, uint8 rollType);
-        void OnGroupLootRollFinish(Player* player, Loot* loot, uint8 rollType, uint8 amount, uint32 itemSlot, uint8 result);
-
-        // Reputation wrapper methods
-        void OnSetOneFactionReputation(Player* player, uint32 factionEntryId);
-
-        // Spell wrapper methods
-        void OnDoSpellHitOnUnit(Unit* caster, Unit* target, uint32 spellId);
-        void OnSpellCast(Unit* caster, Unit* target, Item* castItem, uint32 spellId);
-
-        void OnBGUpdatePlayerScore(BattleGround* bg, Player* player, uint8 type);
 
     private:
         static uint32 GetCurrentPatch();

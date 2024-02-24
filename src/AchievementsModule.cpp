@@ -4887,19 +4887,19 @@ namespace achievements_module
         }
     }
 
-    void AchievementsModule::OnBGUpdatePlayerScore(BattleGround* bg, Player* player, uint8 type)
+    void AchievementsModule::OnUpdatePlayerScore(BattleGround* battleground, Player* player, uint8 scoreType, uint32 value)
     {
         PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
-        if (playerMgr && bg)
+        if (playerMgr && battleground)
         {
             // WS BG Flags
-            if (bg->GetTypeId() == BATTLEGROUND_WS)
+            if (battleground->GetTypeId() == BATTLEGROUND_WS)
             {
-                if (type == SCORE_FLAG_CAPTURES)
+                if (scoreType == SCORE_FLAG_CAPTURES)
                 {
                     playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BG_OBJECTIVE_CAPTURE, ACHIEVEMENT_CRITERIA_ASSET_ID_BG_WS_OBJECTIVE_CAPTURE_FLAG);
                 }
-                else if (type == SCORE_FLAG_RETURNS)
+                else if (scoreType == SCORE_FLAG_RETURNS)
                 {
                     playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BG_OBJECTIVE_CAPTURE, ACHIEVEMENT_CRITERIA_ASSET_ID_BG_WS_OBJECTIVE_RETURN_FLAG);
                 }
@@ -5010,19 +5010,25 @@ namespace achievements_module
         return false;
     }
 
-    void AchievementsModule::OnPlayerHandlePageTextQuery(Player* player, WorldPacket& recv_data)
+    bool AchievementsModule::OnHandlePageTextQuery(Player* player, const WorldPacket& packet)
     {
         PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
         if (playerMgr)
         {
+            WorldPacket packetCpy = packet;
+
+            uint32 pageID;
             ObjectGuid bookGuid;
-            recv_data >> bookGuid;
+            packetCpy >> pageID;
+            packetCpy >> bookGuid;
 
             if (!bookGuid.IsEmpty() && bookGuid.IsGameObject())
             {
                 playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_USE_GAMEOBJECT, bookGuid.GetEntry());
             }
         }
+
+        return false;
     }
 
     void AchievementsModule::OnDeath(Player* player, Unit* killer)
@@ -5047,7 +5053,7 @@ namespace achievements_module
         }
     }
 
-    void AchievementsModule::OnPlayerSetSkill(Player* player, uint32 skillId)
+    void AchievementsModule::OnSetSkill(Player* player, uint16 skillId)
     {
         PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
         if (playerMgr)
@@ -5057,17 +5063,25 @@ namespace achievements_module
         }
     }
 
-    void AchievementsModule::OnPlayerRewardHonor(Player* player, Player* victim)
+    void AchievementsModule::OnRewardHonor(Player* player, Unit* victim)
     {
         PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
         if (playerMgr && victim)
         {
-            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EARN_HONORABLE_KILL);
-            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HK_CLASS, victim->getClass());
-            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HK_RACE, victim->getRace());
-            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL_AT_AREA, player->GetAreaId());
-            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL, 1, 0, victim);
-            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_SPECIAL_PVP_KILL, 1, 0, victim);
+            // Check if killed a player that rewarded honor
+            if (victim->IsPlayer())
+            {
+                Player* playerVictim = (Player*)victim;
+                if (player->GetTeam() != playerVictim->GetTeam() && player->GetLevel() < (playerVictim->GetLevel() + 5))
+                {
+                    playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EARN_HONORABLE_KILL);
+                    playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HK_CLASS, victim->getClass());
+                    playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HK_RACE, victim->getRace());
+                    playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL_AT_AREA, player->GetAreaId());
+                    playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL, 1, 0, victim);
+                    playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_SPECIAL_PVP_KILL, 1, 0, victim);
+                }
+            }
         }
     }
 
@@ -5083,13 +5097,15 @@ namespace achievements_module
         }
     }
 
-    void AchievementsModule::OnPlayerEquipItem(Player* player, uint32 itemId, uint8 slot)
+    void AchievementsModule::OnEquipItem(Player* player, Item* item)
     {
         PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
-        if (playerMgr)
+        if (playerMgr && item)
         {
-            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, itemId);
-            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM, itemId, slot);
+            const uint32 itemEntry = item->GetEntry();
+            const uint8 slot = item->GetSlot();
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, itemEntry);
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM, itemEntry, slot);
         }
     }
 
@@ -5102,7 +5118,7 @@ namespace achievements_module
         }
     }
 
-    void AchievementsModule::OnPlayerRewardQuest(Player* player, const Quest* quest)
+    void AchievementsModule::OnRewardQuest(Player* player, const Quest* quest)
     {
         PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
         if (playerMgr && quest)
@@ -5135,23 +5151,33 @@ namespace achievements_module
         }
     }
 
-    void AchievementsModule::OnPlayerEndBattleground(Player* player, uint32 winner)
+    void AchievementsModule::OnEndBattleGround(BattleGround* battleground, uint32 winnerTeam)
     {
-        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
-        if (playerMgr)
+        if (GetConfig()->enabled && battleground)
         {
-            const uint32 mapId = player->GetMapId();
-            const Team team = player->GetTeam();
-            if (team == winner)
+            for (auto& pair : battleground->GetPlayers())
             {
-                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_BG, mapId);
-            }
+                if (pair.second.offlineRemoveTime)
+                    continue;
 
-            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND, mapId);
+                Player* player = sObjectMgr.GetPlayer(pair.first);
+                PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+                if (player && playerMgr)
+                {
+                    const uint32 mapId = player->GetMapId();
+                    const Team team = player->GetTeam();
+                    if (team == winnerTeam)
+                    {
+                        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_BG, mapId);
+                    }
+
+                    playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND, mapId);
+                }
+            }
         }
     }
 
-    void AchievementsModule::OnPlayerTaxiFlightRouteStart(Player* player, const Taxi::Tracker& taxiTracker, bool initial)
+    void AchievementsModule::OnTaxiFlightRouteStart(Player* player, const Taxi::Tracker& taxiTracker, bool initial)
     {
         if (initial)
         {
@@ -5164,7 +5190,7 @@ namespace achievements_module
         }
     }
 
-    void AchievementsModule::OnPlayerTaxiFlightRouteEnd(Player* player, const Taxi::Tracker& taxiTracker, bool final)
+    void AchievementsModule::OnTaxiFlightRouteEnd(Player* player, const Taxi::Tracker& taxiTracker, bool final)
     {
         PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
         if (playerMgr)
@@ -5181,101 +5207,117 @@ namespace achievements_module
         }
     }
 
-    void AchievementsModule::OnUnitDealDamage(Unit* dealer, Unit* victim, uint32 health, uint32 damage)
+    void AchievementsModule::OnDealDamage(Unit* dealer, Unit* victim, uint32 health, uint32 damage)
     {
-        if (dealer && victim && dealer != victim)
+        if (GetConfig()->enabled)
         {
-            if (Player* killer = dealer->GetBeneficiaryPlayer())
+            if (dealer && victim && dealer != victim)
             {
-                PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(killer);
-                if (playerMgr)
+                if (Player* killer = dealer->GetBeneficiaryPlayer())
                 {
-                    playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_DAMAGE_DONE, damage, 0, victim);
-                    playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HIT_DEALT, damage);
-                }
-            }
-
-            if (victim->IsPlayer())
-            {
-                PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr((Player*)victim);
-                if (playerMgr)
-                {
-                    playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HIT_RECEIVED, damage);
-                    if (health <= damage)
+                    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(killer);
+                    if (playerMgr)
                     {
-                        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_TOTAL_DAMAGE_RECEIVED, health);
+                        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_DAMAGE_DONE, damage, 0, victim);
+                        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HIT_DEALT, damage);
                     }
-                    else
+                }
+
+                if (victim->IsPlayer())
+                {
+                    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr((Player*)victim);
+                    if (playerMgr)
                     {
-                        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_TOTAL_DAMAGE_RECEIVED, damage);
+                        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HIT_RECEIVED, damage);
+                        if (health <= damage)
+                        {
+                            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_TOTAL_DAMAGE_RECEIVED, health);
+                        }
+                        else
+                        {
+                            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_TOTAL_DAMAGE_RECEIVED, damage);
+                        }
                     }
                 }
             }
         }
     }
 
-    void AchievementsModule::OnUnitKill(Unit* killer, Player* responsiblePlayer, Player* playerVictim)
+    void AchievementsModule::OnKill(Unit* killer, Unit* victim)
     {
-        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(playerVictim);
+        if (GetConfig()->enabled)
+        {
+            if (victim && killer)
+            {
+                Player* responsiblePlayer = killer ? killer->GetBeneficiaryPlayer() : nullptr;
+                UpdateAchievementCriteria(responsiblePlayer, ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS, 1, 0, victim);
+
+                if (victim->IsPlayer())
+                {
+                    Player* playerVictim = (Player*)victim;
+                    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(playerVictim);
+                    if (playerMgr)
+                    {
+                        if (responsiblePlayer && playerVictim != responsiblePlayer)
+                        {
+                            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILLED_BY_PLAYER, GetTeamIndexByTeamId(responsiblePlayer->GetTeam()));
+                        }
+                        else if (killer && killer->IsUnit())
+                        {
+                            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILLED_BY_CREATURE, 1, killer->GetEntry());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    void AchievementsModule::OnDealHeal(Unit* dealer, Unit* victim, int32 gain, uint32 addHealth)
+    {
+        if (GetConfig()->enabled)
+        {
+            if (dealer && victim)
+            {
+                if (dealer->IsPlayer())
+                {
+                    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr((Player*)dealer);
+                    if (playerMgr)
+                    {
+                        // use the actual gain, as the overhealing shall not be counted, skip gain 0 (it ignored anyway in to criteria)
+                        if (gain)
+                        {
+                            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HEALING_DONE, gain, 0, victim);
+                        }
+
+                        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HEAL_CASTED, addHealth);
+                    }
+                }
+
+                if (victim->IsPlayer())
+                {
+                    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr((Player*)victim);
+                    if (playerMgr)
+                    {
+                        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_TOTAL_HEALING_RECEIVED, gain);
+                        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HEALING_RECEIVED, addHealth);
+                    }
+                }
+            }
+        }
+    }
+
+    void AchievementsModule::OnHandleLootMasterGive(Loot* loot, Player* target, LootItem* lootItem)
+    {
+        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(target);
         if (playerMgr)
         {
-            if (responsiblePlayer && playerVictim != responsiblePlayer)
-            {
-                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILLED_BY_PLAYER, GetTeamIndexByTeamId(responsiblePlayer->GetTeam()));
-            }
-            else if (killer && killer->IsUnit())
-            {
-                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILLED_BY_CREATURE, 1, killer->GetEntry());
-            }
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM, lootItem->itemId, lootItem->count);
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE, loot->GetLootType(), lootItem->count);
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_EPIC_ITEM, lootItem->itemId, lootItem->count);
         }
     }
 
-    void AchievementsModule::OnUnitDealHeal(Unit* dealer, Unit* victim, int32 gain, uint32 addHealth)
-    {
-        if (dealer && victim)
-        {
-            if (dealer->IsPlayer())
-            {
-                PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr((Player*)dealer);
-                if (playerMgr)
-                {
-                    // use the actual gain, as the overhealing shall not be counted, skip gain 0 (it ignored anyway in to criteria)
-                    if (gain)
-                    {
-                        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HEALING_DONE, gain, 0, victim);
-                    }
-
-                    playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HEAL_CASTED, addHealth);
-                }
-            }
-
-            if (victim->IsPlayer())
-            {
-                PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr((Player*)victim);
-                if (playerMgr)
-                {
-                    playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_TOTAL_HEALING_RECEIVED, gain);
-                    playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HEALING_RECEIVED, addHealth);
-                }
-            }
-        }
-    }
-
-    void AchievementsModule::OnHandleLootMasterGive(Player* target, LootItem* item, Loot* loot, uint8 result)
-    {
-        if (result == EQUIP_ERR_OK)
-        {
-            PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(target);
-            if (playerMgr)
-            {
-                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM, item->itemId, item->count);
-                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE, loot->GetLootType(), item->count);
-                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_EPIC_ITEM, item->itemId, item->count);
-            }
-        }
-    }
-
-    void AchievementsModule::OnHandleLootRoll(Player* player, uint8 rollType)
+    void AchievementsModule::OnPlayerRoll(Loot* loot, Player* player, uint32 itemSlot, uint8 rollType)
     {
         PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
         if (playerMgr)
@@ -5299,7 +5341,7 @@ namespace achievements_module
         }
     }
 
-    void AchievementsModule::OnGroupLootRollFinish(Player* player, Loot* loot, uint8 rollType, uint8 amount, uint32 itemSlot, uint8 result)
+    void AchievementsModule::OnPlayerWinRoll(Loot* loot, Player* player, uint8 rollType, uint8 rollAmount, uint32 itemSlot, uint8 inventoryResult)
     {
         PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
         if (playerMgr)
@@ -5308,7 +5350,7 @@ namespace achievements_module
             if (item)
             {
                 playerMgr->UpdateAchievementCriteria(rollType == ROLL_NEED ? ACHIEVEMENT_CRITERIA_TYPE_ROLL_NEED_ON_LOOT : ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED_ON_LOOT, item->itemId, amount);
-                if (result == EQUIP_ERR_OK)
+                if (inventoryResult == EQUIP_ERR_OK)
                 {
                     playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM, item->itemId, item->count);
                     playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE, loot->GetLootType(), item->count);
@@ -5318,11 +5360,12 @@ namespace achievements_module
         }
     }
 
-    void AchievementsModule::OnSetOneFactionReputation(Player* player, uint32 factionEntryId)
+    void AchievementsModule::OnSetReputation(Player* player, const FactionEntry* factionEntry, int32 standing, bool incremental)
     {
         PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
-        if (playerMgr)
+        if (playerMgr && factionEntry)
         {
+            const uint32 factionEntryId = factionEntry->ID;
             playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KNOWN_FACTIONS, factionEntryId);
             playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION, factionEntryId);
             playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GAIN_EXALTED_REPUTATION, factionEntryId);
@@ -5331,47 +5374,56 @@ namespace achievements_module
         }
     }
 
-    void AchievementsModule::OnDoSpellHitOnUnit(Unit* caster, Unit* target, uint32 spellId)
+    void AchievementsModule::OnHit(Spell* spell, Unit* caster, Unit* target)
     {
-        if (caster && target)
+        if (GetConfig()->enabled)
         {
-            if (target->IsPlayer())
+            if (spell && caster && target)
             {
-                PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr((Player*)target);
-                if (playerMgr)
+                const uint32 spellId = spell->m_spellInfo->Id;
+                if (target->IsPlayer())
                 {
-                    playerMgr->StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_SPELL_TARGET, spellId);
-                    playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, spellId, 0, caster);
-                    playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, spellId, 0, caster);
+                    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr((Player*)target);
+                    if (playerMgr)
+                    {
+                        playerMgr->StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_SPELL_TARGET, spellId);
+                        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, spellId, 0, caster);
+                        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, spellId, 0, caster);
+                    }
                 }
-            }
 
-            if (caster->IsPlayer())
-            {
-                PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr((Player*)caster);
-                if (playerMgr)
+                if (caster->IsPlayer())
                 {
-                    playerMgr->StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_SPELL_CASTER, spellId);
-                    playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2, spellId, 0, target);
+                    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr((Player*)caster);
+                    if (playerMgr)
+                    {
+                        playerMgr->StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_SPELL_CASTER, spellId);
+                        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2, spellId, 0, target);
+                    }
                 }
             }
         }
     }
 
-    void AchievementsModule::OnSpellCast(Unit* caster, Unit* target, Item* castItem, uint32 spellId)
+    void AchievementsModule::OnCast(Spell* spell, Unit* caster, Unit* target)
     {
-        if (caster && caster->IsPlayer())
+        if (GetConfig()->enabled)
         {
-            PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr((Player*)caster);
-            if (playerMgr)
+            if (spell && caster && caster->IsPlayer())
             {
-                if (castItem)
+                PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr((Player*)caster);
+                if (playerMgr)
                 {
-                    playerMgr->StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_ITEM, castItem->GetEntry());
-                    playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM, castItem->GetEntry());
-                }
+                    const uint32 spellId = spell->m_spellInfo->Id;
+                    Item* castItem = spell->GetCastItem();
+                    if (castItem)
+                    {
+                        playerMgr->StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_ITEM, castItem->GetEntry());
+                        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM, castItem->GetEntry());
+                    }
 
-                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL, spellId, 0, (target ? target : caster));
+                    playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL, spellId, 0, (target ? target : caster));
+                }
             }
         }
     }
