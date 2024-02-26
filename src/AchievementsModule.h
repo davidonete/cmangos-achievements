@@ -779,11 +779,13 @@ namespace achievements_module
 
         // Module Hooks
         void OnInitialize() override;
+        void OnUpdate(uint32 elapsed) override;
 
         // Player Hooks
         void OnPreCharacterCreated(Player* player) override;
         void OnPreLoadFromDB(Player* player) override;
         void OnLogOut(Player* player) override;
+        void OnLoadFromDB(Player* player) override;
         void OnDeleteFromDB(uint32 playerId) override;
         void OnSaveToDB(Player* player) override;
         void OnAddSpell(Player* player, uint32 spellId) override;
@@ -795,8 +797,9 @@ namespace achievements_module
         void OnStoreNewItem(Player* player, Item* item) override;
         void OnMoveItemToInventory(Player* player, Item* item) override;
         void OnDeath(Player* player, Unit* killer) override;
+        void OnDeath(Player* player, uint8 environmentalDamageType) override;
         bool OnHandlePageTextQuery(Player* player, const WorldPacket& packet) override;
-        void OnSetSkill(Player* player, uint16 skillId) override;
+        void OnUpdateSkill(Player* player, uint16 skillId) override;
         void OnRewardHonor(Player* player, Unit* victim) override;
         void OnEquipItem(Player* player, Item* item);
         void OnRewardQuest(Player* player, const Quest* quest);
@@ -807,6 +810,13 @@ namespace achievements_module
         void OnBuyBankSlot(Player* player, uint32 slot, uint32 price) override;
         void OnSellItem(Player* player, Item* item, uint32 money) override;
         void OnBuyBackItem(Player* player, Item* item, uint32 money) override;
+        void OnModifyMoney(Player* player, int32 diff) override;
+        void OnSummoned(Player* player, const ObjectGuid& summoner) override;
+        void OnAreaExplored(Player* player, uint32 areaId) override;
+        void OnUpdateHonor(Player* player) override;
+        void OnGiveLevel(Player* player, uint32 level) override;
+        void OnSendMail(Player* player, const ObjectGuid& receiver, uint32 cost) override;
+        void OnAbandonQuest(Player* player, uint32 questId) override;
 
         // Battleground Hooks
         void OnStartBattleGround(BattleGround* battleground) override;
@@ -832,6 +842,7 @@ namespace achievements_module
         void OnHandleLootMasterGive(Loot* loot, Player* target, LootItem* lootItem) override;
         void OnPlayerRoll(Loot* loot, Player* player, uint32 itemSlot, uint8 rollType) override;
         void OnPlayerWinRoll(Loot* loot, Player* player, uint8 rollType, uint8 rollAmount, uint32 itemSlot, uint8 inventoryResult) override;
+        void OnSendGold(Loot* loot, Player* player, uint32 gold, uint8 lootMethod) override;
 
         // Auction House Hooks
         void OnSellItem(AuctionEntry* auctionEntry, Player* player) override;
@@ -840,6 +851,17 @@ namespace achievements_module
         // Player Dump Hooks
         void OnWriteDump(uint32 playerId, std::string& dump) override;
         bool IsModuleDumpTable(const std::string& dbTableName) override;
+
+        // Commands
+        std::vector<ModuleChatCommand>* GetCommandTable() override;
+        const char* GetChatCommandPrefix() const override { return "achievements"; }
+        bool HandleEnableAchiever(WorldSession* session, const std::string& args);
+        bool HandleGetCategories(WorldSession* session, const std::string& args);
+        bool HandleGetAchievements(WorldSession* session, const std::string& args);
+        bool HandleGetCriteria(WorldSession* session, const std::string& args);
+        bool HandleGetCharacterCriteria(WorldSession* session, const std::string& args);
+        bool HandleAddAchievement(WorldSession* session, const std::string& args);
+        bool HandleRemoveAchievement(WorldSession* session, const std::string& args);
 
     private:
         static uint32 GetCurrentPatch();
@@ -928,12 +950,6 @@ namespace achievements_module
         void LoadRewardLocales();
 
         uint8 GetPlayerLocale(WorldSession* session) const;
-
-        void UpdateAchievementCriteria(Player* player, AchievementCriteriaTypes type, uint32 miscValue1 = 0, uint32 miscValue2 = 0, Unit* unit = nullptr);
-        void UpdateTimedAchievements(Player* player, const uint32 diff);
-        void CheckAllAchievementCriteria(Player* player);
-        void ResetAchievementCriteria(Player* player, AchievementCriteriaCondition condition, uint32 value, bool evenIfCriteriaComplete = false);
-
         PlayerAchievementMgr* GetPlayerAchievementMgr(Player* player);
         const PlayerAchievementMgr* GetPlayerAchievementMgr(const Player* player) const;
 

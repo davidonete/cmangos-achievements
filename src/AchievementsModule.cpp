@@ -3222,7 +3222,7 @@ namespace achievements_module
                 // Time is up, remove timer and reset progress
                 if (itr->second <= timeDiff)
                 {
-                    AchievementCriteriaEntry const* entry = sAchievementCriteriaStore.LookupEntry<AchievementCriteriaEntry>(itr->first);
+                    const AchievementCriteriaEntry* entry = sAchievementCriteriaStore.LookupEntry<AchievementCriteriaEntry>(itr->first);
                     RemoveCriteriaProgress(entry);
                     m_timedAchievements.erase(itr++);
                 }
@@ -4857,15 +4857,6 @@ namespace achievements_module
         }
     }
 
-    void AchievementsModule::UpdateAchievementCriteria(Player* player, AchievementCriteriaTypes type, uint32 miscValue1 /*= 0*/, uint32 miscValue2 /*= 0*/, Unit* unit /*= nullptr*/)
-    {
-        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
-        if (playerMgr)
-        {
-            playerMgr->UpdateAchievementCriteria(type, miscValue1, miscValue2, unit);
-        }
-    }
-
     void AchievementsModule::OnUpdatePlayerScore(BattleGround* battleground, Player* player, uint8 scoreType, uint32 value)
     {
         PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
@@ -4883,33 +4874,6 @@ namespace achievements_module
                     playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BG_OBJECTIVE_CAPTURE, ACHIEVEMENT_CRITERIA_ASSET_ID_BG_WS_OBJECTIVE_RETURN_FLAG);
                 }
             }
-        }
-    }
-
-    void AchievementsModule::UpdateTimedAchievements(Player* player, const uint32 diff)
-    {
-        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
-        if (playerMgr)
-        {
-            playerMgr->UpdateTimedAchievements(diff);
-        }
-    }
-
-    void AchievementsModule::CheckAllAchievementCriteria(Player* player)
-    {
-        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
-        if (playerMgr)
-        {
-            playerMgr->CheckAllAchievementCriteria();
-        }
-    }
-
-    void AchievementsModule::ResetAchievementCriteria(Player* player, AchievementCriteriaCondition condition, uint32 value, bool evenIfCriteriaComplete /*= false*/)
-    {
-        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
-        if (playerMgr)
-        {
-            playerMgr->ResetAchievementCriteria(condition, value, evenIfCriteriaComplete);
         }
     }
 
@@ -4936,8 +4900,17 @@ namespace achievements_module
     {
         if (type == DUEL_WON)
         {
-            UpdateAchievementCriteria(player, ACHIEVEMENT_CRITERIA_TYPE_LOSE_DUEL, 1);
-            UpdateAchievementCriteria(opponent, ACHIEVEMENT_CRITERIA_TYPE_WIN_DUEL, 1);
+            PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+            if (playerMgr)
+            {
+                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_DUEL, 1);
+            }
+
+            PlayerAchievementMgr* otherPlayerMgr = GetPlayerAchievementMgr(opponent);
+            if (otherPlayerMgr)
+            {
+                otherPlayerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOSE_DUEL, 1);
+            }
         }
     }
 
@@ -5022,6 +4995,15 @@ namespace achievements_module
         }
     }
 
+    void AchievementsModule::OnDeath(Player* player, uint8 environmentalDamageType)
+    {
+        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+        if (playerMgr)
+        {
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_DEATHS_FROM, 1, environmentalDamageType);
+        }
+    }
+
     void AchievementsModule::OnResetTalents(Player* player, uint32 cost)
     {
         PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
@@ -5032,12 +5014,11 @@ namespace achievements_module
         }
     }
 
-    void AchievementsModule::OnSetSkill(Player* player, uint16 skillId)
+    void AchievementsModule::OnUpdateSkill(Player* player, uint16 skillId)
     {
         PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
         if (playerMgr)
         {
-            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, skillId);
             playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, skillId);
         }
     }
@@ -5203,7 +5184,11 @@ namespace achievements_module
             if (victim && killer)
             {
                 Player* responsiblePlayer = killer ? killer->GetBeneficiaryPlayer() : nullptr;
-                UpdateAchievementCriteria(responsiblePlayer, ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS, 1, 0, victim);
+                PlayerAchievementMgr* responsiblePlayerMgr = GetPlayerAchievementMgr(responsiblePlayer);
+                if (responsiblePlayerMgr)
+                {
+                    responsiblePlayerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS, 1, 0, victim);
+                }
 
                 if (victim->IsPlayer())
                 {
@@ -5578,13 +5563,18 @@ namespace achievements_module
 
     bool AchievementsModule::OnUse(GameObject* gameObject, Unit* user)
     {
-        if (gameObject && gameObject->GetGoType() == GAMEOBJECT_TYPE_FISHINGHOLE && user && user->IsPlayer())
+        if (gameObject && user && user->IsPlayer())
         {
             Player* player = (Player*)user;
             PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
             if (playerMgr)
             {
-                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_FISH_IN_GAMEOBJECT, gameObject->GetGOInfo()->id);
+                if (gameObject->GetGoType() == GAMEOBJECT_TYPE_FISHINGHOLE)
+                {
+                    playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_FISH_IN_GAMEOBJECT, gameObject->GetGOInfo()->id);
+                }
+
+                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_USE_GAMEOBJECT, gameObject->GetEntry());
             }
         }
 
@@ -5606,6 +5596,119 @@ namespace achievements_module
         if (playerMgr && item)
         {
             playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_RECEIVE_EPIC_ITEM, item->GetEntry(), item->GetCount());
+        }
+    }
+
+    void AchievementsModule::OnModifyMoney(Player* player, int32 diff)
+    {
+        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+        if (playerMgr)
+        {
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_GOLD_VALUE_OWNED);
+        }
+    }
+
+    void AchievementsModule::OnSummoned(Player* player, const ObjectGuid& summoner)
+    {
+        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+        if (playerMgr)
+        {
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_ACCEPTED_SUMMONINGS, 1);
+        }
+    }
+
+    void AchievementsModule::OnAreaExplored(Player* player, uint32 areaId)
+    {
+        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+        if (playerMgr)
+        {
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EXPLORE_AREA, areaId);
+        }
+    }
+
+    void AchievementsModule::OnUpdateHonor(Player* player)
+    {
+        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+        if (playerMgr)
+        {
+            const uint8 rank = player->GetHonorHighestRankInfo().rank;
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_OWN_RANK, rank);
+        }
+    }
+
+    void AchievementsModule::OnGiveLevel(Player* player, uint32 level)
+    {
+        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+        if (playerMgr)
+        {
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_LEVEL);
+        }
+    }
+
+    void AchievementsModule::OnUpdate(uint32 elapsed)
+    {
+        if (GetConfig()->enabled)
+        {
+            for (auto& pair : m_playerMgrs)
+            {
+                pair.second.UpdateTimedAchievements(elapsed);
+            }
+        }
+    }
+
+    void AchievementsModule::OnLoadFromDB(Player* player)
+    {
+        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+        if (playerMgr)
+        {
+            playerMgr->CheckAllAchievementCriteria();
+        }
+    }
+
+    void AchievementsModule::OnSendGold(Loot* loot, Player* player, uint32 gold, uint8 lootMethod)
+    {
+        if (GetConfig()->enabled && loot)
+        {
+            if (lootMethod != NOT_GROUP_TYPE_LOOT)
+            {
+                const GuidSet& ownerSet = loot->GetOwnerSet();
+                const uint32 moneyPerPlayer = uint32(gold / ownerSet.size());
+                for (auto playerGuid : ownerSet)
+                {
+                    Player* player = sObjectMgr.GetPlayer(playerGuid);
+                    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+                    if (playerMgr)
+                    {
+                        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_MONEY, moneyPerPlayer);
+                    }
+                }
+            }
+            else
+            {
+                PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+                if (playerMgr)
+                {
+                    playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_MONEY, gold);
+                }
+            }
+        }
+    }
+
+    void AchievementsModule::OnSendMail(Player* player, const ObjectGuid& receiver, uint32 cost)
+    {
+        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+        if (playerMgr)
+        {
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GOLD_SPENT_FOR_MAIL, cost);
+        }
+    }
+
+    void AchievementsModule::OnAbandonQuest(Player* player, uint32 questId)
+    {
+        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+        if (playerMgr)
+        {
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_QUEST_ABANDONED, 1);
         }
     }
 
@@ -5679,186 +5782,226 @@ namespace achievements_module
         return output;
     }
 
-    /*
-    bool ChatHandler::HandleAchievementsCommand(char* args)
+    std::vector<ModuleChatCommand>* AchievementsModule::GetCommandTable()
     {
-        auto ExtractFirstWord = [](std::string& input) -> std::string
+        static std::vector<ModuleChatCommand> commandTable =
         {
-            if (!input.empty())
-            {
-                size_t pos = input.find(" ");
-                if (pos != std::string::npos)
-                {
-                    std::string result = input.substr(0, pos);
-                    input.erase(0, pos + 1);
-                    return result;
-                }
-            }
-
-            std::string result = input;
-            input = "";
-            return result;
+            { "enableAchiever", std::bind(&AchievementsModule::HandleEnableAchiever, this, std::placeholders::_1, std::placeholders::_2), SEC_PLAYER },
+            { "getCategories", std::bind(&AchievementsModule::HandleGetCategories, this, std::placeholders::_1, std::placeholders::_2), SEC_GAMEMASTER },
+            { "getAchievements", std::bind(&AchievementsModule::HandleGetAchievements, this, std::placeholders::_1, std::placeholders::_2), SEC_GAMEMASTER },
+            { "getCriteria", std::bind(&AchievementsModule::HandleGetCriteria, this, std::placeholders::_1, std::placeholders::_2), SEC_GAMEMASTER },
+            { "getCharacterCriteria", std::bind(&AchievementsModule::HandleGetCharacterCriteria, this, std::placeholders::_1, std::placeholders::_2), SEC_GAMEMASTER },
+            { "add", std::bind(&AchievementsModule::HandleAddAchievement, this, std::placeholders::_1, std::placeholders::_2), SEC_GAMEMASTER },
+            { "remove", std::bind(&AchievementsModule::HandleRemoveAchievement, this, std::placeholders::_1, std::placeholders::_2), SEC_GAMEMASTER },
         };
 
-        auto GetNumberFromString = [](const std::string& input, int32& number) -> bool
-        {
-            bool valid = !input.empty();
-            if (valid)
-            {
-                // Check for sign character at the beginning
-                size_t start = 0;
-                if (input[0] == '+' || input[0] == '-')
-                {
-                    start = 1;
-                }
+        return &commandTable;
+    }
 
-                // Loop through each character to check if it's a digit
-                for (size_t i = start; i < input.size(); ++i)
-                {
-                    if (!std::isdigit(input[i]))
-                    {
-                        // Non-numeric character found
-                        valid = false;
-                        break;
-                    }
-                }
+    bool GetNumberFromString(const std::string& input, int32& number)
+    {
+        bool valid = !input.empty();
+        if (valid)
+        {
+            // Check for sign character at the beginning
+            size_t start = 0;
+            if (input[0] == '+' || input[0] == '-')
+            {
+                start = 1;
             }
 
-            if (valid)
+            // Loop through each character to check if it's a digit
+            for (size_t i = start; i < input.size(); ++i)
             {
-                number = std::stoi(input);
-            }
-
-            return valid;
-        };
-
-        auto GetAchievementIdFromString = [&GetNumberFromString](const std::string& input, int32& achievementId) -> bool
-        {
-            bool valid = !input.empty();
-            if (valid)
-            {
-                valid = false;
-                size_t startPos = input.find("|Hachievement:");
-                if (startPos != std::string::npos)
+                if (!std::isdigit(input[i]))
                 {
-                    startPos += 14;
-                    size_t endPos = input.find('|', startPos);
-                    const std::string achievementIdStr = input.substr(startPos, endPos - startPos);
-                    if (GetNumberFromString(achievementIdStr, achievementId))
-                    {
-                        valid = true;
-                    }
+                    // Non-numeric character found
+                    valid = false;
+                    break;
                 }
             }
-
-            return valid;
-        };
-
-        Player* player = m_session ? m_session->GetPlayer() : nullptr;
-        if (!player)
-        {
-            return false;
         }
 
-        std::string fullCommand = args;
-        const std::string command = ExtractFirstWord(fullCommand);
-        if (!command.empty())
+        if (valid)
         {
-            if (command == "enableAchiever")
+            number = std::stoi(input);
+        }
+
+        return valid;
+    }
+
+    bool GetAchievementIdFromString(const std::string& input, int32& achievementId)
+    {
+        bool valid = !input.empty();
+        if (valid)
+        {
+            valid = false;
+            size_t startPos = input.find("|Hachievement:");
+            if (startPos != std::string::npos)
+            {
+                startPos += 14;
+                size_t endPos = input.find('|', startPos);
+                const std::string achievementIdStr = input.substr(startPos, endPos - startPos);
+                if (GetNumberFromString(achievementIdStr, achievementId))
+                {
+                    valid = true;
+                }
+            }
+        }
+
+        return valid;
+    }
+
+    bool AchievementsModule::HandleEnableAchiever(WorldSession* session, const std::string& args)
+    {
+        if (GetConfig()->enabled)
+        {
+            Player* player = session->GetPlayer();
+            if (player)
             {
                 int32 version = 0;
-                const std::string arg = ExtractFirstWord(fullCommand);
-                if (GetNumberFromString(arg, version))
+                if (GetNumberFromString(args, version))
                 {
-                    if (!sAchievementsModule.HasAddon(player))
+                    if (!HasAddon(player))
                     {
-                        sAchievementsModule.EnableAddon(player, version);
+                        EnableAddon(player, version);
                     }
 
                     return true;
                 }
             }
-            else if (command == "getCategories")
+        }
+
+        return false;
+    }
+
+    bool AchievementsModule::HandleGetCategories(WorldSession* session, const std::string& args)
+    {
+        if (GetConfig()->enabled)
+        {
+            Player* player = session->GetPlayer();
+            if (player)
             {
-                if (m_session->GetSecurity() >= SEC_GAMEMASTER)
+                int32 version = 0;
+                if (GetNumberFromString(args, version))
                 {
-                    int32 version = 0;
-                    const std::string arg = ExtractFirstWord(fullCommand);
-                    if (GetNumberFromString(arg, version))
-                    {
-                        sAchievementsModule.GetAllCategories(player, version);
-                        return true;
-                    }
-                }
-            }
-            else if (command == "getAchievements")
-            {
-                if (m_session->GetSecurity() >= SEC_GAMEMASTER)
-                {
-                    int32 version = 0;
-                    const std::string arg = ExtractFirstWord(fullCommand);
-                    if (GetNumberFromString(arg, version))
-                    {
-                        sAchievementsModule.GetAllAchievements(player, version);
-                        return true;
-                    }
-                }
-            }
-            else if (command == "getCriteria")
-            {
-                if (m_session->GetSecurity() >= SEC_GAMEMASTER)
-                {
-                    int32 version = 0;
-                    const std::string arg = ExtractFirstWord(fullCommand);
-                    if (GetNumberFromString(arg, version))
-                    {
-                        sAchievementsModule.GetAllCriteria(player, version);
-                        return true;
-                    }
-                }
-            }
-            else if (command == "getCharacterCriteria")
-            {
-                if (m_session->GetSecurity() >= SEC_GAMEMASTER)
-                {
-                    sAchievementsModule.GetCharacterCriteria(player);
+                    GetAllCategories(player, version);
                     return true;
                 }
             }
-            else if (command == "add")
+        }
+
+        return false;
+    }
+
+    bool AchievementsModule::HandleGetAchievements(WorldSession* session, const std::string& args)
+    {
+        if (GetConfig()->enabled)
+        {
+            Player* player = session->GetPlayer();
+            if (player)
             {
-                if (m_session->GetSecurity() >= SEC_GAMEMASTER)
+                int32 version = 0;
+                if (GetNumberFromString(args, version))
                 {
-                    int32 achievementId = 0;
-                    const std::string arg = ExtractFirstWord(fullCommand);
-                    if (GetAchievementIdFromString(arg, achievementId) || GetNumberFromString(arg, achievementId))
-                    {
-                        // Get the selected player or self
-                        Player* target = getSelectedPlayer();
-                        if (target)
-                        {
-                            return sAchievementsModule.AddAchievement(target, achievementId);
-                        }
-                    }
+                    GetAllAchievements(player, version);
+                    return true;
                 }
             }
-            else if (command == "remove")
+        }
+
+        return false;
+    }
+
+    bool AchievementsModule::HandleGetCriteria(WorldSession* session, const std::string& args)
+    {
+        if (GetConfig()->enabled)
+        {
+            Player* player = session->GetPlayer();
+            if (player)
+            {
+                int32 version = 0;
+                if (GetNumberFromString(args, version))
+                {
+                    GetAllCriteria(player, version);
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    bool AchievementsModule::HandleGetCharacterCriteria(WorldSession* session, const std::string& args)
+    {
+        if (GetConfig()->enabled)
+        {
+            Player* player = session->GetPlayer();
+            if (player)
+            {
+                GetCharacterCriteria(player);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    bool AchievementsModule::HandleAddAchievement(WorldSession* session, const std::string& args)
+    {
+        if (GetConfig()->enabled)
+        {
+            Player* player = session->GetPlayer();
+            if (player)
             {
                 int32 achievementId = 0;
-                const std::string arg = ExtractFirstWord(fullCommand);
-                if (GetAchievementIdFromString(arg, achievementId) || GetNumberFromString(arg, achievementId))
+                if (GetAchievementIdFromString(args, achievementId) || GetNumberFromString(args, achievementId))
                 {
                     // Get the selected player or self
-                    Player* target = getSelectedPlayer();
+                    Player* target = player;
+                    const ObjectGuid& guid = player->GetSelectionGuid();
+                    if (guid)
+                    {
+                        target = sObjectMgr.GetPlayer(guid);
+                    }
+
                     if (target)
                     {
-                        return sAchievementsModule.RemoveAchievement(target, achievementId);
+                        return AddAchievement(target, achievementId);
                     }
                 }
             }
         }
-    
+
         return false;
     }
-    */
+
+    bool AchievementsModule::HandleRemoveAchievement(WorldSession* session, const std::string& args)
+    {
+        if (GetConfig()->enabled)
+        {
+            Player* player = session->GetPlayer();
+            if (player)
+            {
+                int32 achievementId = 0;
+                if (GetAchievementIdFromString(args, achievementId) || GetNumberFromString(args, achievementId))
+                {
+                    // Get the selected player or self
+                    Player* target = player;
+                    const ObjectGuid& guid = player->GetSelectionGuid();
+                    if (guid)
+                    {
+                        target = sObjectMgr.GetPlayer(guid);
+                    }
+
+                    if (target)
+                    {
+                        return RemoveAchievement(target, achievementId);
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
 }
