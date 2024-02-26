@@ -792,7 +792,7 @@ namespace achievements_module
         void OnRewardSinglePlayerAtKill(Player* player, Unit* victim) override;
         bool OnHandleFall(Player* player, const MovementInfo& movementInfo, float lastFallZ) override;
         void OnResetTalents(Player* player, uint32 cost) override;
-        void OnStoreNewItem(Player* player, Loot* loot, Item* item) override;
+        void OnStoreNewItem(Player* player, Item* item) override;
         void OnMoveItemToInventory(Player* player, Item* item) override;
         void OnDeath(Player* player, Unit* killer) override;
         bool OnHandlePageTextQuery(Player* player, const WorldPacket& packet) override;
@@ -803,10 +803,21 @@ namespace achievements_module
         void OnTaxiFlightRouteStart(Player* player, const Taxi::Tracker& taxiTracker, bool initial) override;
         void OnTaxiFlightRouteEnd(Player* player, const Taxi::Tracker& taxiTracker, bool final) override;
         void OnSetReputation(Player* player, const FactionEntry* factionEntry, int32 standing, bool incremental);
+        void OnEmote(Player* player, Unit* target, uint32 emote) override;
+        void OnBuyBankSlot(Player* player, uint32 slot, uint32 price) override;
+        void OnSellItem(Player* player, Item* item, uint32 money) override;
+        void OnBuyBackItem(Player* player, Item* item, uint32 money) override;
 
         // Battleground Hooks
+        void OnStartBattleGround(BattleGround* battleground) override;
         void OnEndBattleGround(BattleGround* battleground, uint32 winnerTeam) override;
         void OnUpdatePlayerScore(BattleGround* battleground, Player* player, uint8 scoreType, uint32 value) override;
+        void OnLeaveBattleGround(BattleGround* battleground, Player* player) override;
+        void OnJoinBattleGround(BattleGround* battleground, Player* player) override;
+        void OnPickUpFlag(BattleGroundWS* battleground, Player* player, uint32 team) override;
+
+        // Game Object Hooks
+        bool OnUse(GameObject* gameObject, Unit* user) override;
 
         // Unit Hooks
         void OnDealDamage(Unit* unit, Unit* victim, uint32 health, uint32 damage) override;
@@ -821,6 +832,10 @@ namespace achievements_module
         void OnHandleLootMasterGive(Loot* loot, Player* target, LootItem* lootItem) override;
         void OnPlayerRoll(Loot* loot, Player* player, uint32 itemSlot, uint8 rollType) override;
         void OnPlayerWinRoll(Loot* loot, Player* player, uint8 rollType, uint8 rollAmount, uint32 itemSlot, uint8 inventoryResult) override;
+
+        // Auction House Hooks
+        void OnSellItem(AuctionEntry* auctionEntry, Player* player) override;
+        void OnUpdateBid(AuctionEntry* auctionEntry, Player* player, uint32 newBid) override;
 
         // Player Dump Hooks
         void OnWriteDump(uint32 playerId, std::string& dump) override;
@@ -915,8 +930,6 @@ namespace achievements_module
         uint8 GetPlayerLocale(WorldSession* session) const;
 
         void UpdateAchievementCriteria(Player* player, AchievementCriteriaTypes type, uint32 miscValue1 = 0, uint32 miscValue2 = 0, Unit* unit = nullptr);
-        void StartTimedAchievement(Player* player, AchievementCriteriaTimedTypes type, uint32 entry, uint32 timeLost = 0);
-        void StartTimedAchievement(BattleGround* bg, AchievementCriteriaTimedTypes type, uint32 entry);
         void UpdateTimedAchievements(Player* player, const uint32 diff);
         void CheckAllAchievementCriteria(Player* player);
         void ResetAchievementCriteria(Player* player, AchievementCriteriaCondition condition, uint32 value, bool evenIfCriteriaComplete = false);

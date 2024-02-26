@@ -4866,27 +4866,6 @@ namespace achievements_module
         }
     }
 
-    void AchievementsModule::StartTimedAchievement(Player* player, AchievementCriteriaTimedTypes type, uint32 entry, uint32 timeLost /*= 0*/)
-    {
-        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
-        if (playerMgr)
-        {
-            playerMgr->StartTimedAchievement(type, entry, timeLost);
-        }
-    }
-
-    void AchievementsModule::StartTimedAchievement(BattleGround* bg, AchievementCriteriaTimedTypes type, uint32 entry)
-    {
-        if (bg)
-        {
-            for (auto itr = bg->GetPlayers().begin(); itr != bg->GetPlayers().end(); ++itr)
-            {
-                Player* player = sObjectMgr.GetPlayer(itr->first);
-                StartTimedAchievement(player, type, entry);
-            }
-        }
-    }
-
     void AchievementsModule::OnUpdatePlayerScore(BattleGround* battleground, Player* player, uint8 scoreType, uint32 value)
     {
         PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
@@ -5085,7 +5064,7 @@ namespace achievements_module
         }
     }
 
-    void AchievementsModule::OnStoreNewItem(Player* player, Loot* loot, Item* item)
+    void AchievementsModule::OnStoreNewItem(Player* player, Item* item)
     {
         PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
         if (playerMgr && item)
@@ -5148,32 +5127,6 @@ namespace achievements_module
 
             playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST_COUNT);
             playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST, quest->GetQuestId());
-        }
-    }
-
-    void AchievementsModule::OnEndBattleGround(BattleGround* battleground, uint32 winnerTeam)
-    {
-        if (GetConfig()->enabled && battleground)
-        {
-            for (auto& pair : battleground->GetPlayers())
-            {
-                if (pair.second.offlineRemoveTime)
-                    continue;
-
-                Player* player = sObjectMgr.GetPlayer(pair.first);
-                PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
-                if (player && playerMgr)
-                {
-                    const uint32 mapId = player->GetMapId();
-                    const Team team = player->GetTeam();
-                    if (team == winnerTeam)
-                    {
-                        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_BG, mapId);
-                    }
-
-                    playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND, mapId);
-                }
-            }
         }
     }
 
@@ -5502,6 +5455,158 @@ namespace achievements_module
         }
 
         return false;
+    }
+
+    void AchievementsModule::OnSellItem(AuctionEntry* auctionEntry, Player* player)
+    {
+        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+        if (playerMgr)
+        {
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CREATE_AUCTION, 1);
+        }
+    }
+
+    void AchievementsModule::OnSellItem(Player* player, Item* item, uint32 money)
+    {
+        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+        if (playerMgr)
+        {
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_MONEY_FROM_VENDORS, money);
+        }
+    }
+
+    void AchievementsModule::OnUpdateBid(AuctionEntry* auctionEntry, Player* player, uint32 newBid)
+    {
+        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+        if (playerMgr)
+        {
+            if (newBid < auctionEntry->buyout || auctionEntry->buyout == 0)
+            {
+                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_AUCTION_BID, newBid);
+            }
+            else
+            {
+                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_AUCTION_BID, auctionEntry->buyout);
+            }
+        }
+    }
+
+    void AchievementsModule::OnLeaveBattleGround(BattleGround* battleground, Player* player)
+    {
+        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+        if (playerMgr)
+        {
+            playerMgr->ResetAchievementCriteria(ACHIEVEMENT_CRITERIA_CONDITION_BG_MAP, battleground->GetMapId(), true);
+        }
+    }
+
+    void AchievementsModule::OnJoinBattleGround(BattleGround* battleground, Player* player)
+    {
+        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+        if (playerMgr)
+        {
+            playerMgr->ResetAchievementCriteria(ACHIEVEMENT_CRITERIA_CONDITION_BG_MAP, battleground->GetMapId(), true);
+        }
+    }
+
+    void AchievementsModule::OnPickUpFlag(BattleGroundWS* battleground, Player* player, uint32 team)
+    {
+        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+        if (playerMgr)
+        {
+            const uint32 criteria = team == HORDE ? ACHIEVEMENT_CRITERIA_TIMED_ASSET_ID_BG_WS_SPELL_SILVERWING_FLAG_PICKED : ACHIEVEMENT_CRITERIA_TIMED_ASSET_ID_BG_WS_SPELL_WARSONG_FLAG_PICKED;
+            playerMgr->StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_SPELL_TARGET, criteria);
+        }
+    }
+
+    void AchievementsModule::OnStartBattleGround(BattleGround* battleground)
+    {
+        if (GetConfig()->enabled && battleground)
+        {
+            for (auto& pair : battleground->GetPlayers())
+            {
+                if (pair.second.offlineRemoveTime)
+                    continue;
+
+                Player* player = sObjectMgr.GetPlayer(pair.first);
+                PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+                if (playerMgr)
+                {
+                    if (battleground->GetTypeId() == BATTLEGROUND_WS)
+                    {
+                        playerMgr->StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEVEMENT_CRITERIA_TIMED_ASSET_ID_BG_WS_EVENT_START_BATTLE);
+                    }
+                }
+            }
+        }
+    }
+
+    void AchievementsModule::OnEndBattleGround(BattleGround* battleground, uint32 winnerTeam)
+    {
+        if (GetConfig()->enabled && battleground)
+        {
+            for (auto& pair : battleground->GetPlayers())
+            {
+                if (pair.second.offlineRemoveTime)
+                    continue;
+
+                Player* player = sObjectMgr.GetPlayer(pair.first);
+                PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+                if (playerMgr)
+                {
+                    const uint32 mapId = player->GetMapId();
+                    const Team team = player->GetTeam();
+                    if (team == winnerTeam)
+                    {
+                        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_BG, mapId);
+                    }
+
+                    playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND, mapId);
+                }
+            }
+        }
+    }
+
+    void AchievementsModule::OnEmote(Player* player, Unit* target, uint32 emote)
+    {
+        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+        if (playerMgr)
+        {
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE, emote, 0, target);
+        }
+    }
+
+    bool AchievementsModule::OnUse(GameObject* gameObject, Unit* user)
+    {
+        if (gameObject && gameObject->GetGoType() == GAMEOBJECT_TYPE_FISHINGHOLE && user && user->IsPlayer())
+        {
+            Player* player = (Player*)user;
+            PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+            if (playerMgr)
+            {
+                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_FISH_IN_GAMEOBJECT, gameObject->GetGOInfo()->id);
+            }
+        }
+
+        return false;
+    }
+
+    void AchievementsModule::OnBuyBankSlot(Player* player, uint32 slot, uint32 price)
+    {
+        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+        if (playerMgr)
+        {
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BUY_BANK_SLOT);
+        }
+    }
+
+    void AchievementsModule::OnBuyBackItem(Player* player, Item* item, uint32 money)
+    {
+        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+        if (playerMgr && item)
+        {
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_RECEIVE_EPIC_ITEM, item->GetEntry(), item->GetCount());
+        }
     }
 
     const char* AchievementEntry::GetName(uint32 locale) const
