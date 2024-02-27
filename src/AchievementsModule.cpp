@@ -4898,7 +4898,6 @@ namespace achievements_module
             {
     #ifdef ENABLE_PLAYERBOTS
                 // Check if randombots can use the achievement system
-                uint32 accId = player->GetSession()->GetAccountId();
                 if (!GetConfig()->randomBots && sRandomPlayerbotMgr.IsFreeBot(player))
                     return;
     #endif
@@ -5523,7 +5522,6 @@ namespace achievements_module
 
     #ifdef ENABLE_PLAYERBOTS
                 // Check if randombots can use the achievement system
-                uint32 accId = player->GetSession()->GetAccountId();
                 if (!GetConfig()->randomBots && sRandomPlayerbotMgr.IsFreeBot(player))
                     return nullptr;
     #endif
@@ -5552,8 +5550,7 @@ namespace achievements_module
 
     #ifdef ENABLE_PLAYERBOTS
                 // Check if randombots can use the achievement system
-                uint32 accId = player->GetSession()->GetAccountId();
-                if (!GetConfig()->randomBots && sRandomPlayerbotMgr.IsFreeBot(player))
+                if (!GetConfig()->randomBots && sRandomPlayerbotMgr.IsFreeBot(playerId))
                     return nullptr;
     #endif
 
