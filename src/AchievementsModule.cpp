@@ -13,7 +13,7 @@
 #include "World/World.h"
 
 #ifdef ENABLE_PLAYERBOTS
-#include "RandomPlayerbotMgr.h"
+#include "PlayerbotAI.h"
 #endif
 
 #if EXPANSION == 0
