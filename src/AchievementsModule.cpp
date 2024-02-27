@@ -1237,11 +1237,6 @@ namespace achievements_module
             }
         }
 
-        if (!achievement || achievementName.empty() || achievementDescription.empty() || achievementTitleReward.empty()) 
-        {
-            return;
-        }
-
         // send visual effect
         if (m_module->GetConfig()->sendVisual && m_module->GetConfig()->effectId)
         {
@@ -1313,8 +1308,7 @@ namespace achievements_module
             return;
 
     #ifdef ENABLE_PLAYERBOTS
-        uint32 accId = GetPlayer()->GetSession()->GetAccountId();
-        if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !m_module->GetConfig()->randomBots)
+        if (!m_module->GetConfig()->randomBots && sRandomPlayerbotMgr.IsFreeBot(m_player))
             return;
     #endif
 
@@ -2654,8 +2648,7 @@ namespace achievements_module
                 return false;
 
     #ifdef ENABLE_PLAYERBOTS
-            uint32 accId = GetPlayer()->GetSession()->GetAccountId();
-            if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !m_module->GetConfig()->randomBotsRealmFirst)
+            if (!m_module->GetConfig()->randomBotsRealmFirst && sRandomPlayerbotMgr.IsFreeBot(m_player))
                 return false;
     #endif
         }
@@ -3104,7 +3097,7 @@ namespace achievements_module
             {
                 // sLog.outError("achievement AchievementMgr::SetCriteriaProgress(%u, %u) %s [%s]", entry->ID, changeValue, m_player->GetName(), achievement->name[0]);
                 std::string breadCrumbs;
-                auto categoryId = achievement->categoryId;
+                int32 categoryId = achievement->categoryId;
                 do
                 {
                     const AchievementCategoryEntry* category = m_module->GetAchievementCategory(categoryId);
@@ -3297,7 +3290,7 @@ namespace achievements_module
             {
                 // sLog.outError("achievement AchievementMgr::CompletedAchievement(%u) %s [%s] x%u points", achievement->ID, m_player->GetName(), achievement->name[0], achievement->points);
                 std::string breadCrumbs;
-                auto categoryId = achievement->categoryId;
+                int32 categoryId = achievement->categoryId;
                 do 
                 {
                     const AchievementCategoryEntry* category = m_module->GetAchievementCategory(categoryId);
@@ -5187,13 +5180,16 @@ namespace achievements_module
 
     void AchievementsModule::OnEquipItem(Player* player, Item* item)
     {
-        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
-        if (playerMgr && item)
+        if (player && !player->GetSession()->PlayerLoading())
         {
-            const uint32 itemEntry = item->GetEntry();
-            const uint8 slot = item->GetSlot();
-            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, itemEntry);
-            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM, itemEntry, slot);
+            PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+            if (playerMgr && item)
+            {
+                const uint32 itemEntry = item->GetEntry();
+                const uint8 slot = item->GetSlot();
+                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, itemEntry);
+                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM, itemEntry, slot);
+            }
         }
     }
 
