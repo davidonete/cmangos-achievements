@@ -102,7 +102,7 @@ namespace achievements_module
         AchievementScriptMgr() : _scriptCount(0), _scheduledScripts(0), _script_loader_callback(nullptr) {}
         ~AchievementScriptMgr() {}
 
-        void Initialize();
+        void Initialize(AchievementsModule* module);
         void LoadDatabase();
         //void FillSpellSummary();
         void CheckIfScriptsInDatabaseExist();
@@ -146,7 +146,7 @@ namespace achievements_module
         uint32 getScriptId(std::string const& name) const;
 
     private:
-        void loadScriptNames();
+        void loadScriptNames(AchievementsModule* module);
         std::vector<std::string> _scriptNamesStore;
 
         //atomic op counter for active scripts amount

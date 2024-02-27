@@ -15,10 +15,7 @@
 namespace achievements_module
 {
     class AchievementsModule;
-
-    extern SQLStorage sAchievementCriteriaStore;
-    extern SQLStorage sAchievementStore;
-    extern SQLStorage sAchievementCategoryStore;
+    class AchievementScriptMgr;
 
     struct AchievementEntry
     {
@@ -26,38 +23,38 @@ namespace achievements_module
         int32 requiredFaction;                               // 1 -1=all, 0=horde, 1=alliance
         int32 mapID;                                         // 2 -1=none
         uint32 parentAchievement;                            // 3 its Achievement parent (can`t start while parent uncomplete, use its Criteria if don`t have own, use its progress on begin)
-        std::array<char const*, 16> name;                    // 4-19
+        std::string name[16];                                // 4-19
         uint32 name_flags;                                   // 20
-        char* description[16];                               // 21-36
+        std::string description[16];                         // 21-36
         uint32 desc_flags;                                   // 37
         uint32 categoryId;                                   // 38
         uint32 points;                                       // 39 reward points
         uint32 OrderInCategory;                              // 40
         uint32 flags;                                        // 41
         uint32 icon;                                         // 42 icon (from SpellIcon.dbc)
-        char* titleReward[16];                               // 43-58
+        std::string titleReward[16];                         // 43-58
         uint32 titleReward_flags;                            // 59
         uint32 count;                                        // 60 - need this count of completed criterias (own or referenced achievement criterias)
         uint32 refAchievement;                               // 61 - referenced achievement (counting of all completed criterias)
         uint32 patch;
 
     public:
-        const char* GetName(uint32 locale) const;
-        const char* GetDescription(uint32 locale) const;
-        const char* GetTitleReward(uint32 locale) const;
+        const std::string& GetName(uint32 locale) const;
+        const std::string& GetDescription(uint32 locale) const;
+        const std::string& GetTitleReward(uint32 locale) const;
     };
 
     struct AchievementCategoryEntry
     {
         int32 ID;                                            // 0
         int32 parentCategory;                                // 1 -1 for main category
-        char* name[16];                                      // 2-17
+        std::string name[16];                                // 2-17
         uint32 name_flags;                                   // 18
         uint32 sortOrder;                                    // 19
         uint32 patch;
 
     public:
-        const char* GetName(uint32 locale) const;
+        const std::string& GetName(uint32 locale) const;
     };
 
     struct AchievementCriteriaEntry
@@ -497,7 +494,7 @@ namespace achievements_module
             uint32  additionalRequirement_value;
         } additionalRequirements[MAX_CRITERIA_REQUIREMENTS];
 
-        char const* name[16];                                   // 9-24
+        std::string name[16];                                   // 9-24
         uint32  name_flags;                                     // 25
         uint32  flags;                                          // 26
         uint32  timedType;                                      // 27
@@ -508,7 +505,7 @@ namespace achievements_module
         uint32 showOrder;                                       // 30 show order
 
     public:
-        const char* GetName(uint32 locale) const;
+        const std::string& GetName(uint32 locale) const;
     };
 
     typedef std::list<AchievementCriteriaEntry const*> AchievementCriteriaEntryList;
@@ -674,6 +671,7 @@ namespace achievements_module
         void Add(AchievementCriteriaData const& data) { storage.push_back(data); }
         bool Meets(Player const* source, Unit const* target, uint32 miscvalue = 0) const;
         void SetCriteriaId(uint32 id) { criteria_id = id; }
+        const Storage& GetStorage() const { return storage; }
 
     private:
         uint32 criteria_id{0};
@@ -771,6 +769,7 @@ namespace achievements_module
     class AchievementsModule : public Module
     {
         friend class PlayerAchievementMgr;
+        friend class AchievementScriptMgr;
 
     public:
         AchievementsModule() : Module("Achievements") {}
@@ -940,11 +939,14 @@ namespace achievements_module
         bool IsRealmCompleted(AchievementEntry const* achievement) const;
         void SetRealmCompleted(AchievementEntry const* achievement);
 
-        [[nodiscard]] AchievementEntry const* GetAchievement(uint32 achievementId) const;
+        [[nodiscard]] const AchievementEntry* GetAchievement(uint32 achievementId, bool assert = true) const;
+        [[nodiscard]] const AchievementCriteriaEntry* GetAchievementCriteria(uint32 criteriaId, bool assert = true) const;
+        [[nodiscard]] const AchievementCategoryEntry* GetAchievementCategory(uint32 categoryId) const;
 
         void LoadAchievementCriteriaList();
         void LoadAchievementCriteriaData();
-        void LoadAchievementReferenceList();
+        void LoadAchievementList();
+        void LoadAchievementCategories();
         void LoadCompletedAchievements();
         void LoadRewards();
         void LoadRewardLocales();
@@ -954,6 +956,9 @@ namespace achievements_module
         const PlayerAchievementMgr* GetPlayerAchievementMgr(const Player* player) const;
 
     private:
+        std::unordered_map<uint32, AchievementEntry> m_achievements;
+        std::unordered_map<uint32, AchievementCategoryEntry> m_achievementCategories;
+        std::unordered_map<uint32, AchievementCriteriaEntry> m_achievementCriterias;
         AchievementCriteriaDataMap m_criteriaDataMap;
 
         // store achievement criterias by type to speed up lookup
@@ -970,10 +975,10 @@ namespace achievements_module
         AchievementRewards m_achievementRewards;
         AchievementRewardLocales m_achievementRewardLocales;
 
-        std::map<uint32, AchievementCriteriaEntryList> m_specialList[ACHIEVEMENT_CRITERIA_TYPE_TOTAL];
-        std::map<uint32, AchievementCriteriaEntryList> m_achievementCriteriasByCondition[ACHIEVEMENT_CRITERIA_CONDITION_TOTAL];
+        std::unordered_map<uint32, AchievementCriteriaEntryList> m_specialList[ACHIEVEMENT_CRITERIA_TYPE_TOTAL];
+        std::unordered_map<uint32, AchievementCriteriaEntryList> m_achievementCriteriasByCondition[ACHIEVEMENT_CRITERIA_CONDITION_TOTAL];
 
-        std::map<uint32, PlayerAchievementMgr> m_playerMgrs;
+        std::unordered_map<uint32, PlayerAchievementMgr> m_playerMgrs;
     };
 
     static AchievementsModule achievementsModule;

@@ -13,7 +13,7 @@
 #include "World/World.h"
 
 #ifdef ENABLE_PLAYERBOTS
-#include "PlayerbotAIConfig.h"
+#include "RandomPlayerbotMgr.h"
 #endif
 
 #if EXPANSION == 0
@@ -24,15 +24,6 @@
 
 namespace achievements_module
 {
-    char constexpr Achievementfmt[] = "iiiissssssssssssssssissssssssssssssssiiiiiissssssssssssssssiiii";
-    SQLStorage sAchievementStore(Achievementfmt, "ID", "achievement_dbc");
-
-    char constexpr AchievementCategoryfmt[] = "iissssssssssssssssiii";
-    SQLStorage sAchievementCategoryStore(AchievementCategoryfmt, "ID", "achievement_category_dbc");
-
-    char constexpr AchievementCriteriafmt[] = "iiiiiiiiissssssssssssssssiiiiii";
-    SQLStorage sAchievementCriteriaStore(AchievementCriteriafmt, "ID", "achievement_criteria_dbc");
-
     static const std::array<std::string, 2> achievementsDBTables =
     {
         "character_achievement",
@@ -589,7 +580,7 @@ namespace achievements_module
                 //    if (source->GetMap()->Is25ManRaid() != ((difficulty.difficulty & RAID_DIFFICULTY_MASK_25MAN) != 0))
                 //        return false;
 
-                //AchievementCriteriaEntry const* criteria = sAchievementCriteriaStore.LookupEntry<AchievementCriteriaEntry>(criteria_id);
+                //AchievementCriteriaEntry const* criteria = sAchievementCriteriaStore->LookupEntry<AchievementCriteriaEntry>(criteria_id);
                 //uint8 spawnMode = source->GetMap()->GetSpawnMode();
                 //// Dungeons completed on heroic mode count towards both in general achievement, but not in statistics.
                 //return sAchievementsModule.IsStatisticCriteria(criteria) ? spawnMode == difficulty.difficulty : spawnMode >= difficulty.difficulty;
@@ -785,7 +776,7 @@ namespace achievements_module
         for (AchievementCriteriaEntryList::const_iterator i = achievementCriteriaList->begin(); i != achievementCriteriaList->end(); ++i)
         {
             AchievementCriteriaEntry const* achievementCriteria = (*i);
-            AchievementEntry const* achievement = sAchievementStore.LookupEntry<AchievementEntry>(achievementCriteria->referredAchievement);
+            AchievementEntry const* achievement = m_module->GetAchievement(achievementCriteria->referredAchievement);
             if (!achievement)
                 continue;
 
@@ -849,7 +840,7 @@ namespace achievements_module
                         Field* fields = result->Fetch();
                         const uint32 achievementId = fields[0].GetUInt32();
                         const uint32 achievementDate = fields[1].GetUInt32();
-                        const AchievementEntry* achievement = sAchievementStore.LookupEntry<AchievementEntry>(achievementId);
+                        const AchievementEntry* achievement = m_module->GetAchievement(achievementId);
                         if (achievement)
                         {
                             // Check if the achievement is valid for the character's faction
@@ -903,7 +894,7 @@ namespace achievements_module
 
                 for (CompletedAchievementMap::iterator iter = m_completedAchievements.begin(); iter != m_completedAchievements.end(); ++iter)
                 {
-                    const AchievementEntry* achievement = sAchievementStore.LookupEntry<AchievementEntry>(iter->first);
+                    const AchievementEntry* achievement = m_module->GetAchievement(iter->first);
                     if (achievement)
                     {
                         for (const auto& pair : accountCharacterGuids)
@@ -1009,7 +1000,7 @@ namespace achievements_module
                 uint32 achievementId = fields[0].GetUInt16();
 
                 // must not happen: cleanup at server startup in sAchievementsModule.LoadCompletedAchievements()
-                AchievementEntry const* achievement = sAchievementStore.LookupEntry<AchievementEntry>(achievementId);
+                AchievementEntry const* achievement = m_module->GetAchievement(achievementId);
                 if (!achievement)
                 {
                     continue;
@@ -1032,7 +1023,7 @@ namespace achievements_module
                 uint32 counter = fields[1].GetUInt32();
                 time_t date    = time_t(fields[2].GetUInt32());
 
-                AchievementCriteriaEntry const* criteria = sAchievementCriteriaStore.LookupEntry<AchievementCriteriaEntry>(id);
+                AchievementCriteriaEntry const* criteria = m_module->GetAchievementCriteria(id);
                 if (!criteria) 
                 {
                     // we will remove not existed criteria for all characters
@@ -1087,7 +1078,7 @@ namespace achievements_module
                             if (criteria->requiredType == ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT)
                             {
                                 const uint32 linkedAchievementID = criteria->complete_achievement.linkedAchievement;
-                                const AchievementEntry* linkedAchievement = sAchievementStore.LookupEntry<AchievementEntry>(linkedAchievementID);
+                                const AchievementEntry* linkedAchievement = m_module->GetAchievement(linkedAchievementID);
                                 if (achievement)
                                 {
                                     AddAchievement(linkedAchievement);
@@ -1115,7 +1106,7 @@ namespace achievements_module
 
     bool PlayerAchievementMgr::AddAchievement(uint32 achievementId)
     {
-        const AchievementEntry* achievement = sAchievementStore.LookupEntry<AchievementEntry>(achievementId);
+        const AchievementEntry* achievement = m_module->GetAchievement(achievementId);
         if (achievement)
         {
             return AddAchievement(achievement);
@@ -1186,15 +1177,15 @@ namespace achievements_module
         //     guild->BroadcastWorker(_localizer, GetPlayer());
         // }
 
-        AchievementEntry const* achievementEntry = sAchievementStore.LookupEntry<AchievementEntry>(achievement->ID);
+        AchievementEntry const* achievementEntry = m_module->GetAchievement(achievement->ID);
         std::ostringstream notification;
         std::string chrName = GetPlayer()->GetName();
         notification << chrName << " has earned the achievement ";
         const uint8 playerLocale = GetPlayerLocale();
-        const char* achievementName = achievementEntry->GetName(playerLocale);
-        const char* achievementDescription = achievementEntry->GetDescription(playerLocale);
-        const char* achievementTitleReward = achievementEntry->GetTitleReward(playerLocale);
-        std::string title = achievementEntry && achievementName ? achievementName : "";
+        const std::string& achievementName = achievementEntry->GetName(playerLocale);
+        const std::string& achievementDescription = achievementEntry->GetDescription(playerLocale);
+        const std::string& achievementTitleReward = achievementEntry->GetTitleReward(playerLocale);
+        std::string title = achievementEntry && !achievementName.empty() ? achievementName : "";
         notification << "|cFFFFFF00|Hachievement:" << achievement->ID << "|h[" << title << "]|h|r";
 
         if (m_module->GetConfig()->sendMessage)
@@ -1246,7 +1237,7 @@ namespace achievements_module
             }
         }
 
-        if (!achievement || !achievementName || !achievementDescription || !achievementTitleReward) 
+        if (!achievement || achievementName.empty() || achievementDescription.empty() || achievementTitleReward.empty()) 
         {
             return;
         }
@@ -1411,7 +1402,7 @@ namespace achievements_module
         for (AchievementCriteriaEntryList::const_iterator i = achievementCriteriaList->begin(); i != achievementCriteriaList->end(); ++i)
         {
             AchievementCriteriaEntry const* achievementCriteria = (*i);
-            AchievementEntry const* achievement = sAchievementStore.LookupEntry<AchievementEntry>(achievementCriteria->referredAchievement);
+            AchievementEntry const* achievement = m_module->GetAchievement(achievementCriteria->referredAchievement);
             if (!achievement)
                 continue;
 
@@ -2433,7 +2424,7 @@ namespace achievements_module
                         uint32 points = 0;
                         for (CompletedAchievementMap::iterator itr = m_completedAchievements.begin(); itr != m_completedAchievements.end(); ++itr)
                         {
-                            if (AchievementEntry const* pAchievement = sAchievementStore.LookupEntry<AchievementEntry>(itr->first))
+                            if (AchievementEntry const* pAchievement = m_module->GetAchievement(itr->first))
                             {
                                 points += pAchievement->points;
                             }
@@ -3102,33 +3093,33 @@ namespace achievements_module
         }
 
         const uint8 playerLocale = GetPlayerLocale();
-        const char* criteriaName = entry->GetName(playerLocale);
+        const std::string& criteriaName = entry->GetName(playerLocale);
 
-        auto const* achievement = sAchievementStore.LookupEntry<AchievementEntry>(entry->referredAchievement);
+       const AchievementEntry* achievement = m_module->GetAchievement(entry->referredAchievement);
         if (achievement)
         {
-            const char* achievementName = achievement->GetName(playerLocale);
-            const char* achievementDescription = achievement->GetDescription(playerLocale);
-            if (achievementName)
+            const std::string& achievementName = achievement->GetName(playerLocale);
+            const std::string& achievementDescription = achievement->GetDescription(playerLocale);
+            if (!achievementName.empty())
             {
                 // sLog.outError("achievement AchievementMgr::SetCriteriaProgress(%u, %u) %s [%s]", entry->ID, changeValue, m_player->GetName(), achievement->name[0]);
                 std::string breadCrumbs;
                 auto categoryId = achievement->categoryId;
                 do
                 {
-                    auto const* category = sAchievementCategoryStore.LookupEntry<AchievementCategoryEntry>(categoryId);
+                    const AchievementCategoryEntry* category = m_module->GetAchievementCategory(categoryId);
                     if (category)
                     {
-                        const char* categoryName = category->GetName(playerLocale);
-                        if(categoryName)
+                        const std::string& categoryName = category->GetName(playerLocale);
+                        if(!categoryName.empty())
                         {
                             categoryId = category->parentCategory;
-                            breadCrumbs = std::string("[") + std::string(categoryName) + std::string("]/") + breadCrumbs;
+                            breadCrumbs = std::string("[") +categoryName + std::string("]/") + breadCrumbs;
                         }
                     }
                 } 
                 while (categoryId != -1);
-                sLog.outDebug("AchievementMgr::SetCriteriaProgress(%u) %s criteria(%s) for %s[%s], %u points (%s)", entry->ID, m_player->GetName(), criteriaName, breadCrumbs.c_str(), achievementName, achievement->points, achievementDescription);
+                sLog.outDebug("AchievementMgr::SetCriteriaProgress(%u) %s criteria(%s) for %s[%s], %u points (%s)", entry->ID, m_player->GetName(), criteriaName.c_str(), breadCrumbs.c_str(), achievementName.c_str(), achievement->points, achievementDescription.c_str());
             }
         }
 
@@ -3186,7 +3177,7 @@ namespace achievements_module
         if (entry->timeLimit)
         {
             // has to exist else we wouldn't be here
-            timedCompleted = IsCompletedCriteria(entry, sAchievementStore.LookupEntry<AchievementEntry>(entry->referredAchievement));
+            timedCompleted = IsCompletedCriteria(entry, m_module->GetAchievement(entry->referredAchievement));
             // Client expects this in packet
             timeElapsed = entry->timeLimit - (timedIter->second / IN_MILLISECONDS);
 
@@ -3222,7 +3213,7 @@ namespace achievements_module
                 // Time is up, remove timer and reset progress
                 if (itr->second <= timeDiff)
                 {
-                    const AchievementCriteriaEntry* entry = sAchievementCriteriaStore.LookupEntry<AchievementCriteriaEntry>(itr->first);
+                    const AchievementCriteriaEntry* entry = m_module->GetAchievementCriteria(itr->first);
                     RemoveCriteriaProgress(entry);
                     m_timedAchievements.erase(itr++);
                 }
@@ -3243,7 +3234,7 @@ namespace achievements_module
             if ((*i)->timerStartEvent != entry)
                 continue;
 
-            AchievementEntry const* achievement = sAchievementStore.LookupEntry<AchievementEntry>((*i)->referredAchievement);
+            AchievementEntry const* achievement = m_module->GetAchievement((*i)->referredAchievement);
             if (m_timedAchievements.find((*i)->ID) == m_timedAchievements.end() && !IsCompletedCriteria(*i, achievement))
             {
                 // Start the timer
@@ -3300,28 +3291,28 @@ namespace achievements_module
         if (achievement) 
         {
             const uint8 playerLocale = GetPlayerLocale();
-            const char* achievementName = achievement->GetName(playerLocale);
-            const char* achievementDescription = achievement->GetDescription(playerLocale);
-            if(achievementName)
+            const std::string& achievementName = achievement->GetName(playerLocale);
+            const std::string& achievementDescription = achievement->GetDescription(playerLocale);
+            if(!achievementName.empty())
             {
                 // sLog.outError("achievement AchievementMgr::CompletedAchievement(%u) %s [%s] x%u points", achievement->ID, m_player->GetName(), achievement->name[0], achievement->points);
                 std::string breadCrumbs;
                 auto categoryId = achievement->categoryId;
                 do 
                 {
-                    auto const* category = sAchievementCategoryStore.LookupEntry<AchievementCategoryEntry>(categoryId);
+                    const AchievementCategoryEntry* category = m_module->GetAchievementCategory(categoryId);
                     if (category) 
                     {
-                        const char* categoryName = category->GetName(playerLocale);
-                        if(categoryName)
+                        const std::string& categoryName = category->GetName(playerLocale);
+                        if(!categoryName.empty())
                         {
                             categoryId = category->parentCategory;
-                            breadCrumbs = std::string("[") + std::string(categoryName) + std::string("]/") + breadCrumbs;
+                            breadCrumbs = std::string("[") + categoryName + std::string("]/") + breadCrumbs;
                         }
                     }
                 } 
                 while (categoryId != -1);
-                sLog.outDebug("AchievementMgr::CompletedAchievement(%u) %s %s[%s], %u points (%s)", achievement->ID, m_player->GetName(), breadCrumbs.c_str(), achievementName, achievement->points, achievementDescription);
+                sLog.outDebug("AchievementMgr::CompletedAchievement(%u) %s %s[%s], %u points (%s)", achievement->ID, m_player->GetName(), breadCrumbs.c_str(), achievementName.c_str(), achievement->points, achievementDescription.c_str());
             }
         }
 
@@ -3621,7 +3612,7 @@ namespace achievements_module
             PlayerAchievementMgr* achievementMgr = GetPlayerAchievementMgr(player);
             if (achievementMgr)
             {
-                const AchievementEntry* achievement = sAchievementStore.LookupEntry<AchievementEntry>(achievementId);
+                const AchievementEntry* achievement = GetAchievement(achievementId);
                 if (achievement)
                 {
                     return achievementMgr->RemoveAchievement(achievement);
@@ -3648,21 +3639,19 @@ namespace achievements_module
         if (version >= GetCurrentVersion())
             return;
 
-        const auto maxId = sAchievementCategoryStore.GetMaxEntry();
-        const auto count = sAchievementCategoryStore.GetRecordCount();
-
         uint32 i = 0;
-        for (uint32 entryId = 0; entryId < maxId; ++entryId)
+        const auto count = m_achievementCategories.size();
+        for (const auto& pair : m_achievementCategories)
         {
-            AchievementCategoryEntry const* category = sAchievementCategoryStore.LookupEntry<AchievementCategoryEntry>(entryId);
+            const AchievementCategoryEntry* category = &pair.second;
             if (!category)
                 continue;
 
             if (category->patch > GetCurrentPatch())
                 continue;
 
-            const char* categoryName = category->GetName(GetPlayerLocale(player->GetSession()));
-            const auto* name = std::strlen(categoryName) <= 2 ? "_" : categoryName;
+            const std::string& categoryName = category->GetName(GetPlayerLocale(player->GetSession()));
+            const char* name = categoryName.size() <= 2 ? "_" : categoryName.c_str();
 
             PSendAchievementMessage
             (
@@ -3696,12 +3685,11 @@ namespace achievements_module
         if (version >= GetCurrentVersion())
             return;
 
-        const auto maxId = sAchievementStore.GetMaxEntry();
-        const auto count = sAchievementStore.GetRecordCount();
         uint32 i = 0;
-        for (uint32 entryId = 0; entryId < maxId; ++entryId) 
+        const auto count = m_achievements.size();
+        for (const auto& pair : m_achievements) 
         {
-            AchievementEntry const* achievement = sAchievementStore.LookupEntry<AchievementEntry>(entryId);
+            const AchievementEntry* achievement = &pair.second;
             if (!achievement)
                 continue;
 
@@ -3713,13 +3701,13 @@ namespace achievements_module
                 continue;
 
             const uint8 playerLocale = GetPlayerLocale(player->GetSession());
-            const char* achievementName = achievement->GetName(playerLocale);
-            const char* achievementDescription = achievement->GetDescription(playerLocale);
-            const char* achievementTitleReward = achievement->GetTitleReward(playerLocale);
+            const std::string& achievementName = achievement->GetName(playerLocale);
+            const std::string& achievementDescription = achievement->GetDescription(playerLocale);
+            const std::string& achievementTitleReward = achievement->GetTitleReward(playerLocale);
 
-            const auto* name = std::strlen(achievementName) <= 2 ? "_" : achievementName;
-            const auto* description = std::strlen(achievementDescription) <= 2 ? "_" : achievementDescription;
-            const auto* titleReward = std::strlen(achievementTitleReward) <= 2 ? "_" : achievementTitleReward;
+            const char* name = achievementName.size() <= 2 ? "_" : achievementName.c_str();
+            const char* description = achievementDescription.size() <= 2 ? "_" : achievementDescription.c_str();
+            const char* titleReward = achievementTitleReward.size() <= 2 ? "_" : achievementTitleReward.c_str();
 
             PSendAchievementMessage
             (
@@ -3762,17 +3750,13 @@ namespace achievements_module
         if (version >= GetCurrentVersion())
             return;
 
-        const auto maxId = sAchievementCriteriaStore.GetMaxEntry();
-        const auto count = sAchievementCriteriaStore.GetRecordCount();
+        const auto count = m_achievementCriterias.size();
         uint32 i = 0;
-        for (uint32 entryId = 0; entryId < maxId; ++entryId) 
+        for (const auto& pair : m_achievementCriterias)
         {
-            AchievementCriteriaEntry const* criteria = sAchievementCriteriaStore.LookupEntry<AchievementCriteriaEntry>(entryId);
-            if (!criteria)
-                continue;
-
-            const char* criteriaName = criteria->GetName(GetPlayerLocale(player->GetSession()));
-            const auto* name = std::strlen(criteriaName) <= 2 ? "_" : criteriaName;
+            const AchievementCriteriaEntry* criteria = &pair.second;
+            const std::string& criteriaName = criteria->GetName(GetPlayerLocale(player->GetSession()));
+            const char* name = criteriaName.size() <= 2 ? "_" : criteriaName.c_str();
 
             PSendAchievementMessage
             (
@@ -3828,7 +3812,7 @@ namespace achievements_module
                     uint32 counter  = fields[1].GetUInt32();
                     const auto date = time_t(fields[2].GetUInt32());
 
-                    AchievementCriteriaEntry const* criteria = sAchievementCriteriaStore.LookupEntry<AchievementCriteriaEntry>(id);
+                    const AchievementCriteriaEntry* criteria = GetAchievementCriteria(id);
                     if (!criteria) 
                     {
                         continue;
@@ -3854,12 +3838,10 @@ namespace achievements_module
                 while (criteriaResult->NextRow());
             }
 
-            const auto maxId = sAchievementStore.GetMaxEntry();
-            const auto count = sAchievementStore.GetRecordCount();
             uint32 i = 0;
-            for (uint32 entryId = 0; entryId < maxId; ++entryId) 
+            for (const auto& pair: m_achievements) 
             {
-                AchievementEntry const* achievement = sAchievementStore.LookupEntry<AchievementEntry>(entryId);
+                const AchievementEntry* achievement = &pair.second;
                 if (!achievement)
                     continue;
 
@@ -3876,11 +3858,11 @@ namespace achievements_module
 
                 if (aMgr->HasAchieved(achievmentForTestId))
                 {
-                    AchievementCriteriaEntryList const* cList = GetAchievementCriteriaByAchievement(achievmentForTestId);
+                    const AchievementCriteriaEntryList* cList = GetAchievementCriteriaByAchievement(achievmentForTestId);
                     for (AchievementCriteriaEntryList::const_iterator i = cList->begin(); i != cList->end(); ++i)
                     {
-                        AchievementCriteriaEntry const* achievementCriteria = (*i);
-                        AchievementEntry const* achievementTemp = sAchievementStore.LookupEntry<AchievementEntry>(achievementCriteria->referredAchievement);
+                        const AchievementCriteriaEntry* achievementCriteria = (*i);
+                        const AchievementEntry* achievementTemp = GetAchievement(achievementCriteria->referredAchievement);
                         if (!achievementTemp)
                             continue;
 
@@ -3926,7 +3908,7 @@ namespace achievements_module
                 Field* fields = achievementResult->Fetch();
                 uint32 achievementid = fields[0].GetUInt16();
 
-                AchievementEntry const* achievement = sAchievementStore.LookupEntry<AchievementEntry>(achievementid);
+                const AchievementEntry* achievement = GetAchievement(achievementid);
                 if (!achievement) 
                 {
                     continue;
@@ -3948,9 +3930,9 @@ namespace achievements_module
         }
     }
 
-    bool AchievementsModule::IsStatisticCriteria(AchievementCriteriaEntry const* achievementCriteria) const
+    bool AchievementsModule::IsStatisticCriteria(const AchievementCriteriaEntry* achievementCriteria) const
     {
-        return isStatisticAchievement(sAchievementStore.LookupEntry<AchievementEntry>(achievementCriteria->referredAchievement));
+        return isStatisticAchievement(GetAchievement(achievementCriteria->referredAchievement));
     }
 
     bool AchievementsModule::isStatisticAchievement(AchievementEntry const* achievement) const
@@ -3958,7 +3940,7 @@ namespace achievements_module
         if (!achievement)
             return false;
 
-        AchievementCategoryEntry const* cat = sAchievementCategoryStore.LookupEntry<AchievementCategoryEntry>(achievement->categoryId);
+        const AchievementCategoryEntry* cat = GetAchievementCategory(achievement->categoryId);
         do
         {
             switch(cat->ID)
@@ -3975,7 +3957,7 @@ namespace achievements_module
 
                 default:
                 {
-                    cat = sAchievementCategoryStore.LookupEntry<AchievementCategoryEntry>(cat->parentCategory);
+                    cat = GetAchievementCategory(cat->parentCategory);
                     break;
                 }
             }
@@ -4002,7 +3984,7 @@ namespace achievements_module
 
         // Allow completing the realm first kill for entire minute after first person did it
         // it may allow more than one group to achieve it (highly unlikely)
-        // but apparently this is how blizz handles it as well
+        // but apparently this is how blizzard handles it as well
         if (achievement->flags & ACHIEVEMENT_FLAG_REALM_FIRST_KILL)
             return (std::chrono::system_clock::now() - itr->second) > std::chrono::minutes(1);
 
@@ -4022,36 +4004,70 @@ namespace achievements_module
     //==========================================================
     void AchievementsModule::LoadAchievementCriteriaList()
     {
-        uint32 oldMSTime = WorldTimer::getMSTime();
-
-        if (sAchievementCriteriaStore.GetMaxEntry() == 0)
+        auto result = WorldDatabase.Query("SELECT `ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Start_Event`, `Start_Asset`, `Fail_Event`, `Fail_Asset`, `Description_Lang_enUS`, `Description_Lang_enGB`, `Description_Lang_koKR`, `Description_Lang_frFR`, `Description_Lang_deDE`, `Description_Lang_enCN`, `Description_Lang_zhCN`, `Description_Lang_enTW`, `Description_Lang_zhTW`, `Description_Lang_esES`, `Description_Lang_esMX`, `Description_Lang_ruRU`, `Description_Lang_ptPT`, `Description_Lang_ptBR`, `Description_Lang_itIT`, `Description_Lang_Unk`, `Description_Lang_Mask`, `Flags`, `Timer_Start_Event`, `Timer_Asset_Id`, `Timer_Time`, `Ui_Order` FROM `achievement_criteria_dbc`;");
+        if (result)
         {
-            sLog.outBasic(" server.loading", ">> Loaded 0 achievement criteria.");
-            sLog.outBasic(" server.loading", " ");
-            return;
-        }
-
-        uint32 loaded = 0;
-        for (uint32 entryId = 0; entryId < sAchievementCriteriaStore.GetMaxEntry(); ++entryId)
-        {
-            AchievementCriteriaEntry const* criteria = sAchievementCriteriaStore.LookupEntry<AchievementCriteriaEntry>(entryId);
-            if (!criteria)
-                continue;
-
-            m_achievementCriteriasByType[criteria->requiredType].push_back(criteria);
-            m_achievementCriteriaListByAchievement[criteria->referredAchievement].push_back(criteria);
-
-            if (criteria->additionalRequirements[0].additionalRequirement_type != ACHIEVEMENT_CRITERIA_CONDITION_NONE)
-                m_achievementCriteriasByCondition[criteria->additionalRequirements[0].additionalRequirement_type][criteria->additionalRequirements[0].additionalRequirement_value].push_back(criteria);
-
-            if (criteria->additionalRequirements[1].additionalRequirement_type != ACHIEVEMENT_CRITERIA_CONDITION_NONE &&
-                criteria->additionalRequirements[1].additionalRequirement_type != criteria->additionalRequirements[0].additionalRequirement_type)
+            uint32 loaded = 0;
+            uint32 oldMSTime = WorldTimer::getMSTime();
+            do
             {
-                m_achievementCriteriasByCondition[criteria->additionalRequirements[1].additionalRequirement_type][criteria->additionalRequirements[1].additionalRequirement_value].push_back(criteria);
-            }
+                Field* fields = result->Fetch();
+                const uint32 criteriaID = fields[0].GetUInt32();
+                const uint32 achievementID = fields[1].GetUInt32();
 
-            switch (criteria->requiredType)
-            {
+                // Don't load the criteria of higher patches
+                const AchievementEntry* achievement = GetAchievement(achievementID, false);
+                if (!achievement || achievement->patch > GetCurrentPatch())
+                    continue;
+
+                AchievementCriteriaEntry* criteria = &m_achievementCriterias[criteriaID];
+
+                criteria->ID = criteriaID;
+                criteria->referredAchievement = achievementID;
+                criteria->requiredType = fields[2].GetUInt32();
+                criteria->raw.field3 = fields[3].GetUInt32();
+                criteria->raw.count = fields[4].GetUInt32();
+                criteria->additionalRequirements[0].additionalRequirement_type = fields[5].GetUInt32();
+                criteria->additionalRequirements[0].additionalRequirement_value = fields[6].GetUInt32();
+                criteria->additionalRequirements[1].additionalRequirement_type = fields[7].GetUInt32();
+                criteria->additionalRequirements[1].additionalRequirement_value = fields[8].GetUInt32();
+                criteria->name[0] = fields[9].GetCppString();
+                criteria->name[1] = fields[10].GetCppString();
+                criteria->name[2] = fields[11].GetCppString();
+                criteria->name[3] = fields[12].GetCppString();
+                criteria->name[4] = fields[13].GetCppString();
+                criteria->name[5] = fields[14].GetCppString();
+                criteria->name[6] = fields[15].GetCppString();
+                criteria->name[7] = fields[16].GetCppString();
+                criteria->name[8] = fields[17].GetCppString();
+                criteria->name[9] = fields[18].GetCppString();
+                criteria->name[10] = fields[19].GetCppString();
+                criteria->name[11] = fields[20].GetCppString();
+                criteria->name[12] = fields[21].GetCppString();
+                criteria->name[13] = fields[22].GetCppString();
+                criteria->name[14] = fields[23].GetCppString();
+                criteria->name[15] = fields[24].GetCppString();
+                criteria->name_flags = fields[25].GetUInt32();
+                criteria->flags = fields[26].GetUInt32();
+                criteria->timedType = fields[27].GetUInt32();
+                criteria->timerStartEvent = fields[28].GetUInt32();
+                criteria->timeLimit = fields[29].GetUInt32();
+                criteria->showOrder = fields[30].GetUInt32();
+
+                m_achievementCriteriasByType[criteria->requiredType].push_back(criteria);
+                m_achievementCriteriaListByAchievement[criteria->referredAchievement].push_back(criteria);
+
+                if (criteria->additionalRequirements[0].additionalRequirement_type != ACHIEVEMENT_CRITERIA_CONDITION_NONE)
+                    m_achievementCriteriasByCondition[criteria->additionalRequirements[0].additionalRequirement_type][criteria->additionalRequirements[0].additionalRequirement_value].push_back(criteria);
+
+                if (criteria->additionalRequirements[1].additionalRequirement_type != ACHIEVEMENT_CRITERIA_CONDITION_NONE &&
+                    criteria->additionalRequirements[1].additionalRequirement_type != criteria->additionalRequirements[0].additionalRequirement_type)
+                {
+                    m_achievementCriteriasByCondition[criteria->additionalRequirements[1].additionalRequirement_type][criteria->additionalRequirements[1].additionalRequirement_value].push_back(criteria);
+                }
+
+                switch (criteria->requiredType)
+                {
                 case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE:
                 {
                     m_specialList[criteria->requiredType][criteria->kill_creature.creatureID].push_back(criteria);
@@ -4258,41 +4274,175 @@ namespace achievements_module
                     m_specialList[criteria->requiredType][criteria->learn_skill_line.skillLine].push_back(criteria);
                     break;
                 }
+                }
+
+                if (criteria->timeLimit)
+                    m_achievementCriteriasByTimedType[criteria->timedType].push_back(criteria);
+
+                ++loaded;
             }
+            while (result->NextRow());
 
-            if (criteria->timeLimit)
-                m_achievementCriteriasByTimedType[criteria->timedType].push_back(criteria);
-
-            ++loaded;
+            sLog.outBasic(">> Loaded %u achievement criteria in %u ms", loaded, WorldTimer::getMSTimeDiff(oldMSTime, WorldTimer::getMSTime()));
         }
-
-        sLog.outBasic(">> Loaded %u achievement criteria in %u ms", loaded, WorldTimer::getMSTimeDiff(oldMSTime, WorldTimer::getMSTime()));
+        else
+        {
+            sLog.outBasic(" server.loading", ">> Loaded 0 achievement criteria.");
+            sLog.outBasic(" server.loading", " ");
+        }
     }
 
-    void AchievementsModule::LoadAchievementReferenceList()
+    void AchievementsModule::LoadAchievementList()
     {
-        uint32 oldMSTime = WorldTimer::getMSTime();
-
-        if (sAchievementStore.GetMaxEntry() == 0)
+        auto result = WorldDatabase.Query("SELECT `ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_enGB`, `Title_Lang_koKR`, `Title_Lang_frFR`, `Title_Lang_deDE`, `Title_Lang_enCN`, `Title_Lang_zhCN`, `Title_Lang_enTW`, `Title_Lang_zhTW`, `Title_Lang_esES`, `Title_Lang_esMX`, `Title_Lang_ruRU`, `Title_Lang_ptPT`, `Title_Lang_ptBR`, `Title_Lang_itIT`, `Title_Lang_Unk`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_enGB`, `Description_Lang_koKR`, `Description_Lang_frFR`, `Description_Lang_deDE`, `Description_Lang_enCN`, `Description_Lang_zhCN`, `Description_Lang_enTW`, `Description_Lang_zhTW`, `Description_Lang_esES`, `Description_Lang_esMX`, `Description_Lang_ruRU`, `Description_Lang_ptPT`, `Description_Lang_ptBR`, `Description_Lang_itIT`, `Description_Lang_Unk`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `Flags`, `IconID`, `Reward_Lang_enUS`, `Reward_Lang_enGB`, `Reward_Lang_koKR`, `Reward_Lang_frFR`, `Reward_Lang_deDE`, `Reward_Lang_enCN`, `Reward_Lang_zhCN`, `Reward_Lang_enTW`, `Reward_Lang_zhTW`, `Reward_Lang_esES`, `Reward_Lang_esMX`, `Reward_Lang_ruRU`, `Reward_Lang_ptPT`, `Reward_Lang_ptBR`, `Reward_Lang_itIT`, `Reward_Lang_Unk`, `Reward_Lang_Mask`, `Minimum_Criteria`, `Shares_Criteria`, `patch` FROM `achievement_dbc`;");
+        if (result)
         {
-            sLog.outBasic(" server.loading", ">> Loaded 0 achievement references.");
+            uint32 loaded = 0;
+            uint32 oldMSTime = WorldTimer::getMSTime();
+            do
+            {
+                Field* fields = result->Fetch();
+                const uint32 achievementID = fields[0].GetUInt32();
+                const uint32 patch = fields[62].GetUInt32();
+
+                // Don't load achievement of future patches
+                if (patch > GetCurrentPatch())
+                    continue;
+
+                AchievementEntry* achievement = &m_achievements[achievementID];
+
+                achievement->ID = achievementID;
+                achievement->requiredFaction = fields[1].GetInt32();
+                achievement->mapID = fields[2].GetUInt32();
+                achievement->parentAchievement = fields[3].GetUInt32();
+                achievement->name[0] = fields[4].GetCppString();
+                achievement->name[1] = fields[5].GetCppString();
+                achievement->name[2] = fields[6].GetCppString();
+                achievement->name[3] = fields[7].GetCppString();
+                achievement->name[4] = fields[8].GetCppString();
+                achievement->name[5] = fields[9].GetCppString();
+                achievement->name[6] = fields[10].GetCppString();
+                achievement->name[7] = fields[11].GetCppString();
+                achievement->name[8] = fields[12].GetCppString();
+                achievement->name[9] = fields[13].GetCppString();
+                achievement->name[10] = fields[14].GetCppString();
+                achievement->name[11] = fields[15].GetCppString();
+                achievement->name[12] = fields[16].GetCppString();
+                achievement->name[13] = fields[17].GetCppString();
+                achievement->name[14] = fields[18].GetCppString();
+                achievement->name[15] = fields[19].GetCppString();
+                achievement->name_flags = fields[20].GetUInt32();
+                achievement->description[0] = fields[21].GetCppString();
+                achievement->description[1] = fields[22].GetCppString();
+                achievement->description[2] = fields[23].GetCppString();
+                achievement->description[3] = fields[24].GetCppString();
+                achievement->description[4] = fields[25].GetCppString();
+                achievement->description[5] = fields[26].GetCppString();
+                achievement->description[6] = fields[27].GetCppString();
+                achievement->description[7] = fields[28].GetCppString();
+                achievement->description[8] = fields[29].GetCppString();
+                achievement->description[9] = fields[30].GetCppString();
+                achievement->description[10] = fields[31].GetCppString();
+                achievement->description[11] = fields[32].GetCppString();
+                achievement->description[12] = fields[33].GetCppString();
+                achievement->description[13] = fields[34].GetCppString();
+                achievement->description[14] = fields[35].GetCppString();
+                achievement->description[15] = fields[36].GetCppString();
+                achievement->desc_flags = fields[37].GetUInt32();
+                achievement->categoryId = fields[38].GetUInt32();
+                achievement->points = fields[39].GetUInt32();
+                achievement->OrderInCategory = fields[40].GetUInt32();
+                achievement->flags = fields[41].GetUInt32();
+                achievement->icon = fields[42].GetUInt32();
+                achievement->titleReward[0] = fields[43].GetCppString();
+                achievement->titleReward[1] = fields[44].GetCppString();
+                achievement->titleReward[2] = fields[45].GetCppString();
+                achievement->titleReward[3] = fields[46].GetCppString();
+                achievement->titleReward[4] = fields[47].GetCppString();
+                achievement->titleReward[5] = fields[48].GetCppString();
+                achievement->titleReward[6] = fields[49].GetCppString();
+                achievement->titleReward[7] = fields[50].GetCppString();
+                achievement->titleReward[8] = fields[51].GetCppString();
+                achievement->titleReward[9] = fields[52].GetCppString();
+                achievement->titleReward[10] = fields[53].GetCppString();
+                achievement->titleReward[11] = fields[54].GetCppString();
+                achievement->titleReward[12] = fields[55].GetCppString();
+                achievement->titleReward[13] = fields[56].GetCppString();
+                achievement->titleReward[14] = fields[57].GetCppString();
+                achievement->titleReward[15] = fields[58].GetCppString();
+                achievement->titleReward_flags = fields[59].GetUInt32();
+                achievement->count = fields[60].GetUInt32();
+                achievement->refAchievement = fields[61].GetUInt32();
+                achievement->patch = patch;
+
+                if (achievement->refAchievement)
+                {
+                    m_achievementListByReferencedId[achievement->refAchievement].push_back(achievement);
+                }
+
+                ++loaded;
+            } 
+            while (result->NextRow());
+
+            sLog.outBasic(">> Loaded %u achievements in %u ms", loaded, WorldTimer::getMSTimeDiff(oldMSTime, WorldTimer::getMSTime()));
+        }
+        else
+        {
+            sLog.outBasic(" server.loading", ">> Loaded 0 achievements.");
             sLog.outBasic(" server.loading", " ");
-            return;
         }
+    }
 
-        uint32 count = 0;
-
-        for (uint32 entryId = 0; entryId < sAchievementStore.GetMaxEntry(); ++entryId)
+    void AchievementsModule::LoadAchievementCategories()
+    {
+        auto result = WorldDatabase.Query("SELECT `ID`, `Parent`, `Name_Lang_enUS`, `Name_Lang_enGB`, `Name_Lang_koKR`, `Name_Lang_frFR`, `Name_Lang_deDE`, `Name_Lang_enCN`, `Name_Lang_zhCN`, `Name_Lang_enTW`, `Name_Lang_zhTW`, `Name_Lang_esES`, `Name_Lang_esMX`, `Name_Lang_ruRU`, `Name_Lang_ptPT`, `Name_Lang_ptBR`, `Name_Lang_itIT`, `Name_Lang_Unk`, `Name_Lang_Mask`, `Ui_Order`, `patch` FROM `achievement_category_dbc`;");
+        if (result)
         {
-            AchievementEntry const* achievement = sAchievementStore.LookupEntry<AchievementEntry>(entryId);
-            if (!achievement || !achievement->refAchievement)
-                continue;
+            uint32 loaded = 0;
+            uint32 oldMSTime = WorldTimer::getMSTime();
+            do
+            {
+                Field* fields = result->Fetch();
+                const uint32 categoryID = fields[0].GetUInt32();
+                const uint32 patch = fields[20].GetUInt32();
 
-            m_achievementListByReferencedId[achievement->refAchievement].push_back(achievement);
-            ++count;
+                // Don't load category of future patch
+                if (patch > GetCurrentPatch())
+                    continue;
+
+                AchievementCategoryEntry* category = &m_achievementCategories[categoryID];
+
+                category->ID = categoryID;
+                category->parentCategory = fields[1].GetInt32();
+                category->name[0] = fields[2].GetCppString();
+                category->name[1] = fields[3].GetCppString();
+                category->name[2] = fields[4].GetCppString();
+                category->name[3] = fields[5].GetCppString();
+                category->name[4] = fields[6].GetCppString();
+                category->name[5] = fields[7].GetCppString();
+                category->name[6] = fields[8].GetCppString();
+                category->name[7] = fields[9].GetCppString();
+                category->name[8] = fields[10].GetCppString();
+                category->name[9] = fields[11].GetCppString();
+                category->name[10] = fields[12].GetCppString();
+                category->name[11] = fields[13].GetCppString();
+                category->name[12] = fields[14].GetCppString();
+                category->name[13] = fields[15].GetCppString();
+                category->name[14] = fields[17].GetCppString();
+                category->name[15] = fields[17].GetCppString();
+                category->name_flags = fields[18].GetUInt32();
+                category->sortOrder = fields[19].GetUInt32();
+                category->patch = patch;
+            }
+            while (result->NextRow());
+
+            sLog.outBasic(">> Loaded %u achievement categories in %u ms", loaded, WorldTimer::getMSTimeDiff(oldMSTime, WorldTimer::getMSTime()));
         }
-
-        sLog.outBasic(">> Loaded %u achievement references in %u ms", count, WorldTimer::getMSTimeDiff(oldMSTime, WorldTimer::getMSTime()));
+        else
+        {
+            sLog.outBasic(" server.loading", ">> Loaded 0 categories.");
+            sLog.outBasic(" server.loading", " ");
+        }
     }
 
     void AchievementsModule::LoadAchievementCriteriaData()
@@ -4301,7 +4451,7 @@ namespace achievements_module
 
         m_criteriaDataMap.clear();                              // need for reload case
 
-        auto result = WorldDatabase.Query("SELECT criteria_id, type, value1, value2, ScriptName FROM achievement_criteria_data");
+        auto result = WorldDatabase.Query("SELECT `criteria_id`, `type`, `value1`, `value2`, `ScriptName` FROM `achievement_criteria_data`");
 
         if (!result)
         {
@@ -4316,17 +4466,14 @@ namespace achievements_module
         {
             Field* fields = result->Fetch();
             uint32 criteria_id = fields[0].GetUInt32();
-
-            AchievementCriteriaEntry const* criteria = sAchievementCriteriaStore.LookupEntry<AchievementCriteriaEntry>(criteria_id);
-
+            const AchievementCriteriaEntry* criteria = GetAchievementCriteria(criteria_id, false);
             if (!criteria)
             {
-                sLog.outError("sql.sql Table `achievement_criteria_data` has data for non-existing criteria (Entry: %u), ignore.", criteria_id);
                 continue;
             }
 
             uint32 dataType = fields[1].GetUInt8();
-            std::string scriptName = fields[4].GetString();
+            std::string scriptName = fields[4].GetCppString();
             uint32 scriptId = 0;
             if (scriptName.length()) // not empty
             {
@@ -4355,12 +4502,9 @@ namespace achievements_module
         while (result->NextRow());
 
         // post loading checks
-        for (uint32 entryId = 0; entryId < sAchievementCriteriaStore.GetMaxEntry(); ++entryId)
+        for (const auto& pair : m_achievementCriterias)
         {
-            AchievementCriteriaEntry const* criteria = sAchievementCriteriaStore.LookupEntry<AchievementCriteriaEntry>(entryId);
-            if (!criteria)
-                continue;
-
+            const AchievementCriteriaEntry* criteria = &pair.second;
             switch (criteria->requiredType)
             {
                 case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE:
@@ -4386,11 +4530,11 @@ namespace achievements_module
 
                 case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:
                 {
-                    AchievementEntry const* achievement = sAchievementStore.LookupEntry<AchievementEntry>(criteria->referredAchievement);
+                    const AchievementEntry* achievement = GetAchievement(criteria->referredAchievement);
                     if (!achievement)
                         continue;
 
-                    // exist many achievements with this criteria, use at this moment hardcoded check to skil simple case
+                    // exist many achievements with this criteria, use at this moment hardcoded check to skill simple case
                     if (achievement->ID == 1282)
                         break;
 
@@ -4432,7 +4576,7 @@ namespace achievements_module
                 case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_DAILY_QUEST:
                 case ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM:        // only Children's Week achievements
                 {
-                    AchievementEntry const* achievement = sAchievementStore.LookupEntry<AchievementEntry>(criteria->referredAchievement);
+                    const AchievementEntry* achievement = GetAchievement(criteria->referredAchievement);
                     if (!achievement)
                         continue;
 
@@ -4458,22 +4602,19 @@ namespace achievements_module
     {
         uint32 oldMSTime = WorldTimer::getMSTime();
 
-        auto result = CharacterDatabase.Query("SELECT achievement FROM character_achievement GROUP BY achievement");
-
         // Populate _allCompletedAchievements with all realm first achievement ids to make multithreaded access safer
         // while it will not prevent races, it will prevent crashes that happen because std::unordered_map key was added
         // instead the only potential race will happen on value associated with the key
-        for (uint32 i = 0; i < sAchievementStore.GetMaxEntry(); ++i)
+        for (const auto& pair : m_achievements)
         {
-            if (AchievementEntry const* achievement = sAchievementStore.LookupEntry<AchievementEntry>(i))
+            const AchievementEntry* achievement = &pair.second;
+            if (achievement && achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_REACH | ACHIEVEMENT_FLAG_REALM_FIRST_KILL))
             {
-                if (achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_REACH | ACHIEVEMENT_FLAG_REALM_FIRST_KILL))
-                {
-                    m_allCompletedAchievements[achievement->ID] = std::chrono::system_clock::time_point::min();
-                }
+                m_allCompletedAchievements[achievement->ID] = std::chrono::system_clock::time_point::min();
             }
         }
 
+        auto result = CharacterDatabase.Query("SELECT achievement FROM character_achievement GROUP BY achievement");
         if (!result)
         {
             sLog.outBasic(" server.loading", ">> Loaded 0 completed achievements. DB table `character_achievement` is empty.");
@@ -4486,7 +4627,7 @@ namespace achievements_module
             Field* fields = result->Fetch();
 
             uint16 achievementId = fields[0].GetUInt16();
-            const AchievementEntry* achievement = sAchievementStore.LookupEntry<AchievementEntry>(achievementId);
+            const AchievementEntry* achievement = GetAchievement(achievementId);
             if (!achievement) 
             {
                 // Remove non existent achievements from all characters
@@ -4510,9 +4651,7 @@ namespace achievements_module
 
         m_achievementRewards.clear();                           // need for reload case
 
-        //                                               0      1        2        3     4       5        6     7
-        auto result = WorldDatabase.Query("SELECT ID, TitleA, TitleH, ItemID, Sender, Subject, Body, MailTemplateID FROM achievement_reward");
-
+        auto result = WorldDatabase.Query("SELECT `ID`, `TitleA`, `TitleH`, `ItemID`, `Sender`, `Subject`, `Body`, `MailTemplateID` FROM `achievement_reward`");
         if (!result)
         {
             sLog.outBasic(" server.loading", ">> Loaded 0 achievement rewards. DB table `achievement_reward` is empty.");
@@ -4526,10 +4665,9 @@ namespace achievements_module
         {
             Field* fields = result->Fetch();
             uint32 entry = fields[0].GetUInt32();
-            AchievementEntry const* achievement = sAchievementStore.LookupEntry<AchievementEntry>(entry);
+            const AchievementEntry* achievement = GetAchievement(entry, false);
             if (!achievement)
             {
-                sLog.outError("sql.sql Table `achievement_reward` has wrong achievement (Entry: %u). Ignoring.", entry);
                 continue;
             }
 
@@ -4538,8 +4676,8 @@ namespace achievements_module
             reward.titleId[1]   = fields[2].GetUInt32(); // Horde title
             reward.itemId       = fields[3].GetUInt32();
             reward.sender       = fields[4].GetUInt32(); // The sender of the mail (a creature from creature_template)
-            // reward.subject      = fields[5].GetString();
-            // reward.text         = fields[6].GetString(); // Body in DB
+            // reward.subject      = fields[5].GetCppString();
+            // reward.text         = fields[6].GetCppString(); // Body in DB
             reward.mailTemplate = fields[7].GetUInt32();
 
             // Must reward a title or send a mail else, skip it.
@@ -4654,13 +4792,13 @@ namespace achievements_module
                 continue;
             }
 
-            LocaleConstant locale = GetLocaleByName(fields[1].GetString());
+            LocaleConstant locale = GetLocaleByName(fields[1].GetCppString());
             if (locale == LOCALE_enUS)
                 continue;
 
             AchievementRewardLocale& data = m_achievementRewardLocales[ID];
-            // ObjectMgr::AddLocaleString(fields[2].GetString(), locale, data.Subject);
-            // ObjectMgr::AddLocaleString(fields[3].GetString(), locale, data.Text);
+            // ObjectMgr::AddLocaleString(fields[2].GetCppString(), locale, data.Subject);
+            // ObjectMgr::AddLocaleString(fields[3].GetCppString(), locale, data.Text);
         } 
         while (result->NextRow());
 
@@ -4672,16 +4810,13 @@ namespace achievements_module
         if (GetConfig()->enabled)
         {
             sLog.outString("Loading Achievements...");
-            sAchievementStore.Load();
-            sAchievementCategoryStore.Load();
-            sAchievementCriteriaStore.Load();
-
+            LoadAchievementList();
+            LoadAchievementCategories();
+            LoadAchievementCriteriaList();
             sLog.outString("Loading Achievement Scripts...");
-            sAchievementScriptMgr.Initialize();
+            sAchievementScriptMgr.Initialize(this);
             sAchievementScriptMgr.LoadDatabase();
             sLog.outString("Loading Achievement Criteria Data...");
-            LoadAchievementReferenceList();
-            LoadAchievementCriteriaList();
             LoadAchievementCriteriaData();
             sLog.outString("Loading Achievement Rewards...");
             LoadRewards();
@@ -4690,11 +4825,6 @@ namespace achievements_module
             sLog.outString("Loading Completed Achievements...");
             LoadCompletedAchievements();
         }
-    }
-
-    AchievementEntry const* AchievementsModule::GetAchievement(uint32 achievementId) const
-    {
-        return sAchievementStore.LookupEntry<AchievementEntry>(achievementId);
     }
 
     uint8 AchievementsModule::GetPlayerLocale(WorldSession* session) const
@@ -4750,8 +4880,7 @@ namespace achievements_module
             {
     #ifdef ENABLE_PLAYERBOTS
                 // Check if randombots can use the achievement system
-                uint32 accId = player->GetSession()->GetAccountId();
-                if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !GetConfig()->randomBots)
+                if (!GetConfig()->randomBots && sRandomPlayerbotMgr.IsFreeBot(player))
                     return;
     #endif
                 // Create the player achievement manager
@@ -4770,7 +4899,7 @@ namespace achievements_module
     #ifdef ENABLE_PLAYERBOTS
                 // Check if randombots can use the achievement system
                 uint32 accId = player->GetSession()->GetAccountId();
-                if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !GetConfig()->randomBots)
+                if (!GetConfig()->randomBots && sRandomPlayerbotMgr.IsFreeBot(player))
                     return;
     #endif
                 // Create the player achievement manager
@@ -5321,22 +5450,30 @@ namespace achievements_module
                 const uint32 spellId = spell->m_spellInfo->Id;
                 if (target->IsPlayer())
                 {
-                    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr((Player*)target);
-                    if (playerMgr)
+                    Player* playerTarget = (Player*)target;
+                    if (!playerTarget->GetSession()->PlayerLoading())
                     {
-                        playerMgr->StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_SPELL_TARGET, spellId);
-                        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, spellId, 0, caster);
-                        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, spellId, 0, caster);
+                        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(playerTarget);
+                        if (playerMgr)
+                        {
+                            playerMgr->StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_SPELL_TARGET, spellId);
+                            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, spellId, 0, caster);
+                            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, spellId, 0, caster);
+                        }
                     }
                 }
 
                 if (caster->IsPlayer())
                 {
-                    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr((Player*)caster);
-                    if (playerMgr)
+                    Player* playerCaster = (Player*)caster;
+                    if (!playerCaster->GetSession()->PlayerLoading())
                     {
-                        playerMgr->StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_SPELL_CASTER, spellId);
-                        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2, spellId, 0, target);
+                        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(playerCaster);
+                        if (playerMgr)
+                        {
+                            playerMgr->StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_SPELL_CASTER, spellId);
+                            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2, spellId, 0, target);
+                        }
                     }
                 }
             }
@@ -5349,18 +5486,22 @@ namespace achievements_module
         {
             if (spell && caster && caster->IsPlayer())
             {
-                PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr((Player*)caster);
-                if (playerMgr)
+                Player* playerCaster = (Player*)caster;
+                if (!playerCaster->GetSession()->PlayerLoading())
                 {
-                    const uint32 spellId = spell->m_spellInfo->Id;
-                    Item* castItem = spell->GetCastItem();
-                    if (castItem)
+                    PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(playerCaster);
+                    if (playerMgr)
                     {
-                        playerMgr->StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_ITEM, castItem->GetEntry());
-                        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM, castItem->GetEntry());
-                    }
+                        const uint32 spellId = spell->m_spellInfo->Id;
+                        Item* castItem = spell->GetCastItem();
+                        if (castItem)
+                        {
+                            playerMgr->StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_ITEM, castItem->GetEntry());
+                            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM, castItem->GetEntry());
+                        }
 
-                    playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL, spellId, 0, (target ? target : caster));
+                        playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL, spellId, 0, (target ? target : caster));
+                    }
                 }
             }
         }
@@ -5383,7 +5524,7 @@ namespace achievements_module
     #ifdef ENABLE_PLAYERBOTS
                 // Check if randombots can use the achievement system
                 uint32 accId = player->GetSession()->GetAccountId();
-                if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !GetConfig()->randomBots)
+                if (!GetConfig()->randomBots && sRandomPlayerbotMgr.IsFreeBot(player))
                     return nullptr;
     #endif
 
@@ -5412,7 +5553,7 @@ namespace achievements_module
     #ifdef ENABLE_PLAYERBOTS
                 // Check if randombots can use the achievement system
                 uint32 accId = player->GetSession()->GetAccountId();
-                if (sPlayerbotAIConfig.IsInRandomAccountList(accId) && !GetConfig()->randomBots)
+                if (!GetConfig()->randomBots && sRandomPlayerbotMgr.IsFreeBot(player))
                     return nullptr;
     #endif
 
@@ -5712,74 +5853,69 @@ namespace achievements_module
         }
     }
 
-    const char* AchievementEntry::GetName(uint32 locale) const
+    const std::string& AchievementEntry::GetName(uint32 locale) const
     {
-        const char* output = name[0];
         if (locale < MAX_ACHIEVEMENT_LOCALE)
         {
-            if (std::strlen(name[locale]) > 0)
+            if (!name[locale].empty())
             {
-                output = name[locale];
+                return name[locale];
             }
         }
 
-        return output;
+        return name[0];
     }
 
-    const char* AchievementEntry::GetDescription(uint32 locale) const
+    const std::string& AchievementEntry::GetDescription(uint32 locale) const
     {
-        const char* output = description[0];
         if (locale < MAX_ACHIEVEMENT_LOCALE)
         {
-            if (std::strlen(description[locale]) > 0)
+            if (!description[locale].empty())
             {
-                output = description[locale];
+                return description[locale];
             }
         }
 
-        return output;
+        return description[0];
     }
 
-    const char* AchievementEntry::GetTitleReward(uint32 locale) const
+    const std::string& AchievementEntry::GetTitleReward(uint32 locale) const
     {
-        const char* output = titleReward[0];
         if (locale < MAX_ACHIEVEMENT_LOCALE)
         {
-            if (std::strlen(titleReward[locale]) > 0)
+            if (!titleReward[locale].empty())
             {
-                output = titleReward[locale];
+               return titleReward[locale];
             }
         }
 
-        return output;
+        return titleReward[0];
     }
 
-    const char* AchievementCategoryEntry::GetName(uint32 locale) const
+    const std::string& AchievementCategoryEntry::GetName(uint32 locale) const
     {
-        const char* output = name[0];
         if (locale < MAX_ACHIEVEMENT_LOCALE)
         {
-            if (std::strlen(name[locale]) > 0)
+            if (!name[locale].empty())
             {
-                output = name[locale];
+                return name[locale];
             }
         }
 
-        return output;
+        return name[0];
     }
 
-    const char* AchievementCriteriaEntry::GetName(uint32 locale) const
+    const std::string& AchievementCriteriaEntry::GetName(uint32 locale) const
     {
-        const char* output = name[0];
         if (locale < MAX_ACHIEVEMENT_LOCALE)
         {
-            if (std::strlen(name[locale]) > 0)
+            if (!name[locale].empty())
             {
-                output = name[locale];
+                return name[locale];
             }
         }
 
-        return output;
+        return name[0];
     }
 
     std::vector<ModuleChatCommand>* AchievementsModule::GetCommandTable()
@@ -6003,5 +6139,49 @@ namespace achievements_module
         }
 
         return false;
+    }
+
+    const AchievementEntry* AchievementsModule::GetAchievement(uint32 achievementId, bool assert) const
+    {
+        auto it = m_achievements.find(achievementId);
+        if (it != m_achievements.end())
+        {
+            return &it->second;
+        }
+
+        if (assert)
+        {
+            MANGOS_ASSERT(false);
+        }
+        
+        return nullptr;
+    }
+
+    const AchievementCriteriaEntry* AchievementsModule::GetAchievementCriteria(uint32 criteriaId, bool assert) const
+    {
+        auto it = m_achievementCriterias.find(criteriaId);
+        if (it != m_achievementCriterias.end())
+        {
+            return &it->second;
+        }
+
+        if (assert)
+        {
+            MANGOS_ASSERT(false);
+        }
+
+        return nullptr;
+    }
+
+    const AchievementCategoryEntry* AchievementsModule::GetAchievementCategory(uint32 categoryId) const
+    {
+        auto it = m_achievementCategories.find(categoryId);
+        if (it != m_achievementCategories.end())
+        {
+            return &it->second;
+        }
+
+        MANGOS_ASSERT(false);
+        return nullptr;
     }
 }

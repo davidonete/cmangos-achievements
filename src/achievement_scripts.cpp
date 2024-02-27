@@ -239,10 +239,6 @@ namespace achievements_module
         new achievement_arena_by_type("achievement_arena_2v2_check", ARENA_TYPE_2v2);
         new achievement_arena_by_type("achievement_arena_3v3_check", ARENA_TYPE_3v3);
         new achievement_arena_by_type("achievement_arena_5v5_check", ARENA_TYPE_5v5);
-    #else
-        new achievement_arena_by_type("achievement_arena_2v2_check", 0);
-        new achievement_arena_by_type("achievement_arena_3v3_check", 0);
-        new achievement_arena_by_type("achievement_arena_5v5_check", 0);
     #endif
         new achievement_killed_exp_or_honor_target();
     }

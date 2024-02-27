@@ -40,11 +40,11 @@ namespace achievements_module
         if (!V) \
             return R;
 
-    void AchievementScriptMgr::Initialize()
+    void AchievementScriptMgr::Initialize(AchievementsModule* module)
     {
         sLog.outBasic("server.loading, > Loading C++ scripts");
         sLog.outBasic("server.loading,  ");
-        loadScriptNames();
+        loadScriptNames(module);
 
         AddSC_achievement_scripts();
     }
@@ -76,13 +76,13 @@ namespace achievements_module
         sLog.outBasic("server.loading, ");
     }
 
-    void AchievementScriptMgr::loadScriptNames() 
+    void AchievementScriptMgr::loadScriptNames(AchievementsModule* module)
     {
         // We insert an empty placeholder here so we can use the
         // script id 0 as dummy for "no script found".
         _scriptNamesStore.emplace_back("");
 
-        std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT DISTINCT(`ScriptName`) FROM `achievement_criteria_data` WHERE `ScriptName` <> '' AND `type` = 11"));
+        std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `criteria_id`, `ScriptName` FROM `achievement_criteria_data` WHERE `ScriptName` <> '' AND `type` = 11"));
 
         if (!result)
         {
@@ -90,11 +90,20 @@ namespace achievements_module
             return;
         }
 
-        _scriptNamesStore.reserve(result->GetRowCount() + 1);
-
         do
         {
-            _scriptNamesStore.push_back((*result)[0].GetString());
+            Field* fields = result->Fetch();
+            const uint32 criteriaId = fields[0].GetUInt32();
+            const std::string scriptName = fields[1].GetCppString();
+
+            if (module->GetAchievementCriteria(criteriaId, false))
+            {
+                auto it = std::find(_scriptNamesStore.begin(), _scriptNamesStore.end(), scriptName);
+                if (it == _scriptNamesStore.end())
+                {
+                    _scriptNamesStore.push_back(scriptName);
+                }
+            }
         } 
         while (result->NextRow());
 
