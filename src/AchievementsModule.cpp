@@ -5076,7 +5076,10 @@ namespace achievements_module
             if (player->IsAlive())
             {
                 const float zDiff = lastFallZ - movementInfo.GetPos().z;
-                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_FALL_WITHOUT_DYING, uint32(zDiff * 100));
+                if (zDiff > 0.0f)
+                {
+                    playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_FALL_WITHOUT_DYING, uint32(zDiff * 100));
+                }
             }
         }
 
