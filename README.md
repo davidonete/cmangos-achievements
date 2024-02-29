@@ -1,4 +1,4 @@
-# Achievements Mod
+# Achievements
 Achievements mod to make WoTLK achievements work on cmangos classic and tbc cores.
 
 ![image](https://github.com/davidonete/cmangos-achievements/assets/11618807/caa813e9-0053-4405-8d00-cf04fe5c205f)
