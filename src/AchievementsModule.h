@@ -793,7 +793,7 @@ namespace achievements_module
         void OnRewardSinglePlayerAtKill(Player* player, Unit* victim) override;
         bool OnHandleFall(Player* player, const MovementInfo& movementInfo, float lastFallZ) override;
         void OnResetTalents(Player* player, uint32 cost) override;
-        void OnStoreNewItem(Player* player, Item* item) override;
+        void OnStoreItem(Player* player, Item* item) override;
         void OnMoveItemToInventory(Player* player, Item* item) override;
         void OnDeath(Player* player, Unit* killer) override;
         void OnDeath(Player* player, uint8 environmentalDamageType) override;

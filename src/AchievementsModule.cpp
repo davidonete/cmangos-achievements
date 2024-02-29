@@ -5169,7 +5169,7 @@ namespace achievements_module
         }
     }
 
-    void AchievementsModule::OnStoreNewItem(Player* player, Item* item)
+    void AchievementsModule::OnStoreItem(Player* player, Item* item)
     {
         PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
         if (playerMgr && item)
