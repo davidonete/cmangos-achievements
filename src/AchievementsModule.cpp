@@ -5765,12 +5765,14 @@ namespace achievements_module
 
     void AchievementsModule::OnUpdateHonor(Player* player)
     {
+#if EXPANSION == 0
         PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
         if (playerMgr)
         {
             const uint8 rank = player->GetHonorHighestRankInfo().rank;
             playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_OWN_RANK, rank);
         }
+#endif
     }
 
     void AchievementsModule::OnGiveLevel(Player* player, uint32 level)
