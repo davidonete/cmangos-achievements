@@ -791,7 +791,7 @@ namespace achievements_module
         void OnDuelComplete(Player* player, Player* opponent, uint8 duelCompleteType) override;
         void OnKilledMonsterCredit(Player* player, uint32 entry, ObjectGuid& guid) override;
         void OnRewardSinglePlayerAtKill(Player* player, Unit* victim) override;
-        bool OnHandleFall(Player* player, const MovementInfo& movementInfo, float lastFallZ) override;
+        void OnHandleFall(Player* player, const MovementInfo& movementInfo, float lastFallZ, uint32 damage) override;
         void OnResetTalents(Player* player, uint32 cost) override;
         void OnStoreItem(Player* player, Item* item) override;
         void OnMoveItemToInventory(Player* player, Item* item) override;

@@ -5068,7 +5068,7 @@ namespace achievements_module
         }
     }
 
-    bool AchievementsModule::OnHandleFall(Player* player, const MovementInfo& movementInfo, float lastFallZ)
+    void AchievementsModule::OnHandleFall(Player* player, const MovementInfo& movementInfo, float lastFallZ, uint32 damage)
     {
         PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
         if (playerMgr)
@@ -5082,8 +5082,6 @@ namespace achievements_module
                 }
             }
         }
-
-        return false;
     }
 
     bool AchievementsModule::OnHandlePageTextQuery(Player* player, const WorldPacket& packet)
