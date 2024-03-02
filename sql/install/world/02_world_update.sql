@@ -110,6 +110,8 @@ UPDATE `achievement_dbc` SET `patch`='2' WHERE  `ID`=137;
 INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Title_Lang_enUS`, `Description_Lang_enUS`, `Category`, `Points`, `Ui_Order`, `IconID`) VALUES ('138', '-1', '-1', 'Bandage Dispenser', 'Create 500 Heavy Runecloth Bandages.', '172', '10', '6', '1621');
 -- criteria
 INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Flags`, `Ui_Order`) VALUES ('1833', '138', '29', '18630', '500', 'Create 500 Heavy Runecloth Bandages', '16712190', '1', '1');
+-- criteria data
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`) VALUES ('1833', '0', '0');
 -- Ultimate Triage (frost bandage)
 UPDATE `achievement_dbc` SET `patch`='2' WHERE  `ID`=141;
 -- Replace
