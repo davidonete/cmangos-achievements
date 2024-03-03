@@ -5056,7 +5056,7 @@ namespace achievements_module
         }
     }
 
-    void AchievementsModule::OnRewardSinglePlayerAtKill(Player* player, Unit* victim)
+    void AchievementsModule::OnRewardPlayerAtKill(Player* player, Unit* victim)
     {
         PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
         if (playerMgr)
