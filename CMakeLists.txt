@@ -28,31 +28,7 @@ set(LIBRARY_SRCS
 )
 
 # Define ENABLE_PLAYERBOTS if need
-if (BUILD_PLAYERBOTS OR BUILD_IKE3_BOTS)
-	include_directories(
-		${CMAKE_SOURCE_DIR}/dep/g3dlite
-		${CMAKE_SOURCE_DIR}/src/game/Chat
-		${CMAKE_SOURCE_DIR}/src/game/DBScripts
-		${CMAKE_SOURCE_DIR}/src/game/Entities
-		${CMAKE_SOURCE_DIR}/src/game/Globals
-		${CMAKE_SOURCE_DIR}/src/game/Guilds
-		${CMAKE_SOURCE_DIR}/src/game/Loot
-		${CMAKE_SOURCE_DIR}/src/game/Maps
-		${CMAKE_SOURCE_DIR}/src/game/MotionGenerators
-		${CMAKE_SOURCE_DIR}/src/game/Server
-		${CMAKE_SOURCE_DIR}/src/game/Spells
-		${CMAKE_SOURCE_DIR}/src/game/World
-		${CMAKE_SOURCE_DIR}/src/shared
-		${CMAKE_SOURCE_DIR}/src/shared/Config
-		${CMAKE_SOURCE_DIR}/src/modules/Bots/playerbot
-		${CMAKE_SOURCE_DIR}/src/modules/Bots/ahbot
-	)
-
-	# delete this once bots are merged into cmangos
-	if (BUILD_PLAYERBOTS)
-		add_definitions(-DENABLE_MANGOSBOTS)
-	endif()
-
+if (BUILD_PLAYERBOTS)
 	add_definitions(-DENABLE_PLAYERBOTS)
 endif()
 
