@@ -85,6 +85,8 @@ if(UNIX)
 	endif()
 endif()
 
+set_target_properties(${LIBRARY_NAME} PROPERTIES PROJECT_LABEL "Achievements")
+
 # Install config files
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/achievements.conf.dist.in ${CMAKE_CURRENT_BINARY_DIR}/achievements.conf.dist)
 if (NOT CONF_INSTALL_DIR)
