@@ -61,7 +61,7 @@ INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Quantit
 -- Lock out 7 Bank Slots to wrath
 UPDATE `achievement_dbc` SET `patch`='2' WHERE  `ID`=546;
 -- Cenarius Circle and Refuge reputation lock to tbc+
-UPDATE `classicmangos`.`achievement_dbc` SET `patch`='1' WHERE  `ID`=953;
+UPDATE `achievement_dbc` SET `patch`='1' WHERE  `ID`=953;
 
 -- Emblem achievements are for wotlk
 UPDATE `achievement_dbc` SET `patch`='2' WHERE  `ID` IN (4785,4784,4729,4730,3838,3839,3840,3841,3842,3843,3844,3876,4316);
