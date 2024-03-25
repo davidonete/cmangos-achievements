@@ -2,10 +2,10 @@
 
 #include "Util/Timer.h"
 
+INSTANTIATE_SINGLETON_1(achievements_module::AchievementScriptMgr);
+
 namespace achievements_module
 {
-    INSTANTIATE_SINGLETON_1(AchievementScriptMgr);
-
     extern void AddSC_achievement_scripts();
 
     // Utility macros to refer to the script registry.
