@@ -1,5 +1,5 @@
 #pragma once
-#include "ModuleConfig.h"
+#include "../../modules/src/ModuleConfig.h"
 
 #define MAX_ACHIEVEMENT_LOCALE     16
 
