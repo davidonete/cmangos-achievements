@@ -980,7 +980,5 @@ namespace achievements_module
 
         std::unordered_map<uint32, PlayerAchievementMgr> m_playerMgrs;
     };
-
-    static AchievementsModule achievementsModule;
 }
 #endif
