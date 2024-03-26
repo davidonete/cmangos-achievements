@@ -24,13 +24,13 @@ file(GLOB achievements_source ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp ${CMAKE_CURR
 
 #Define base source library
 set(LIBRARY_SRCS
-    ${achievements_source}
+  ${achievements_source}
 )
 
 # Define ENABLE_PLAYERBOTS if need
 if (BUILD_PLAYERBOTS)
-	include_directories(${CMAKE_SOURCE_DIR}/src/modules/PlayerBots)
-	add_definitions(-DENABLE_PLAYERBOTS)
+  include_directories(${CMAKE_SOURCE_DIR}/src/modules/PlayerBots)
+  add_definitions(-DENABLE_PLAYERBOTS)
 endif()
 
 include_directories(${CMAKE_SOURCE_DIR}/src/modules/modules/src)
@@ -51,15 +51,16 @@ endif()
 add_library(${LIBRARY_NAME} STATIC ${LIBRARY_SRCS})
 
 target_link_libraries(${LIBRARY_NAME}
-	shared
-	RecastNavigation::Detour
+  modules
+  shared
+  RecastNavigation::Detour
 )
 
 if(UNIX)
-	# Both systems don't have libdl and don't need them
-	if (NOT (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD" OR CMAKE_SYSTEM_NAME STREQUAL "NetBSD"))
-		target_link_libraries(${LIBRARY_NAME} dl)
-	endif()
+  # Both systems don't have libdl and don't need them
+  if (NOT (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD" OR CMAKE_SYSTEM_NAME STREQUAL "NetBSD"))
+    target_link_libraries(${LIBRARY_NAME} dl)
+  endif()
 endif()
 
 set_target_properties(${LIBRARY_NAME} PROPERTIES PROJECT_LABEL "Achievements")
@@ -67,6 +68,6 @@ set_target_properties(${LIBRARY_NAME} PROPERTIES PROJECT_LABEL "Achievements")
 # Install config files
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/achievements.conf.dist.in ${CMAKE_CURRENT_BINARY_DIR}/achievements.conf.dist)
 if (NOT CONF_INSTALL_DIR)
-	set(CONF_INSTALL_DIR ${CONF_DIR})
+  set(CONF_INSTALL_DIR ${CONF_DIR})
 endif()
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/achievements.conf.dist DESTINATION ${CONF_INSTALL_DIR})
