@@ -1,5 +1,5 @@
 #pragma once
-#include "ModuleConfig.h"
+#include "CmangosModuleConfig.h"
 
 #define MAX_ACHIEVEMENT_LOCALE     16
 
@@ -223,7 +223,7 @@ enum AchievementCommonCategories
     ACHIEVEMENT_CATEGORY_STATISTICS = 1
 };
 
-class AchievementsModuleConfig : public ModuleConfig
+class AchievementsModuleConfig : public CmangosModuleConfig
 {
 public:
     AchievementsModuleConfig();

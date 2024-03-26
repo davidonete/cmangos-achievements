@@ -1,7 +1,7 @@
 #include "AchievementsModuleConfig.h"
 
 AchievementsModuleConfig::AchievementsModuleConfig()
-: ModuleConfig("achievements.conf")
+: CmangosModuleConfig("achievements.conf")
 , enabled(false)
 , sendMessage(false)
 , sendAddon(false)
