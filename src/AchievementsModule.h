@@ -1,7 +1,7 @@
 #ifndef MANGOS_ACHIEVEMENTS_MODULE_H
 #define MANGOS_ACHIEVEMENTS_MODULE_H
 
-#include "../../modules/src/Module.h"
+#include "Module.h"
 #include "AchievementsModuleConfig.h"
 
 #include "Database/SQLStorage.h"
