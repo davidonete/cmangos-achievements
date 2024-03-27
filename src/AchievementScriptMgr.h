@@ -3,7 +3,7 @@
 
 #include "AchievementsModule.h"
 
-namespace achievements_module
+namespace cmangos_module
 {
     class AchievementScriptObject 
     {

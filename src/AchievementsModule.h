@@ -1,7 +1,7 @@
 #ifndef MANGOS_ACHIEVEMENTS_MODULE_H
 #define MANGOS_ACHIEVEMENTS_MODULE_H
 
-#include "CmangosModule.h"
+#include "Module.h"
 #include "AchievementsModuleConfig.h"
 
 #include "Database/SQLStorage.h"
@@ -12,7 +12,7 @@
 #include <chrono>
 #include <array>
 
-namespace achievements_module
+namespace cmangos_module
 {
     class AchievementsModule;
     class AchievementScriptMgr;
@@ -766,15 +766,15 @@ namespace achievements_module
         AchievementsModule* m_module;
     };
 
-    class AchievementsModule : public CmangosModule
+    class AchievementsModule : public Module
     {
         friend class PlayerAchievementMgr;
         friend class AchievementScriptMgr;
 
     public:
-        AchievementsModule() : CmangosModule("Achievements") {}
-        AchievementsModuleConfig* CreateConfig() override { return new AchievementsModuleConfig(); }
-        const AchievementsModuleConfig* GetConfig() const override { return (AchievementsModuleConfig*)GetConfigInternal(); }
+        AchievementsModule();
+        AchievementsModuleConfig* CreateConfig() override;
+        const AchievementsModuleConfig* GetConfig() const override;
 
         // Module Hooks
         void OnInitialize() override;

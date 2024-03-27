@@ -2,9 +2,9 @@
 
 #include "Util/Timer.h"
 
-INSTANTIATE_SINGLETON_1(achievements_module::AchievementScriptMgr);
+INSTANTIATE_SINGLETON_1(cmangos_module::AchievementScriptMgr);
 
-namespace achievements_module
+namespace cmangos_module
 {
     extern void AddSC_achievement_scripts();
 

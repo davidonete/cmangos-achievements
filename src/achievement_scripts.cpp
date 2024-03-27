@@ -5,7 +5,7 @@
 #include "BattleGround/BattleGroundWS.h"
 #include "Entities/Player.h"
 
-namespace achievements_module
+namespace cmangos_module
 {
     class achievement_resilient_victory: public AchievementCriteriaScript 
     {

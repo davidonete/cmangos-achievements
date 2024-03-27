@@ -22,7 +22,7 @@
 #define MAX_DIFFICULTY             1
 #endif
 
-namespace achievements_module
+namespace cmangos_module
 {
     static const std::array<std::string, 2> achievementsDBTables =
     {
@@ -3533,6 +3533,22 @@ namespace achievements_module
         }
 
         return localeIndex;
+    }
+
+    AchievementsModule::AchievementsModule()
+    : Module("Achievements")
+    {
+
+    }
+
+    AchievementsModuleConfig* AchievementsModule::CreateConfig()
+    {
+        return new AchievementsModuleConfig();
+    }
+
+    const AchievementsModuleConfig* AchievementsModule::GetConfig() const
+    {
+        return (AchievementsModuleConfig*)GetConfigInternal();
     }
 
     bool AchievementsModule::HasAddon(Player* player) const
