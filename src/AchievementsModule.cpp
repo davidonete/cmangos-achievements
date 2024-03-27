@@ -1023,7 +1023,7 @@ namespace cmangos_module
                 uint32 counter = fields[1].GetUInt32();
                 time_t date    = time_t(fields[2].GetUInt32());
 
-                AchievementCriteriaEntry const* criteria = m_module->GetAchievementCriteria(id);
+                AchievementCriteriaEntry const* criteria = m_module->GetAchievementCriteria(id, false);
                 if (!criteria) 
                 {
                     // we will remove not existed criteria for all characters
