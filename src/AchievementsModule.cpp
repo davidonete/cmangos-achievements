@@ -3816,9 +3816,12 @@ namespace cmangos_module
                     uint32 counter  = fields[1].GetUInt32();
                     const auto date = time_t(fields[2].GetUInt32());
 
-                    const AchievementCriteriaEntry* criteria = GetAchievementCriteria(id);
-                    if (!criteria) 
+                    const AchievementCriteriaEntry* criteria = GetAchievementCriteria(id, false);
+                    if (!criteria)
                     {
+                        // we will remove not existed criteria for all characters
+                        sLog.outError("achievement, Non-existing achievement criteria %u data removed from table `character_achievement_progress`.", id);
+                        CharacterDatabase.PExecute("DELETE FROM `character_achievement_progress` WHERE `criteria` = '%u'", uint16(id));
                         continue;
                     }
 
