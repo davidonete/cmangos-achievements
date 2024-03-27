@@ -3536,19 +3536,14 @@ namespace cmangos_module
     }
 
     AchievementsModule::AchievementsModule()
-    : Module("Achievements")
+    : Module("Achievements", new AchievementsModuleConfig())
     {
 
-    }
-
-    AchievementsModuleConfig* AchievementsModule::CreateConfig()
-    {
-        return new AchievementsModuleConfig();
     }
 
     const AchievementsModuleConfig* AchievementsModule::GetConfig() const
     {
-        return (AchievementsModuleConfig*)GetConfigInternal();
+        return (AchievementsModuleConfig*)Module::GetConfig();
     }
 
     bool AchievementsModule::HasAddon(Player* player) const

@@ -1,5 +1,5 @@
-#ifndef MANGOS_ACHIEVEMENTS_MODULE_H
-#define MANGOS_ACHIEVEMENTS_MODULE_H
+#ifndef CMANGOS_MODULE_ACHIEVEMENTS_H
+#define CMANGOS_MODULE_ACHIEVEMENTS_H
 
 #include "Module.h"
 #include "AchievementsModuleConfig.h"
@@ -773,7 +773,6 @@ namespace cmangos_module
 
     public:
         AchievementsModule();
-        AchievementsModuleConfig* CreateConfig() override;
         const AchievementsModuleConfig* GetConfig() const override;
 
         // Module Hooks
