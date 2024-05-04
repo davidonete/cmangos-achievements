@@ -737,7 +737,7 @@ namespace cmangos_module
         void EnableAddon(uint32 version);
         uint32 GetVersion() { return m_version; }
 
-        bool AddAchievement(uint32 achievementId);
+        bool AddAchievement(uint32 achievementId, bool assert = true);
         bool AddAchievement(const AchievementEntry* entry);
         bool RemoveAchievement(const AchievementEntry* entry);
 

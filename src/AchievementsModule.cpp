@@ -1072,7 +1072,8 @@ namespace cmangos_module
                         for (AchievementCriteriaEntryList::const_iterator itr = criteriaList->begin(); itr != criteriaList->end(); ++itr)
                         {
                             const AchievementCriteriaEntry* criteria = *itr;
-                            SetCriteriaProgress(criteria, criteria->raw.count);
+                            const uint32 criteriaProgress = criteria->requiredType == ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LEVEL ? criteria->raw.count * 75 : criteria->raw.count;
+                            SetCriteriaProgress(criteria, criteriaProgress);
 
                             // If the achievement is a collection of other achievements complete them too
                             if (criteria->requiredType == ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT)
@@ -1104,9 +1105,9 @@ namespace cmangos_module
         return false;
     }
 
-    bool PlayerAchievementMgr::AddAchievement(uint32 achievementId)
+    bool PlayerAchievementMgr::AddAchievement(uint32 achievementId, bool assert)
     {
-        const AchievementEntry* achievement = m_module->GetAchievement(achievementId);
+        const AchievementEntry* achievement = m_module->GetAchievement(achievementId, assert);
         if (achievement)
         {
             return AddAchievement(achievement);
@@ -3599,7 +3600,7 @@ namespace cmangos_module
             PlayerAchievementMgr* achievementMgr = GetPlayerAchievementMgr(player);
             if (achievementMgr)
             {
-                return achievementMgr->AddAchievement(achievementId);
+                return achievementMgr->AddAchievement(achievementId, false);
             }
         }
 
