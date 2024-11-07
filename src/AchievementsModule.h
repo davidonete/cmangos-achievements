@@ -15,6 +15,7 @@
 namespace cmangos_module
 {
     class AchievementsModule;
+    class PlayerAchievementMgr;
     class AchievementScriptMgr;
 
     struct AchievementEntry
@@ -661,7 +662,7 @@ namespace cmangos_module
         }
 
         bool IsValid(AchievementCriteriaEntry const* criteria);
-        bool Meets(uint32 criteria_id, Player const* source, Unit const* target, uint32 miscvalue1 = 0) const;
+        bool Meets(uint32 criteria_id, const PlayerAchievementMgr* playerAchievementMgr, const Unit* target, uint32 miscvalue1 = 0) const;
     };
 
     struct AchievementCriteriaDataSet
@@ -669,7 +670,7 @@ namespace cmangos_module
         AchievementCriteriaDataSet()  {}
         typedef std::vector<AchievementCriteriaData> Storage;
         void Add(AchievementCriteriaData const& data) { storage.push_back(data); }
-        bool Meets(Player const* source, Unit const* target, uint32 miscvalue = 0) const;
+        bool Meets(const PlayerAchievementMgr* playerAchievementMgr, const Unit* target, uint32 miscvalue = 0) const;
         void SetCriteriaId(uint32 id) { criteria_id = id; }
         const Storage& GetStorage() const { return storage; }
 
@@ -711,6 +712,8 @@ namespace cmangos_module
 
     class PlayerAchievementMgr
     {
+        friend struct AchievementCriteriaData;
+
     public:
         explicit PlayerAchievementMgr(Player* player, AchievementsModule* module);
         ~PlayerAchievementMgr();
@@ -740,12 +743,14 @@ namespace cmangos_module
         bool AddAchievement(uint32 achievementId, bool assert = true);
         bool AddAchievement(const AchievementEntry* entry);
         bool RemoveAchievement(const AchievementEntry* entry);
+        const AchievementsModule* GetModule() const { return m_module; }
 
     private:
         enum ProgressType { PROGRESS_SET, PROGRESS_ACCUMULATE, PROGRESS_HIGHEST, PROGRESS_RESET };
         void SendAchievementEarned(AchievementEntry const* achievement) const;
         void SendCriteriaUpdate(AchievementCriteriaEntry const* entry, CriteriaProgress const* progress, uint32 timeElapsed, bool timedCompleted) const;
         CriteriaProgress* GetCriteriaProgress(AchievementCriteriaEntry const* entry);
+        const CriteriaProgress* GetCriteriaProgress(AchievementCriteriaEntry const* entry) const;
         void SetCriteriaProgress(AchievementCriteriaEntry const* entry, uint32 changeValue, ProgressType ptype = PROGRESS_SET);
         void CompletedCriteriaFor(AchievementEntry const* achievement);
         bool IsCompletedCriteria(AchievementCriteriaEntry const* achievementCriteria, AchievementEntry const* achievement);
@@ -770,6 +775,7 @@ namespace cmangos_module
     {
         friend class PlayerAchievementMgr;
         friend class AchievementScriptMgr;
+        friend struct AchievementCriteriaData;
 
     public:
         AchievementsModule();

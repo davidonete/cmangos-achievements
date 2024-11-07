@@ -126,7 +126,8 @@ INSERT INTO `achievement_category_dbc` (`ID`, `Parent`, `Name_Lang_enUS`, `Name_
 	(14941, 155, 'Argent Tournament', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 16712190, 10, 2),
 	(15002, 168, 'Call of the Crusade 25-Player Raid', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 16712190, 10, 2),
 	(15041, 168, 'Fall of the Lich King 10-Player Raid', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 16712190, 11, 2),
-	(15042, 168, 'Fall of the Lich King 25-Player Raid', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 16712190, 12, 2);
+	(15042, 168, 'Fall of the Lich King 25-Player Raid', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 16712190, 12, 2),
+	(15063, -1, 'Hardcore', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 16712190, 11, 0);
 /*!40000 ALTER TABLE `achievement_category_dbc` ENABLE KEYS */;
 
 -- Dumping structure for table classicmangos.achievement_criteria_data

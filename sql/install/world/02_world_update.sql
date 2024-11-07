@@ -380,11 +380,6 @@ UPDATE `achievement_dbc` SET `patch`='1' WHERE `ID` IN (255,288,289,291,292,963,
 -- TBC+ achievements
 UPDATE `achievement_dbc` SET `patch`='1' WHERE `ID` IN (277,1295,1687,1688,1690,4436);
 
--- Custom
--- Ironman Challenge
-INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`) VALUES ('704', '-1', '-1', 'I Can\'t Believe You Have Done That!', '16712190', 'Reach max level without dying once.', '16712190', '81', '0', '161', '3582', '16712190');
-INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('580', '704', '5', '0', '100', 'Reach max level without dying once.', '0', '1');
-
 -- Kalimdor Quests Achievements
 -- (Horde) Durotar + Valley of Trials + Ragefire Chasm
 INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `Flags`, `IconID`, `Reward_Lang_Mask`) VALUES ('716', '0', '-1', 'Durotar Loremaster', '16712190', 'Complete 46 quests in Durotar.', '16712190', '14861', '10', '6', '136', '3532', '16712190');
@@ -773,3 +768,80 @@ INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Ti
 INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES (54, 1051, 7, 393, 300, 'Skill to 300', 2, 1);
 INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `Flags`, `IconID`, `Minimum_Criteria`, `Shares_Criteria`, `patch`) VALUES (1052, -1, -1, 0, 'Realm First! Artisan Tailor', 16712190, 'First person on the realm to achieve 300 skill in tailoring.', 16712190, 81, 0, 35, 256, 341, 0, 0, 0);
 INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES (55, 1052, 7, 197, 300, 'Skill to 300', 2, 1);
+
+-- Custom
+-- Hardcore
+-- Leveling from 1 to 70 without dying
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('704', '-1', '-1', '0', 'I Can\'t Believe You Have Done That!', '16712190', 'Reach level 10 without dying once.', '16712190', '15063', '10', '1', '3268', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('580', '704', '5', '0', '10', 'Reach level 10 without dying once.', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('580', '25', '0', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1053', '-1', '-1', '704', 'I Can\'t Believe You Have Done That!', '16712190', 'Reach level 20 without dying once.', '16712190', '15063', '10', '2', '3269', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('56', '1053', '5', '0', '20', 'Reach level 20 without dying once.', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('56', '25', '0', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1054', '-1', '-1', '1053', 'I Can\'t Believe You Have Done That!', '16712190', 'Reach level 30 without dying once.', '16712190', '15063', '10', '3', '3270', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2090', '1054', '5', '0', '30', 'Reach level 30 without dying once.', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2090', '25', '0', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1055', '-1', '-1', '1054', 'I Can\'t Believe You Have Done That!', '16712190', 'Reach level 40 without dying once.', '16712190', '15063', '10', '4', '3271', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2091', '1055', '5', '0', '40', 'Reach level 40 without dying once.', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2091', '25', '0', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1056', '-1', '-1', '1055', 'I Can\'t Believe You Have Done That!', '16712190', 'Reach level 50 without dying once.', '16712190', '15063', '10', '5', '3272', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2092', '1056', '5', '0', '50', 'Reach level 50 without dying once.', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2092', '25', '0', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1058', '-1', '-1', '1056', 'I Can\'t Believe You Have Done That!', '16712190', 'Reach level 60 without dying once.', '16712190', '15063', '10', '6', '3273', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2093', '1058', '5', '0', '60', 'Reach level 60 without dying once.', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2093', '25', '0', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1059', '-1', '-1', '1058', 'I Can\'t Believe You Have Done That!', '16712190', 'Reach level 70 without dying once.', '16712190', '15063', '10', '7', '3274', '16712190', '1');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2094', '1059', '5', '0', '70', 'Reach level 70 without dying once.', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2094', '25', '0', '0');
+
+-- Leveling a class to 60 without dying
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1060', '-1', '-1', '0', 'Hardcore Warrior', '16712190', 'Reach level 60 without dying once with a warrior class.', '16712190', '15063', '10', '8', '1462', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2095', '1060', '5', '0', '60', 'Reach level 60 without dying once with a warrior class.', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2095', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2095', '21', '1', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1061', '-1', '-1', '0', 'Hardcore Rogue', '16712190', 'Reach level 60 without dying once with a rogue class.', '16712190', '15063', '10', '9', '1834', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2096', '1061', '5', '0', '60', 'Reach level 60 without dying once with a rogue class.', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2096', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2096', '21', '4', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1062', '-1', '-1', '0', 'Hardcore Mage', '16712190', 'Reach level 60 without dying once with a mage class.', '16712190', '15063', '10', '10', '2832', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2097', '1062', '5', '0', '60', 'Reach level 60 without dying once with a mage class.', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2097', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2097', '21', '8', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1063', '-1', '-1', '0', 'Hardcore Hunter', '16712190', 'Reach level 60 without dying once with a hunter class.', '16712190', '15063', '10', '11', '2831', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2098', '1063', '5', '0', '60', 'Reach level 60 without dying once with a hunter class.', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2098', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2098', '21', '3', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1064', '-1', '-1', '0', 'Hardcore Warlock', '16712190', 'Reach level 60 without dying once with a warlock class.', '16712190', '15063', '10', '12', '155', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2116', '1064', '5', '0', '60', 'Reach level 60 without dying once with a warlock class.', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2116', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2116', '21', '9', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1116', '-1', '-1', '0', 'Hardcore Priest', '16712190', 'Reach level 60 without dying once with a priest class.', '16712190', '15063', '10', '13', '1523', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2117', '1116', '5', '0', '60', 'Reach level 60 without dying once with a priest class.', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2117', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2117', '21', '5', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1117', '-1', '-1', '0', 'Hardcore Paladin', '16712190', 'Reach level 60 without dying once with a paladin class.', '16712190', '15063', '10', '14', '25', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2118', '1117', '5', '0', '60', 'Reach level 60 without dying once with a paladin class.', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2118', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2118', '21', '2', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1118', '-1', '-1', '0', 'Hardcore Druid', '16712190', 'Reach level 60 without dying once with a druid class.', '16712190', '15063', '10', '15', '261', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2119', '1118', '5', '0', '60', 'Reach level 60 without dying once with a druid class.', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2119', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2119', '21', '11', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1119', '-1', '-1', '0', 'Hardcore Shaman', '16712190', 'Reach level 60 without dying once with a shaman class.', '16712190', '15063', '10', '16', '38', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2120', '1119', '5', '0', '60', 'Reach level 60 without dying once with a shaman class.', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2120', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2120', '21', '7', '0');

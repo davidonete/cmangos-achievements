@@ -176,6 +176,7 @@ namespace cmangos_module
             case ACHIEVEMENT_CRITERIA_DATA_TYPE_NONE:
             case ACHIEVEMENT_CRITERIA_DATA_TYPE_INSTANCE_SCRIPT:
             case ACHIEVEMENT_CRITERIA_DATA_TYPE_NTH_BIRTHDAY:
+            case ACHIEVEMENT_CRITERIA_DATA_TYPE_NO_DEATH:
             {
                 return true;
             }
@@ -462,8 +463,9 @@ namespace cmangos_module
         }
     }
 
-    bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Unit const* target, uint32 miscvalue1 /*= 0*/) const
+    bool AchievementCriteriaData::Meets(uint32 criteria_id, const PlayerAchievementMgr* playerAchievementMgr, Unit const* target, uint32 miscvalue1) const
     {
+        const Player* source = playerAchievementMgr->GetPlayer();
         switch (dataType)
         {
             case ACHIEVEMENT_CRITERIA_DATA_TYPE_NONE:
@@ -703,16 +705,37 @@ namespace cmangos_module
                 return source->GetTeam() == winnerTeam && winnnerScore == teams_scores.winner_score && loserScore == teams_scores.loser_score;
             }
 
+            case ACHIEVEMENT_CRITERIA_DATA_TYPE_NO_DEATH:
+            {
+                // Check the current amount of deaths
+                bool noDeaths = true;
+                const AchievementCriteriaEntryList* criteriaList = playerAchievementMgr->GetModule()->GetAchievementCriteriaByType(ACHIEVEMENT_CRITERIA_TYPE_DEATH);
+                if (criteriaList)
+                {
+                    const AchievementCriteriaEntry* criteria = criteriaList->front();
+                    if (criteria)
+                    {
+                        const CriteriaProgress* progress = playerAchievementMgr->GetCriteriaProgress(criteria);
+                        if (progress)
+                        {
+                            noDeaths = progress->counter <= 0;
+                        }
+                    }
+                }
+
+                return noDeaths;
+            }
+
             default: break;
         }
         return false;
     }
 
-    bool AchievementCriteriaDataSet::Meets(Player const* source, Unit const* target, uint32 miscvalue /*= 0*/) const
+    bool AchievementCriteriaDataSet::Meets(const PlayerAchievementMgr* playerAchievementMgr, const Unit* target, uint32 miscvalue) const
     {
         for (Storage::const_iterator itr = storage.begin(); itr != storage.end(); ++itr)
         {
-            if (!itr->Meets(criteria_id, source, target, miscvalue))
+            if (!itr->Meets(criteria_id, playerAchievementMgr, target, miscvalue))
             {
                 return false;
             }
@@ -1475,7 +1498,7 @@ namespace cmangos_module
                     if (achievement->categoryId == CATEGORY_CHILDRENS_WEEK)
                     {
                         AchievementCriteriaDataSet const* data = m_module->GetCriteriaDataSet(achievementCriteria);
-                        if (!data || !data->Meets(GetPlayer(), nullptr))
+                        if (!data || !data->Meets(this, nullptr))
                             continue;
                     }
 
@@ -1493,7 +1516,7 @@ namespace cmangos_module
 
                     // those requirements couldn't be found in the dbc
                     AchievementCriteriaDataSet const* data = m_module->GetCriteriaDataSet(achievementCriteria);
-                    if (!data || !data->Meets(GetPlayer(), unit))
+                    if (!data || !data->Meets(this, unit))
                         continue;
 
                     SetCriteriaProgress(achievementCriteria, 1, PROGRESS_ACCUMULATE);
@@ -1510,7 +1533,7 @@ namespace cmangos_module
 
                     // those requirements couldn't be found in the dbc
                     AchievementCriteriaDataSet const* data = m_module->GetCriteriaDataSet(achievementCriteria);
-                    if (!data || !data->Meets(GetPlayer(), unit))
+                    if (!data || !data->Meets(this, unit))
                         continue;
 
                     SetCriteriaProgress(achievementCriteria, miscValue2, PROGRESS_ACCUMULATE);
@@ -1525,7 +1548,7 @@ namespace cmangos_module
 
                     // those requirements couldn't be found in the dbc
                     AchievementCriteriaDataSet const* data = m_module->GetCriteriaDataSet(achievementCriteria);
-                    if (!data || !data->Meets(GetPlayer(), unit, miscValue1))
+                    if (!data || !data->Meets(this, unit, miscValue1))
                         continue;
 
                     SetCriteriaProgress(achievementCriteria, miscValue2, PROGRESS_ACCUMULATE);
@@ -1536,7 +1559,7 @@ namespace cmangos_module
                 {
                     if (AchievementCriteriaDataSet const* data = m_module->GetCriteriaDataSet(achievementCriteria))
                     {
-                        if (!data->Meets(GetPlayer(), unit))
+                        if (!data->Meets(this, unit))
                         {
                             continue;
                         }
@@ -1544,32 +1567,6 @@ namespace cmangos_module
                     
                     const uint8 currentLevel = GetPlayer()->GetLevel();
                     SetCriteriaProgress(achievementCriteria, currentLevel);
-                    const uint8 maxLevel = 60 + (10 * EXPANSION);
-
-                    // Hardcore challenge
-                    if (currentLevel == maxLevel)
-                    {
-                        // Check the current amount of deaths
-                        bool challengeCompleted = true;
-                        const AchievementCriteriaEntryList* criteriaList = m_module->GetAchievementCriteriaByType(ACHIEVEMENT_CRITERIA_TYPE_DEATH);
-                        if (criteriaList)
-                        {
-                            const AchievementCriteriaEntry* criteria = criteriaList->front();
-                            if (criteria)
-                            {
-                                const CriteriaProgress* progress = GetCriteriaProgress(criteria);
-                                if (progress)
-                                {
-                                    challengeCompleted = progress->counter <= 0;
-                                }
-                            }
-                        }
-
-                        if (challengeCompleted)
-                        {
-                            AddAchievement(704);
-                        }
-                    }
 
                     break;
                 }
@@ -1813,7 +1810,7 @@ namespace cmangos_module
 
                     // those requirements couldn't be found in the dbc
                     AchievementCriteriaDataSet const* data = m_module->GetCriteriaDataSet(achievementCriteria);
-                    if (!data || !data->Meets(GetPlayer(), unit))
+                    if (!data || !data->Meets(this, unit))
                         continue;
 
                     // miscvalue1 is the ingame fallheight*100 as stored in dbc
@@ -1851,7 +1848,7 @@ namespace cmangos_module
 
                     if (AchievementCriteriaDataSet const* data = m_module->GetCriteriaDataSet(achievementCriteria))
                     {
-                        if (!data->Meets(GetPlayer(), unit))
+                        if (!data->Meets(this, unit))
                         {
                             continue;
                         }
@@ -1872,7 +1869,7 @@ namespace cmangos_module
                     if (!data)
                         continue;
 
-                    if (!data->Meets(GetPlayer(), unit))
+                    if (!data->Meets(this, unit))
                         continue;
 
                     SetCriteriaProgress(achievementCriteria, 1, PROGRESS_ACCUMULATE);
@@ -1890,7 +1887,7 @@ namespace cmangos_module
                     if (!data)
                         continue;
 
-                    if (!data->Meets(GetPlayer(), unit))
+                    if (!data->Meets(this, unit))
                         continue;
 
                     SetCriteriaProgress(achievementCriteria, 1, PROGRESS_ACCUMULATE);
@@ -1923,7 +1920,7 @@ namespace cmangos_module
                     {
                         // those requirements couldn't be found in the dbc
                         AchievementCriteriaDataSet const* data = m_module->GetCriteriaDataSet(achievementCriteria);
-                        if (!data || !data->Meets(GetPlayer(), unit))
+                        if (!data || !data->Meets(this, unit))
                             continue;
                     }
 
@@ -1951,7 +1948,7 @@ namespace cmangos_module
                     {
                         // those requirements couldn't be found in the dbc
                         AchievementCriteriaDataSet const* data = m_module->GetCriteriaDataSet(achievementCriteria);
-                        if (!data || !data->Meets(GetPlayer(), unit, miscValue1))
+                        if (!data || !data->Meets(this, unit, miscValue1))
                         {
                             // reset the progress as we have a win without the requirement.
                             SetCriteriaProgress(achievementCriteria, 0);
@@ -1977,7 +1974,7 @@ namespace cmangos_module
                     {
                         // skip progress only if data exists and is not meet
                         AchievementCriteriaDataSet const* data = m_module->GetCriteriaDataSet(achievementCriteria);
-                        if (data && !data->Meets(GetPlayer(), nullptr))
+                        if (data && !data->Meets(this, nullptr))
                             continue;
                     }
 
@@ -2105,7 +2102,7 @@ namespace cmangos_module
 
                     // check item level and quality via achievement_criteria_data
                     AchievementCriteriaDataSet const* data = m_module->GetCriteriaDataSet(achievementCriteria);
-                    if (!data || !data->Meets(GetPlayer(), 0, miscValue1))
+                    if (!data || !data->Meets(this, 0, miscValue1))
                         continue;
 
                     SetCriteriaProgress(achievementCriteria, 1);
@@ -2129,7 +2126,7 @@ namespace cmangos_module
 
                     // check item level via achievement_criteria_data
                     AchievementCriteriaDataSet const* data = m_module->GetCriteriaDataSet(achievementCriteria);
-                    if (!data || !data->Meets(GetPlayer(), 0, pProto->ItemLevel))
+                    if (!data || !data->Meets(this, 0, pProto->ItemLevel))
                         continue;
 
                     SetCriteriaProgress(achievementCriteria, 1, PROGRESS_ACCUMULATE);
@@ -2149,7 +2146,7 @@ namespace cmangos_module
                     {
                         // those requirements couldn't be found in the dbc
                         AchievementCriteriaDataSet const* data = m_module->GetCriteriaDataSet(achievementCriteria);
-                        if (!data || !data->Meets(GetPlayer(), unit))
+                        if (!data || !data->Meets(this, unit))
                             continue;
                     }
 
@@ -2251,7 +2248,7 @@ namespace cmangos_module
                         if (!data)
                             continue;
 
-                        if (!data->Meets(GetPlayer(), unit))
+                        if (!data->Meets(this, unit))
                             continue;
                     }
 
@@ -2442,7 +2439,7 @@ namespace cmangos_module
 
                     // those requirements couldn't be found in the dbc
                     AchievementCriteriaDataSet const* data = m_module->GetCriteriaDataSet(achievementCriteria);
-                    if (!data || !data->Meets(GetPlayer(), unit))
+                    if (!data || !data->Meets(this, unit))
                         continue;
 
                     SetCriteriaProgress(achievementCriteria, 1, PROGRESS_ACCUMULATE);
@@ -2459,7 +2456,7 @@ namespace cmangos_module
 
                     // those requirements couldn't be found in the dbc
                     AchievementCriteriaDataSet const* data = m_module->GetCriteriaDataSet(achievementCriteria);
-                    if (!data || !data->Meets(GetPlayer(), unit))
+                    if (!data || !data->Meets(this, unit))
                         continue;
 
                     SetCriteriaProgress(achievementCriteria, 1, PROGRESS_ACCUMULATE);
@@ -2547,7 +2544,7 @@ namespace cmangos_module
 
                     // They have no proper requirements in dbc
                     AchievementCriteriaDataSet const* data = m_module->GetCriteriaDataSet(achievementCriteria);
-                    if (!data || !data->Meets(GetPlayer(), unit))
+                    if (!data || !data->Meets(this, unit))
                         continue;
 
                     SetCriteriaProgress(achievementCriteria, 1, PROGRESS_ACCUMULATE);
@@ -2559,7 +2556,7 @@ namespace cmangos_module
                 {
                     // those requirements couldn't be found in the dbc
                     AchievementCriteriaDataSet const* data = m_module->GetCriteriaDataSet(achievementCriteria);
-                    if (!data || !data->Meets(GetPlayer(), nullptr))
+                    if (!data || !data->Meets(this, nullptr))
                         continue;
 
                     // Check map id requirement
@@ -3067,6 +3064,16 @@ namespace cmangos_module
     CriteriaProgress* PlayerAchievementMgr::GetCriteriaProgress(AchievementCriteriaEntry const* entry)
     {
         CriteriaProgressMap::iterator iter = m_criteriaProgress.find(entry->ID);
+
+        if (iter == m_criteriaProgress.end())
+            return nullptr;
+
+        return &(iter->second);
+    }
+
+    const CriteriaProgress* PlayerAchievementMgr::GetCriteriaProgress(AchievementCriteriaEntry const* entry) const
+    {
+        const auto iter = m_criteriaProgress.find(entry->ID);
 
         if (iter == m_criteriaProgress.end())
             return nullptr;

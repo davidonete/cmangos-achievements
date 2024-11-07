@@ -189,35 +189,36 @@ namespace cmangos_module
 
     enum AchievementCriteriaDataType
     {
-        // value1         value2        comment
-        ACHIEVEMENT_CRITERIA_DATA_TYPE_NONE = 0, // 0              0
-        ACHIEVEMENT_CRITERIA_DATA_TYPE_T_CREATURE = 1, // creature_id    0
-        ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_CLASS_RACE = 2, // class_id       race_id
-        ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_LESS_HEALTH = 3, // health_percent 0
-        ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_DEAD = 4, // own_team       0             not corpse (not released body), own_team == false if enemy team expected
-        ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AURA = 5, // spell_id       effect_idx
-        ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AREA = 6, // area id        0
-        ACHIEVEMENT_CRITERIA_DATA_TYPE_T_AURA = 7, // spell_id       effect_idx
-        ACHIEVEMENT_CRITERIA_DATA_TYPE_VALUE = 8, // minvalue                     value provided with achievement update must be not less that limit
-        ACHIEVEMENT_CRITERIA_DATA_TYPE_T_LEVEL = 9, // minlevel                     minlevel of target
-        ACHIEVEMENT_CRITERIA_DATA_TYPE_T_GENDER = 10, // gender                       0=male; 1=female
-        ACHIEVEMENT_CRITERIA_DATA_TYPE_SCRIPT = 11, // scripted requirement
-        ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_DIFFICULTY = 12, // difficulty                   normal/heroic difficulty for current event map
-        ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_PLAYER_COUNT = 13, // count                        "with less than %u people in the zone"
-        ACHIEVEMENT_CRITERIA_DATA_TYPE_T_TEAM = 14, // team                         HORDE(67), ALLIANCE(469)
-        ACHIEVEMENT_CRITERIA_DATA_TYPE_S_DRUNK = 15, // drunken_state  0             (enum DrunkenState) of player
-        ACHIEVEMENT_CRITERIA_DATA_TYPE_HOLIDAY = 16, // holiday_id     0             event in holiday time
-        ACHIEVEMENT_CRITERIA_DATA_TYPE_BG_LOSS_TEAM_SCORE = 17, // min_score      max_score     player's team win bg and opposition team have team score in range
-        ACHIEVEMENT_CRITERIA_DATA_TYPE_INSTANCE_SCRIPT = 18, // 0              0             maker instance script call for check current criteria requirements fit
-        ACHIEVEMENT_CRITERIA_DATA_TYPE_S_EQUIPED_ITEM = 19, // item_level     item_quality  for equipped item in slot to check item level and quality
-        ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_ID = 20, // map_id         0             player must be on map with id in map_id
-        ACHIEVEMENT_CRITERIA_DATA_TYPE_S_PLAYER_CLASS_RACE = 21, // class_id       race_id
-        ACHIEVEMENT_CRITERIA_DATA_TYPE_NTH_BIRTHDAY = 22, // N                            login on day of N-th Birthday
-        ACHIEVEMENT_CRITERIA_DATA_TYPE_S_KNOWN_TITLE = 23, // title_id                     known (pvp) title, values from dbc
-        ACHIEVEMENT_CRITERIA_DATA_TYPE_BG_TEAMS_SCORES = 24, // winner_score   loser score   player's team win bg and their teams have exact scores
+                                                                    // value1         value2        comment
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_NONE = 0,                    // 0              0
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_T_CREATURE = 1,              // creature_id    0
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_CLASS_RACE = 2,     // class_id       race_id
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_LESS_HEALTH = 3,    // health_percent 0
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_DEAD = 4,           // own_team       0             not corpse (not released body), own_team == false if enemy team expected
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AURA = 5,                  // spell_id       effect_idx
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AREA = 6,                  // area id        0
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_T_AURA = 7,                  // spell_id       effect_idx
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_VALUE = 8,                   // minvalue       0             value provided with achievement update must be not less that limit
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_T_LEVEL = 9,                 // minlevel       0             minlevel of target
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_T_GENDER = 10,               // gender         0             0=male; 1=female
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_SCRIPT = 11,                 // 0              0             scripted requirement
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_DIFFICULTY = 12,         // difficulty     0             normal/heroic difficulty for current event map
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_PLAYER_COUNT = 13,       // count          0             "with less than %u people in the zone"
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_T_TEAM = 14,                 // team           0             HORDE(67), ALLIANCE(469)
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_S_DRUNK = 15,                // drunken_state  0             (enum DrunkenState) of player
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_HOLIDAY = 16,                // holiday_id     0             event in holiday time
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_BG_LOSS_TEAM_SCORE = 17,     // min_score      max_score     player's team win bg and opposition team have team score in range
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_INSTANCE_SCRIPT = 18,        // 0              0             maker instance script call for check current criteria requirements fit
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_S_EQUIPED_ITEM = 19,         // item_level     item_quality  for equipped item in slot to check item level and quality
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_ID = 20,                 // map_id         0             player must be on map with id in map_id
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_S_PLAYER_CLASS_RACE = 21,    // class_id       race_id
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_NTH_BIRTHDAY = 22,           // N              0             login on day of N-th Birthday
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_S_KNOWN_TITLE = 23,          // title_id       0             known (pvp) title, values from dbc
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_BG_TEAMS_SCORES = 24,        // winner_score   loser score   player's team win bg and their teams have exact scores
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_NO_DEATH = 25,               // 0              0             must achieve criteria without ever dying
     };
 
-    #define MAX_ACHIEVEMENT_CRITERIA_DATA_TYPE               25 // maximum value in AchievementCriteriaDataType enum
+    #define MAX_ACHIEVEMENT_CRITERIA_DATA_TYPE               26     // maximum value in AchievementCriteriaDataType enum
 
     enum AchievementCommonCategories
     {

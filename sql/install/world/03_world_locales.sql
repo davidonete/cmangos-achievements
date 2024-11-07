@@ -456,7 +456,7 @@ UPDATE `achievement_dbc` SET `Title_Lang_esES`='Libertad de la Horda', `Descript
 UPDATE `achievement_dbc` SET `Title_Lang_esES`='Libertad de la Alianza', `Description_Lang_esES`='Consigue una insignia o medallón de la Alianza.' WHERE `ID`=701;
 UPDATE `achievement_dbc` SET `Title_Lang_esES`='¡Por la Horda!', `Description_Lang_esES`='Mata a los líderes de la Alianza.' WHERE `ID`=702;
 UPDATE `achievement_dbc` SET `Title_Lang_esES`='¡Por la Alianza!', `Description_Lang_esES`='Mata a los líderes de la Horda.' WHERE `ID`=703;
-UPDATE `achievement_dbc` SET `Title_Lang_esES`='¡No me puedo creer que lo hayas hecho!', `Description_Lang_esES`='Llega al nivel máximo sin morir ninguna vez.' WHERE `ID`=704;
+UPDATE `achievement_dbc` SET `Title_Lang_esES`='¡No me puedo creer que lo hayas hecho!', `Description_Lang_esES`='Llega al nivel 10 sin morir.' WHERE `ID`=704;
 UPDATE `achievement_dbc` SET `Title_Lang_esES`='Maestro armero', `Description_Lang_esES`='Eleva cuatro habilidades con armas a 400.' WHERE `ID`=705;
 UPDATE `achievement_dbc` SET `Title_Lang_esES`='Aullador Lobo Gélido', `Description_Lang_esES`='Consigue un aullador Lobo Gélido.' WHERE `ID`=706;
 UPDATE `achievement_dbc` SET `Title_Lang_esES`='Carnero de batalla Pico Tormenta', `Description_Lang_esES`='Consigue un carnero de batalla Pico Tormenta.' WHERE `ID`=707;
@@ -766,7 +766,18 @@ UPDATE `achievement_dbc` SET `Title_Lang_esES`='Tiros por codicia para el botín
 UPDATE `achievement_dbc` SET `Title_Lang_esES`='Tiros por necesidad para el botín', `Description_Lang_esES`='Tiros por necesidad para el botín' WHERE `ID`=1044;
 UPDATE `achievement_dbc` SET `Title_Lang_esES`='Veces que has animado', `Description_Lang_esES`='Veces que has animado' WHERE `ID`=1045;
 UPDATE `achievement_dbc` SET `Title_Lang_esES`='Veces que te has tapado la cara', `Description_Lang_esES`='Veces que te has tapado la cara' WHERE `ID`=1047;
+UPDATE `achievement_dbc` SET `Title_Lang_esES`='¡No me puedo creer que lo hayas hecho!', `Description_Lang_esES`='Llega al nivel 20 sin morir.' WHERE `ID`=1053;
+UPDATE `achievement_dbc` SET `Title_Lang_esES`='¡No me puedo creer que lo hayas hecho!', `Description_Lang_esES`='Llega al nivel 30 sin morir.' WHERE `ID`=1054;
+UPDATE `achievement_dbc` SET `Title_Lang_esES`='¡No me puedo creer que lo hayas hecho!', `Description_Lang_esES`='Llega al nivel 40 sin morir.' WHERE `ID`=1055;
+UPDATE `achievement_dbc` SET `Title_Lang_esES`='¡No me puedo creer que lo hayas hecho!', `Description_Lang_esES`='Llega al nivel 50 sin morir.' WHERE `ID`=1056;
 UPDATE `achievement_dbc` SET `Title_Lang_esES`='Muertes en 2c2', `Description_Lang_esES`='Muertes en 2c2' WHERE `ID`=1057;
+UPDATE `achievement_dbc` SET `Title_Lang_esES`='¡No me puedo creer que lo hayas hecho!', `Description_Lang_esES`='Llega al nivel 60 sin morir.' WHERE `ID`=1058;
+UPDATE `achievement_dbc` SET `Title_Lang_esES`='¡No me puedo creer que lo hayas hecho!', `Description_Lang_esES`='Llega al nivel 70 sin morir.' WHERE `ID`=1059;
+UPDATE `achievement_dbc` SET `Title_Lang_esES`='Guerrero de hierro', `Description_Lang_esES`='Llega al nivel 60 sin morir con un guerrero.' WHERE `ID`=1060;
+UPDATE `achievement_dbc` SET `Title_Lang_esES`='Pícaro de hierro', `Description_Lang_esES`='Llega al nivel 60 sin morir con un pícaro.' WHERE `ID`=1061;
+UPDATE `achievement_dbc` SET `Title_Lang_esES`='Mago de hierro', `Description_Lang_esES`='Llega al nivel 60 sin morir con un mago.' WHERE `ID`=1062;
+UPDATE `achievement_dbc` SET `Title_Lang_esES`='Cazador de hierro', `Description_Lang_esES`='Llega al nivel 60 sin morir con un cazador.' WHERE `ID`=1063;
+UPDATE `achievement_dbc` SET `Title_Lang_esES`='Brujo de hierro', `Description_Lang_esES`='Llega al nivel 60 sin morir con un brujo.' WHERE `ID`=1064;
 UPDATE `achievement_dbc` SET `Title_Lang_esES`='Veces que has hecho /saludar', `Description_Lang_esES`='Veces que has hecho /saludar' WHERE `ID`=1065;
 UPDATE `achievement_dbc` SET `Title_Lang_esES`='Veces que has hecho /jaja', `Description_Lang_esES`='Veces que has hecho /jaja' WHERE `ID`=1066;
 UPDATE `achievement_dbc` SET `Title_Lang_esES`='Veces que has tocado el violín más pequeño del mundo', `Description_Lang_esES`='Veces que has tocado el violín más pequeño del mundo' WHERE `ID`=1067;
@@ -817,6 +828,10 @@ UPDATE `achievement_dbc` SET `Title_Lang_esES`='Muertes con honor en el Ojo de l
 UPDATE `achievement_dbc` SET `Title_Lang_esES`='Muertes con honor en el Valle de Alterac', `Description_Lang_esES`='Muertes con honor en el Valle de Alterac' WHERE `ID`=1113;
 UPDATE `achievement_dbc` SET `Title_Lang_esES`='Muertes con honor en la Cuenca de Arathi', `Description_Lang_esES`='Muertes con honor en la Cuenca de Arathi' WHERE `ID`=1114;
 UPDATE `achievement_dbc` SET `Title_Lang_esES`='Muertes con honor en la Garganta Grito de Guerra', `Description_Lang_esES`='Muertes con honor en la Garganta Grito de Guerra' WHERE `ID`=1115;
+UPDATE `achievement_dbc` SET `Title_Lang_esES`='Sacerdote de hierro', `Description_Lang_esES`='Llega al nivel 60 sin morir con un sacerdote.' WHERE `ID`=1116;
+UPDATE `achievement_dbc` SET `Title_Lang_esES`='Paladín de hierro', `Description_Lang_esES`='Llega al nivel 60 sin morir con un paladín.' WHERE `ID`=1117;
+UPDATE `achievement_dbc` SET `Title_Lang_esES`='Druida de hierro', `Description_Lang_esES`='Llega al nivel 60 sin morir con un druida.' WHERE `ID`=1118;
+UPDATE `achievement_dbc` SET `Title_Lang_esES`='Chamán de hierro', `Description_Lang_esES`='Llega al nivel 60 sin morir con un chamán.' WHERE `ID`=1119;
 UPDATE `achievement_dbc` SET `Title_Lang_esES`='Venda más utilizada', `Description_Lang_esES`='Venda más utilizada' WHERE `ID`=1125;
 UPDATE `achievement_dbc` SET `Title_Lang_esES`='Rey del Festival de Fuego', `Description_Lang_esES`='Completa la misión "Una recompensa de ladrón" robando las llamas de las capitales de tus enemigos.' WHERE `ID`=1145;
 UPDATE `achievement_dbc` SET `Title_Lang_esES`='Cantidad de oro gastada en viajes', `Description_Lang_esES`='Cantidad de oro gastada en viajes' WHERE `ID`=1146;
@@ -1954,6 +1969,7 @@ UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Alcanza el nivel 
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Alcanza el nivel 60.' WHERE `ID`=39;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Alcanza el nivel 70.' WHERE `ID`=40;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Alcanza el nivel 80.' WHERE `ID`=41;
+UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Llega al nivel 20 sin morir ninguna vez.' WHERE `ID`=56;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Completa una misión diaria durante cinco días consecutivos.' WHERE `ID`=72;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Completa 2000 misiones.' WHERE `ID`=73;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Completa 130 misiones en Tundra Boreal' WHERE `ID`=74;
@@ -2236,7 +2252,7 @@ UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Ya no es inmortal
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='¡Muerte al Jefe de Guerra!' WHERE `ID`=577;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Pezuña sangrante' WHERE `ID`=578;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Derribando a la Dama Oscura' WHERE `ID`=579;
-UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Llega al nivel máximo sin morir ninguna vez.' WHERE `ID`=580;
+UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Llega al nivel 10 sin morir ninguna vez.' WHERE `ID`=580;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Durotar' WHERE `ID`=581;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Valle de las Pruebas' WHERE `ID`=582;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Sima Ignea' WHERE `ID`=583;
@@ -3708,6 +3724,15 @@ UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Tanaris, Gadgetz�
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Cuna del Invierno, Mirada Eterna' WHERE `ID`=2087;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Anillo derecho' WHERE `ID`=2088;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Segundo abalorio' WHERE `ID`=2089;
+UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Llega al nivel 30 sin morir ninguna vez.' WHERE `ID`=2090;
+UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Llega al nivel 40 sin morir ninguna vez.' WHERE `ID`=2091;
+UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Llega al nivel 50 sin morir ninguna vez.' WHERE `ID`=2092;
+UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Llega al nivel 60 sin morir ninguna vez.' WHERE `ID`=2093;
+UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Llega al nivel 70 sin morir ninguna vez.' WHERE `ID`=2094;
+UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Llega al nivel 60 sin morir ninguna vez con un guerrero.' WHERE `ID`=2095;
+UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Llega al nivel 60 sin morir ninguna vez con un picaro.' WHERE `ID`=2096;
+UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Llega al nivel 60 sin morir ninguna vez con un mago.' WHERE `ID`=2097;
+UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Llega al nivel 60 sin morir ninguna vez con un cazador.' WHERE `ID`=2098;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Baldíos, Trinquete' WHERE `ID`=2099;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Marjal Revolcafango, Mudsprocket' WHERE `ID`=2100;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Silithus, Bastión Cenarion' WHERE `ID`=2101;
@@ -3725,6 +3750,11 @@ UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Mulgore, Pueblo P
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Orgrimmar, Valle de la Fuerza' WHERE `ID`=2113;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Sierra Espolón, Retiro de Sun Rock' WHERE `ID`=2114;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Cima del Trueno, menor altura' WHERE `ID`=2115;
+UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Llega al nivel 60 sin morir ninguna vez con un brujo.' WHERE `ID`=2116;
+UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Llega al nivel 60 sin morir ninguna vez con un sacerdote.' WHERE `ID`=2117;
+UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Llega al nivel 60 sin morir ninguna vez con un paladin.' WHERE `ID`=2118;
+UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Llega al nivel 60 sin morir ninguna vez con un druida.' WHERE `ID`=2119;
+UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Llega al nivel 60 sin morir ninguna vez con un chamán.' WHERE `ID`=2120;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Dun Morogh, Kharanos' WHERE `ID`=2132;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Bosque del Ocaso, Villa Oscura' WHERE `ID`=2133;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Bosque de Elwynn, Villadorada' WHERE `ID`=2134;
@@ -9828,6 +9858,7 @@ UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Muertes de Halion
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Muertes de Halion (El Sagrario Rubí heroica 10 j.)' WHERE `ID`=13468;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='' WHERE `ID`=13469;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Escarchado' WHERE `ID`=13470;
+UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Escarchado' WHERE `ID`=580;
 
 UPDATE `achievement_category_dbc` SET `Name_Lang_esES`='General' WHERE `ID`=92;
 UPDATE `achievement_category_dbc` SET `Name_Lang_esES`='Arenas' WHERE `ID`=123;
@@ -9915,3 +9946,4 @@ UPDATE `achievement_category_dbc` SET `Name_Lang_esES`='Torneo Argenta' WHERE `I
 UPDATE `achievement_category_dbc` SET `Name_Lang_esES`='Llamada del Cruzado 25 Jugadores' WHERE `ID`=15002;
 UPDATE `achievement_category_dbc` SET `Name_Lang_esES`='La Caida del Rey Exánime 10 Jugadores' WHERE `ID`=15041;
 UPDATE `achievement_category_dbc` SET `Name_Lang_esES`='La Caida del Rey Exánime 25 Jugadores' WHERE `ID`=15042;
+UPDATE `achievement_category_dbc` SET `Name_Lang_esES`='Hardcore' WHERE `ID`=15063;
