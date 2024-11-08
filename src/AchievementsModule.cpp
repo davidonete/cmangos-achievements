@@ -177,6 +177,7 @@ namespace cmangos_module
             case ACHIEVEMENT_CRITERIA_DATA_TYPE_INSTANCE_SCRIPT:
             case ACHIEVEMENT_CRITERIA_DATA_TYPE_NTH_BIRTHDAY:
             case ACHIEVEMENT_CRITERIA_DATA_TYPE_NO_DEATH:
+            case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_PLAYED_TIME:
             {
                 return true;
             }
@@ -289,6 +290,7 @@ namespace cmangos_module
             }
 
             case ACHIEVEMENT_CRITERIA_DATA_TYPE_T_LEVEL:
+            case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_LEVEL:
             {
                 if (level.minlevel > MAX_LEVEL)
                 {
@@ -465,7 +467,7 @@ namespace cmangos_module
 
     bool AchievementCriteriaData::Meets(uint32 criteria_id, const PlayerAchievementMgr* playerAchievementMgr, Unit const* target, uint32 miscvalue1) const
     {
-        const Player* source = playerAchievementMgr->GetPlayer();
+        Player* source = playerAchievementMgr->GetPlayer();
         switch (dataType)
         {
             case ACHIEVEMENT_CRITERIA_DATA_TYPE_NONE:
@@ -724,6 +726,22 @@ namespace cmangos_module
                 }
 
                 return noDeaths;
+            }
+
+            case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_LEVEL:
+            {
+                if (!source)
+                    return false;
+
+                return source->GetLevel() <= player_level.max_level;
+            }
+
+            case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_PLAYED_TIME:
+            {
+                if (!source)
+                    return false;
+
+                return source->GetTotalPlayedTime() <= playtime.max_playtime;
             }
 
             default: break;

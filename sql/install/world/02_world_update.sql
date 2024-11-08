@@ -845,3 +845,185 @@ INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Ti
 INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2120', '1119', '5', '0', '60', 'Reach level 60 without dying once with a shaman class.', '0', '1');
 INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2120', '25', '0', '0');
 INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2120', '21', '7', '0');
+
+-- Speedrun
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1196', '-1', '-1', '0', 'Speedrunner', '16712190', 'Reach level 10 within 2 hours without dying once.', '16712190', '15065', '10', '1', '516', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2181', '1196', '5', '0', '10', 'Reach level 10 within 2 hours.', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2181', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2181', '27', '7200', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1204', '-1', '-1', '1196', 'Speedrunner', '16712190', 'Reach level 20 within 12 hours without dying once.', '16712190', '15065', '10', '2', '516', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2182', '1204', '5', '0', '20', 'Reach level 20 within 12 hours.', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2182', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2182', '27', '43200', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1207', '-1', '-1', '1204', 'Speedrunner', '16712190', 'Reach level 30 within 27 hours without dying once.', '16712190', '15065', '10', '3', '516', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2183', '1207', '5', '0', '30', 'Reach level 30 within 27 hours.', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2183', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2183', '27', '97200', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1208', '-1', '-1', '1207', 'Speedrunner', '16712190', 'Reach level 40 within 50 hours without dying once.', '16712190', '15065', '10', '4', '516', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2184', '1208', '5', '0', '40', 'Reach level 40 within 50 hours.', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2184', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2184', '27', '180000', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1209', '-1', '-1', '1208', 'Speedrunner', '16712190', 'Reach level 50 within 81 hours without dying once.', '16712190', '15065', '10', '5', '516', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2185', '1209', '5', '0', '50', 'Reach level 50 within 81 hours.', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2185', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2185', '27', '291600', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1210', '-1', '-1', '1209', 'Speedrunner', '16712190', 'Reach level 60 within 120 hours without dying once.', '16712190', '15065', '10', '6', '516', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2186', '1210', '5', '0', '60', 'Reach level 60 within 120 hours.', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2186', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2186', '27', '432000', '0');
+
+-- Completing quests before level cap
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1120', '1', '-1', '0', 'Deep in the Ban\'ethil Barrow Den', '16712190', 'Complete the quest "Druid of the Claw" in Teldrassil before reaching level 10 and without dying once.', '16712190', '15064', '10', '17', '3186', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2121', '1120', '27', '2561', '1', '"Druid of the Claw" quest completed', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2121', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2121', '26', '9', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1121', '1', '-1', '0', 'Vagash Goes Down!', '16712190', 'Complete the quest "Protecting the Herd" in Dun Morogh before reaching level 11 and without dying once.', '16712190', '15064', '10', '18', '3522', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2122', '1121', '27', '314', '1', '"Protecting the Herd" quest completed', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2122', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2122', '26', '10', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1122', '0', '-1', '0', 'Captain Dargol Goes Back to the Grave', '16712190', 'Complete the quest "The Family Crypt" in Tirisfal Glades before reaching level 12 and without dying once.', '16712190', '15064', '10', '19', '3379', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2123', '1122', '27', '408', '1', '"The Family Crypt" quest completed', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2123', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2123', '26', '11', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1123', '0', '-1', '0', 'Arra\'chea Goes Down!', '16712190', 'Complete the quest "Rites of the Earthmother" in Mulgore before reaching level 12 and without dying once.', '16712190', '15064', '10', '20', '1684', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2124', '1123', '27', '776', '1', '"Rites of the Earthmother" quest completed', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2124', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2124', '26', '11', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1124', '1', '-1', '0', 'Benny Blaanco\'s Demise', '16712190', 'Complete the quest "The Forgotten Heirloom" in Westfall before reaching level 13 and without dying once.', '16712190', '15064', '10', '21', '3652', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2125', '1124', '27', '64', '1', '"The Forgotten Heirloom" quest completed', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2125', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2125', '26', '12', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1126', '0', '-1', '0', 'Burning Shadows', '16712190', 'Complete the quest "Burning Shadows" in Durotar before reaching level 13 and without dying once.', '16712190', '15064', '10', '22', '1553', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2126', '1126', '27', '832', '1', '"Burning Shadows" quest completed', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2126', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2126', '26', '12', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1127', '1', '-1', '0', 'Hogger Goes Down!', '16712190', 'Complete the quest "Wanted: Hogger" in Elwynn Forest before reaching level 12 and without dying once.', '16712190', '15064', '10', '23', '2690', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2127', '1127', '27', '176', '1', '"Wanted: Hogger" quest completed', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2127', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2127', '26', '11', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1128', '1', '-1', '0', 'Grawmug Taken Down!', '16712190', 'Complete the quest "In Defense of the King\'s Land" in Loch Modan before reaching level 17 and without dying once.', '16712190', '15064', '10', '24', '3558', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2128', '1128', '27', '217', '1', '"In Defense of the King\'s Land" quest completed', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2128', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2128', '26', '16', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1129', '1', '-1', '0', 'Protect the Prospector', '16712190', 'Complete the quest "Absent Minded Prospector" in Darkshore before reaching level 20 and without dying once.', '16712190', '15064', '10', '25', '202', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2129', '1129', '27', '731', '1', '"Absent Minded Prospector" quest completed', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2129', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2129', '26', '19', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1130', '0', '-1', '0', 'Finishing of the Kolkar', '16712190', 'Complete the quest "Counterattack!" in The Barrens before reaching level 21 and without dying once.', '16712190', '15064', '10', '26', '2849', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2130', '1130', '27', '4021', '1', '"Counterattack!" quest completed', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2130', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2130', '26', '20', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1131', '0', '-1', '0', 'Death to Goggeroc', '16712190', 'Complete the quest "Earthen Arise" in Stonetalon Mountains before reaching level 21 and without dying once.', '16712190', '15064', '10', '27', '66', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2131', '1131', '27', '6481', '1', '"Earthen Arise" quest completed', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2131', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2131', '26', '20', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1132', '0', '-1', '0', 'Dalaran Archmage Goes Down!', '16712190', 'Complete the quest "The Weaver" in Silverpine Forest before reaching level 21 and without dying once.', '16712190', '15064', '10', '28', '2120', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2162', '1132', '27', '480', '1', '"The Weaver" quest completed', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2162', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2162', '26', '20', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1133', '1', '-1', '0', 'Fangore Eliminated', '16712190', 'Complete the quest "Wanted: Lieutenant Fangore" in Redridge Mountains before reaching level 24 and without dying once.', '16712190', '15064', '10', '29', '38', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2163', '1133', '27', '180', '1', '"Wanted: Lieutenant Fangore" quest completed', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2163', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2163', '26', '23', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1134', '1', '-1', '0', 'Light of Elune', '16712190', 'Complete the quest "Mage Summoner" in Ashenvale before reaching level 24 and without dying once.', '16712190', '15064', '10', '30', '1308', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2164', '1134', '27', '1017', '1', '"Mage Summoner" quest completed', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2164', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2164', '26', '23', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1135', '0', '-1', '0', 'Eradicate the Beasts', '16712190', 'Complete the quest "The Hunt Completed" in Ashenvale before reaching level 27 and without dying once.', '16712190', '15064', '10', '31', '2222', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2165', '1135', '27', '247', '1', '"The Hunt Completed" quest completed', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2165', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2165', '26', '26', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1136', '0', '-1', '0', 'Army of the Harpies', '16712190', 'Complete the quest "Test of Endurance" in Thousand Needles before reaching level 31 and without dying once.', '16712190', '15064', '10', '32', '3580', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2166', '1136', '27', '1150', '1', '"Test of Endurance" quest completed', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2166', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2166', '26', '30', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1137', '1', '-1', '0', 'Defeat Nek\'rosh', '16712190', 'Complete the quest "Defeat Nek\'rosh" in Wetlands before reaching level 32 and without dying once.', '16712190', '15064', '10', '33', '2785', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2167', '1137', '27', '474', '1', '"Defeat Nek\'rosh" quest completed', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2167', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2167', '26', '31', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1138', '0', '-1', '0', 'Battle of Hillsbrad', '16712190', 'Complete the quest "Battle of Hillsbrad" in Hillsbrad Foothills before reaching level 34 and without dying once.', '16712190', '15064', '10', '34', '3555', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2168', '1138', '27', '550', '1', '"Battle of Hillsbrad" quest completed', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2168', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2168', '26', '33', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1139', '1', '-1', '0', 'Mor\'Ladim Defeated', '16712190', 'Complete the quest "Mor\'Ladim" in Duskwood before reaching level 34 and without dying once.', '16712190', '15064', '10', '35', '3009', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2169', '1139', '27', '228', '1', '"Mor\'Ladim" quest completed', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2169', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2169', '26', '33', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1140', '1', '-1', '0', 'Hints of a New Plague', '16712190', 'Complete the quest "Hints of a New Plague" in Hillsbrad Foothills before reaching level 35 and without dying once.', '16712190', '15064', '10', '36', '4035', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2170', '1140', '27', '658', '1', '"Hints of a New Plague" quest completed', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2170', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2170', '26', '34', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1141', '0', '-1', '0', 'Stinky\'s Escape', '16712190', 'Complete the quest "Stinky\'s Escape" in Dustwallow Marsh before reaching level 35 and without dying once.', '16712190', '15064', '10', '37', '3534', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2171', '1141', '27', '1270', '1', '"Stinky\'s Escape" quest completed', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2171', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2171', '26', '34', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1142', '1', '-1', '0', 'Stinky\'s Escape', '16712190', 'Complete the quest "Stinky\'s Escape" in Dustwallow Marsh before reaching level 35 and without dying once.', '16712190', '15064', '10', '38', '3534', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2172', '1142', '27', '1222', '1', '"Stinky\'s Escape" quest completed', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2172', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2172', '26', '34', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1143', '-1', '-1', '0', 'Galen\'s Escape', '16712190', 'Complete the quest "Galen\'s Escape" in Swamp of Sorrows before reaching level 39 and without dying once.', '16712190', '15064', '10', '39', '3569', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2173', '1143', '27', '1393', '1', '"Galen\'s Escape" quest completed', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2173', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2173', '26', '38', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1144', '-1', '-1', '0', 'Big Game Hunter', '16712190', 'Complete the quest "Big Game Hunter" in Stranglethorn Vale before reaching level 40 and without dying once.', '16712190', '15064', '10', '40', '916', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2174', '1144', '27', '208', '1', '"Big Game Hunter" quest completed', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2174', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2174', '26', '39', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1154', '0', '-1', '0', 'Serum to the Forsaken', '16712190', 'Complete the quest "Nothing but the Truth" in Duskwood before reaching level 41 and without dying once.', '16712190', '15064', '10', '41', '4237', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2175', '1154', '27', '1383', '1', '"Nothing but the Truth" quest completed', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2175', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2175', '26', '40', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1155', '0', '-1', '0', 'Kill the Betrayer', '16712190', 'Complete the quest "Broken Alliances" in Badlands before reaching level 41 and without dying once.', '16712190', '15064', '10', '42', '3954', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2176', '1155', '27', '782', '1', '"Broken Alliances" quest completed', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2176', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2176', '26', '40', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1156', '1', '-1', '0', 'Tremors of the Earth', '16712190', 'Complete the quest "Tremors of the Earth" in Badlands before reaching level 41 and without dying once.', '16712190', '15064', '10', '43', '2289', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2177', '1156', '27', '732', '1', '"Tremors of the Earth" quest completed', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2177', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2177', '26', '40', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1158', '-1', '-1', '0', 'An Ally Saved', '16712190', 'Complete the quest "Get Me Out of Here!" in Desolace before reaching level 42 and without dying once.', '16712190', '15064', '10', '44', '3530', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2178', '1158', '27', '6132', '1', '"Get Me Out of Here!" quest completed', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2178', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2178', '26', '41', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1163', '1', '-1', '0', 'Death to Shalzaru', '16712190', 'Complete the quest "Against Lord Shalzaru" in Feralas before reaching level 44 and without dying once.', '16712190', '15064', '10', '45', '3812', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2179', '1163', '27', '2870', '1', '"Against Lord Shalzaru" quest completed', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2179', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2179', '26', '43', '0');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1179', '0', '-1', '0', 'The Crown of Will', '16712190', 'Complete the quest "The Crown of Will" in Alterac Mountains before reaching level 44 and without dying once.', '16712190', '15064', '10', '46', '3954', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2180', '1179', '27', '521', '1', '"The Crown of Will" quest completed', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2180', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2180', '26', '43', '0');

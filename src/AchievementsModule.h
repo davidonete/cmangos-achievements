@@ -638,6 +638,16 @@ namespace cmangos_module
                 uint32 winner_score;
                 uint32 loser_score;
             } teams_scores;
+            // ACHIEVEMENT_CRITERIA_DATA_TYPE_S_LEVEL   = 26
+            struct
+            {
+                uint32 max_level;
+            } player_level;
+            // ACHIEVEMENT_CRITERIA_DATA_TYPE_S_PLAYED_TIME   = 27
+            struct
+            {
+                uint32 max_playtime;
+            } playtime;
             // ...
             struct
             {

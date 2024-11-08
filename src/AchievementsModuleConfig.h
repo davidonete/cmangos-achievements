@@ -216,9 +216,11 @@ namespace cmangos_module
         ACHIEVEMENT_CRITERIA_DATA_TYPE_S_KNOWN_TITLE = 23,          // title_id       0             known (pvp) title, values from dbc
         ACHIEVEMENT_CRITERIA_DATA_TYPE_BG_TEAMS_SCORES = 24,        // winner_score   loser score   player's team win bg and their teams have exact scores
         ACHIEVEMENT_CRITERIA_DATA_TYPE_NO_DEATH = 25,               // 0              0             must achieve criteria without ever dying
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_S_LEVEL = 26,                // max_level      0             max_level of player
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_S_PLAYED_TIME = 27           // max_playtime    0            max_playtime of player
     };
 
-    #define MAX_ACHIEVEMENT_CRITERIA_DATA_TYPE               26     // maximum value in AchievementCriteriaDataType enum
+    #define MAX_ACHIEVEMENT_CRITERIA_DATA_TYPE               28     // maximum value in AchievementCriteriaDataType enum
 
     enum AchievementCommonCategories
     {
