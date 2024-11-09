@@ -922,6 +922,11 @@ UPDATE `achievement_dbc` SET `Title_Lang_esES`='A toda mecha!', `Description_Lan
 UPDATE `achievement_dbc` SET `Title_Lang_esES`='A toda mecha!', `Description_Lang_esES`='Sube al nivel 40 en menos de 50 horas y sin morir.' WHERE `ID`=1208;
 UPDATE `achievement_dbc` SET `Title_Lang_esES`='A toda mecha!', `Description_Lang_esES`='Sube al nivel 50 en menos de 81 horas y sin morir.' WHERE `ID`=1209;
 UPDATE `achievement_dbc` SET `Title_Lang_esES`='A toda mecha!', `Description_Lang_esES`='Sube al nivel 60 en menos de 120 horas y sin morir.' WHERE `ID`=1210;
+UPDATE `achievement_dbc` SET `Title_Lang_esES`='Cantidad de grupos unidos', `Description_Lang_esES`='Cantidad de grupos unidos' WHERE `ID`=1211;
+UPDATE `achievement_dbc` SET `Title_Lang_esES`='Objetos recibidos por correo', `Description_Lang_esES`='Objetos recibidos por correo' WHERE `ID`=1212;
+UPDATE `achievement_dbc` SET `Title_Lang_esES`='Oro recibido por correo', `Description_Lang_esES`='Oro recibidos por correo' WHERE `ID`=1213;
+UPDATE `achievement_dbc` SET `Title_Lang_esES`='Numero de veces comerciadas', `Description_Lang_esES`='Numero de veces comerciadas' WHERE `ID`=1214;
+UPDATE `achievement_dbc` SET `Title_Lang_esES`='Mejor solo que mal acompañado', `Description_Lang_esES`='Sube al nivel 60 sin morir y sin usar el correo, comerciar con otros o la casa de subastas.' WHERE `ID`=1215;
 UPDATE `achievement_dbc` SET `Title_Lang_esES`='Pescador de Terrallende', `Description_Lang_esES`='Pesca un pez en cada uno de los nodos específicos de la lista a continuación.' WHERE `ID`=1225;
 UPDATE `achievement_dbc` SET `Title_Lang_esES`='Revivido por druidas', `Description_Lang_esES`='Revivido por druidas' WHERE `ID`=1229;
 UPDATE `achievement_dbc` SET `Title_Lang_esES`='Muertes de Keristrasza (El Nexo)', `Description_Lang_esES`='Muertes de Keristrasza (El Nexo)' WHERE `ID`=1231;
@@ -3857,6 +3862,11 @@ UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Sube al nivel 30 
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Sube al nivel 40 en menos de 50 horas.' WHERE `ID`=2184;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Sube al nivel 50 en menos de 81 horas.' WHERE `ID`=2185;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Sube al nivel 60 en menos de 120 horas.' WHERE `ID`=2186;
+UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Cantidad de grupos unidos' WHERE `ID`=2187;
+UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Objetos recibidos por correo' WHERE `ID`=2188;
+UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Oro recibido por correo' WHERE `ID`=2189;
+UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Numero de veces comerciadas' WHERE `ID`=2190;
+UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Sube al nivel 60 sin morir.' WHERE `ID`=2191;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Montañas Filo de la Espada, Sylvanaar' WHERE `ID`=2195;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Montañas Blade\'s Edge, estación de Toshley' WHERE `ID`=2196;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Península del Fuego Infernal, Bastión del Honor' WHERE `ID`=2197;

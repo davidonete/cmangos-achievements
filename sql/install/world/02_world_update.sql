@@ -1027,3 +1027,23 @@ INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Ti
 INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2180', '1179', '27', '521', '1', '"The Crown of Will" quest completed', '0', '1');
 INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2180', '25', '0', '0');
 INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2180', '26', '43', '0');
+
+-- Self found
+-- Tracker achievements
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `Flags`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1211', '-1', '-1', '0', 'Groups joined', '16712190', 'Groups joined', '16712190', '131', '0', '7', '1', '1', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2187', '1211', '120', '0', '0', '"Groups joined', '0', '1');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `Flags`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1212', '-1', '-1', '0', 'Items received from mail', '16712190', 'Items received from mail', '16712190', '131', '0', '8', '1', '1', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2188', '1212', '121', '0', '0', '"Items received from mail', '0', '1');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `Flags`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1213', '-1', '-1', '0', 'Gold received from mail', '16712190', 'Gold received from mail', '16712190', '140', '0', '16', '1', '1', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2189', '1213', '122', '0', '0', '"Gold received from mail', '32', '1');
+
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `Flags`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1214', '-1', '-1', '0', 'Trades done', '16712190', 'Trades done', '16712190', '131', '0', '9', '1', '1', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2190', '1214', '123', '0', '0', '"Trades done', '0', '1');
+
+-- Level to 60
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1215', '-1', '-1', '0', 'Self Found', '16712190', 'Reach level 60 without dying once and without using the auction house, mailbox or trades.', '16712190', '15065', '10', '7', '63', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2191', '1215', '5', '0', '60', 'Reach level 60 without dying once.', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2191', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2191', '28', '0', '0');

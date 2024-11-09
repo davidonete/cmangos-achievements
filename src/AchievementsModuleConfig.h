@@ -179,6 +179,10 @@ namespace cmangos_module
         ACHIEVEMENT_CRITERIA_TYPE_ACCEPTED_SUMMONINGS = 114,
         ACHIEVEMENT_CRITERIA_TYPE_EARN_ACHIEVEMENT_POINTS = 115,
         ACHIEVEMENT_CRITERIA_TYPE_USE_LFD_TO_GROUP_WITH_PLAYERS = 119,
+        ACHIEVEMENT_CRITERIA_TYPE_JOINED_GROUP = 120,
+        ACHIEVEMENT_CRITERIA_TYPE_MAIL_ITEMS = 121,
+        ACHIEVEMENT_CRITERIA_TYPE_MAIL_GOLD = 122,
+        ACHIEVEMENT_CRITERIA_TYPE_TRADES_DONE = 123,
         ACHIEVEMENT_CRITERIA_TYPE_TOTAL = 124, // 0..123 => 124 criteria types total
     };
 
@@ -217,10 +221,11 @@ namespace cmangos_module
         ACHIEVEMENT_CRITERIA_DATA_TYPE_BG_TEAMS_SCORES = 24,        // winner_score   loser score   player's team win bg and their teams have exact scores
         ACHIEVEMENT_CRITERIA_DATA_TYPE_NO_DEATH = 25,               // 0              0             must achieve criteria without ever dying
         ACHIEVEMENT_CRITERIA_DATA_TYPE_S_LEVEL = 26,                // max_level      0             max_level of player
-        ACHIEVEMENT_CRITERIA_DATA_TYPE_S_PLAYED_TIME = 27           // max_playtime    0            max_playtime of player
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_S_PLAYED_TIME = 27,          // max_playtime   0             max_playtime of player
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_S_SELF_FOUND = 28            // 0              0             must achieve criteria without grouping, trading, using mailbox or auction house
     };
 
-    #define MAX_ACHIEVEMENT_CRITERIA_DATA_TYPE               28     // maximum value in AchievementCriteriaDataType enum
+    #define MAX_ACHIEVEMENT_CRITERIA_DATA_TYPE               29     // maximum value in AchievementCriteriaDataType enum
 
     enum AchievementCommonCategories
     {

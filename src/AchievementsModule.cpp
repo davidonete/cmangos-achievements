@@ -95,11 +95,11 @@ namespace cmangos_module
 
         while (char* line = ChatHandler::LineFromMessage(pos))
         {
-    #if EXPANSION == 0
+#if EXPANSION == 0
             ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, line, LANG_UNIVERSAL);
-    #else
+#else
             ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, line, LANG_ADDON);
-    #endif
+#endif
             player->GetSession()->SendPacket(data);
         }
 
@@ -178,6 +178,7 @@ namespace cmangos_module
             case ACHIEVEMENT_CRITERIA_DATA_TYPE_NTH_BIRTHDAY:
             case ACHIEVEMENT_CRITERIA_DATA_TYPE_NO_DEATH:
             case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_PLAYED_TIME:
+            case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_SELF_FOUND:
             {
                 return true;
             }
@@ -744,6 +745,86 @@ namespace cmangos_module
                 return source->GetTotalPlayedTime() <= playtime.max_playtime;
             }
 
+            case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_SELF_FOUND:
+            {
+                bool noGrouping = true;
+                const AchievementCriteriaEntryList* criteriaList = playerAchievementMgr->GetModule()->GetAchievementCriteriaByType(ACHIEVEMENT_CRITERIA_TYPE_JOINED_GROUP);
+                if (criteriaList)
+                {
+                    const AchievementCriteriaEntry* criteria = criteriaList->front();
+                    if (criteria)
+                    {
+                        const CriteriaProgress* progress = playerAchievementMgr->GetCriteriaProgress(criteria);
+                        if (progress)
+                        {
+                            noGrouping = progress->counter <= 0;
+                        }
+                    }
+                }
+
+                bool noMailboxGold = true;
+                criteriaList = playerAchievementMgr->GetModule()->GetAchievementCriteriaByType(ACHIEVEMENT_CRITERIA_TYPE_MAIL_GOLD);
+                if (criteriaList)
+                {
+                    const AchievementCriteriaEntry* criteria = criteriaList->front();
+                    if (criteria)
+                    {
+                        const CriteriaProgress* progress = playerAchievementMgr->GetCriteriaProgress(criteria);
+                        if (progress)
+                        {
+                            noMailboxGold = progress->counter <= 0;
+                        }
+                    }
+                }
+
+                bool noMailboxItems = true;
+                criteriaList = playerAchievementMgr->GetModule()->GetAchievementCriteriaByType(ACHIEVEMENT_CRITERIA_TYPE_MAIL_ITEMS);
+                if (criteriaList)
+                {
+                    const AchievementCriteriaEntry* criteria = criteriaList->front();
+                    if (criteria)
+                    {
+                        const CriteriaProgress* progress = playerAchievementMgr->GetCriteriaProgress(criteria);
+                        if (progress)
+                        {
+                            noMailboxItems = progress->counter <= 0;
+                        }
+                    }
+                }
+
+                bool noAuctionHouse = true;
+                criteriaList = playerAchievementMgr->GetModule()->GetAchievementCriteriaByType(ACHIEVEMENT_CRITERIA_TYPE_WON_AUCTIONS);
+                if (criteriaList)
+                {
+                    const AchievementCriteriaEntry* criteria = criteriaList->front();
+                    if (criteria)
+                    {
+                        const CriteriaProgress* progress = playerAchievementMgr->GetCriteriaProgress(criteria);
+                        if (progress)
+                        {
+                            noAuctionHouse = progress->counter <= 0;
+                        }
+                    }
+                }
+
+                bool noTrading = true;
+                criteriaList = playerAchievementMgr->GetModule()->GetAchievementCriteriaByType(ACHIEVEMENT_CRITERIA_TYPE_TRADES_DONE);
+                if (criteriaList)
+                {
+                    const AchievementCriteriaEntry* criteria = criteriaList->front();
+                    if (criteria)
+                    {
+                        const CriteriaProgress* progress = playerAchievementMgr->GetCriteriaProgress(criteria);
+                        if (progress)
+                        {
+                            noTrading = progress->counter <= 0;
+                        }
+                    }
+                }
+
+                return noGrouping && noMailboxGold && noMailboxItems && noAuctionHouse && noTrading;
+            }
+
             default: break;
         }
         return false;
@@ -839,10 +920,10 @@ namespace cmangos_module
 
     void PlayerAchievementMgr::SyncAccountAcchievements()
     {
-    #ifdef ENABLE_PLAYERBOTS
+#ifdef ENABLE_PLAYERBOTS
         if (!GetPlayer()->isRealPlayer())
             return;
-    #endif
+#endif
 
         // Check if its a new character
         const bool newCharacter = GetPlayer()->GetTotalPlayedTime() == 0;
@@ -1349,10 +1430,10 @@ namespace cmangos_module
         if (m_player->IsGameMaster())
             return;
 
-    #ifdef ENABLE_PLAYERBOTS
+#ifdef ENABLE_PLAYERBOTS
         if (!m_module->GetConfig()->randomBots && sRandomPlayerbotMgr.IsFreeBot(m_player))
             return;
-    #endif
+#endif
 
         if (type >= ACHIEVEMENT_CRITERIA_TYPE_TOTAL)
         {
@@ -1454,7 +1535,7 @@ namespace cmangos_module
                 case ACHIEVEMENT_CRITERIA_TYPE_NUMBER_OF_TALENT_RESETS:
                 case ACHIEVEMENT_CRITERIA_TYPE_LOSE_DUEL:
                 case ACHIEVEMENT_CRITERIA_TYPE_CREATE_AUCTION:
-                case ACHIEVEMENT_CRITERIA_TYPE_WON_AUCTIONS:    /* FIXME: for online player only currently */
+                case ACHIEVEMENT_CRITERIA_TYPE_WON_AUCTIONS:
                 case ACHIEVEMENT_CRITERIA_TYPE_ROLL_NEED:
                 case ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED:
                 case ACHIEVEMENT_CRITERIA_TYPE_QUEST_ABANDONED:
@@ -1481,6 +1562,10 @@ namespace cmangos_module
                 case ACHIEVEMENT_CRITERIA_TYPE_TOTAL_DAMAGE_RECEIVED:
                 case ACHIEVEMENT_CRITERIA_TYPE_TOTAL_HEALING_RECEIVED:
                 case ACHIEVEMENT_CRITERIA_TYPE_USE_LFD_TO_GROUP_WITH_PLAYERS:
+                case ACHIEVEMENT_CRITERIA_TYPE_JOINED_GROUP:
+                case ACHIEVEMENT_CRITERIA_TYPE_MAIL_ITEMS:
+                case ACHIEVEMENT_CRITERIA_TYPE_MAIL_GOLD:
+                case ACHIEVEMENT_CRITERIA_TYPE_TRADES_DONE:
                 {
                     // AchievementMgr::UpdateAchievementCriteria might also be called on login - skip in this case
                     if (!miscValue1)
@@ -2057,11 +2142,11 @@ namespace cmangos_module
                     if (miscValue1 && miscValue1 != achievementCriteria->gain_reputation.factionID)
                         continue;
 
-    #if EXPANSION == 1
+#if EXPANSION == 1
                     FactionEntry const* factionEntry = sFactionStore.LookupEntry<FactionEntry>(achievementCriteria->gain_reputation.factionID);
-    #else
+#else
                     FactionEntry const* factionEntry = sFactionStore.LookupEntry(achievementCriteria->gain_reputation.factionID);
-    #endif
+#endif
                     if(!factionEntry)
                         continue;
 
@@ -2075,17 +2160,17 @@ namespace cmangos_module
                 case ACHIEVEMENT_CRITERIA_TYPE_GAIN_EXALTED_REPUTATION:
                 {
                     uint32 exaltedCount = 0;
-    #if EXPANSION == 1
+#if EXPANSION == 1
                     for (unsigned int i = 1; i < sFactionStore.GetMaxEntry(); ++i)
-    #else
+#else
                     for (unsigned int i = 1; i < sFactionStore.GetNumRows(); ++i)
-    #endif
+#endif
                     {
-    #if EXPANSION == 1
+#if EXPANSION == 1
                         FactionEntry const* factionEntry = sFactionStore.LookupEntry<FactionEntry>(achievementCriteria->gain_reputation.factionID);
-    #else
+#else
                         FactionEntry const* factionEntry = sFactionStore.LookupEntry(achievementCriteria->gain_reputation.factionID);
-    #endif
+#endif
                         if (factionEntry && (factionEntry->HasReputation()))
                         {
                             ReputationRank rank = GetPlayer()->GetReputationMgr().GetRank(factionEntry);
@@ -2277,17 +2362,17 @@ namespace cmangos_module
                 case ACHIEVEMENT_CRITERIA_TYPE_GAIN_REVERED_REPUTATION:
                 {
                     uint32 counter = 0;
-    #if EXPANSION == 1
+#if EXPANSION == 1
                     for (unsigned int i = 1; i < sFactionStore.GetMaxEntry(); ++i)
-    #else
+#else
                     for (unsigned int i = 1; i < sFactionStore.GetNumRows(); ++i)
-    #endif
+#endif
                     {
-    #if EXPANSION == 1
+#if EXPANSION == 1
                         FactionEntry const* factionEntry = sFactionStore.LookupEntry<FactionEntry>(achievementCriteria->gain_reputation.factionID);
-    #else
+#else
                         FactionEntry const* factionEntry = sFactionStore.LookupEntry(achievementCriteria->gain_reputation.factionID);
-    #endif
+#endif
                         if (factionEntry && (factionEntry->HasReputation()))
                         {
                             ReputationRank rank = GetPlayer()->GetReputationMgr().GetRank(factionEntry);
@@ -2303,17 +2388,17 @@ namespace cmangos_module
                 case ACHIEVEMENT_CRITERIA_TYPE_GAIN_HONORED_REPUTATION:
                 {
                     uint32 counter = 0;
-    #if EXPANSION == 1
+#if EXPANSION == 1
                     for (unsigned int i = 1; i < sFactionStore.GetMaxEntry(); ++i)
-    #else
+#else
                     for (unsigned int i = 1; i < sFactionStore.GetNumRows(); ++i)
-    #endif
+#endif
                     {
-    #if EXPANSION == 1
+#if EXPANSION == 1
                         FactionEntry const* factionEntry = sFactionStore.LookupEntry<FactionEntry>(achievementCriteria->gain_reputation.factionID);
-    #else
+#else
                         FactionEntry const* factionEntry = sFactionStore.LookupEntry(achievementCriteria->gain_reputation.factionID);
-    #endif
+#endif
                         if (factionEntry && (factionEntry->HasReputation()))
                         {
                             ReputationRank rank = GetPlayer()->GetReputationMgr().GetRank(factionEntry);
@@ -2329,17 +2414,17 @@ namespace cmangos_module
                 case ACHIEVEMENT_CRITERIA_TYPE_KNOWN_FACTIONS:
                 {
                     uint32 counter = 0;
-    #if EXPANSION == 1
+#if EXPANSION == 1
                     for (unsigned int i = 1; i < sFactionStore.GetMaxEntry(); ++i)
-    #else
+#else
                     for (unsigned int i = 1; i < sFactionStore.GetNumRows(); ++i)
-    #endif
+#endif
                     {
-    #if EXPANSION == 1
+#if EXPANSION == 1
                         FactionEntry const* factionEntry = sFactionStore.LookupEntry<FactionEntry>(achievementCriteria->gain_reputation.factionID);
-    #else
+#else
                         FactionEntry const* factionEntry = sFactionStore.LookupEntry(achievementCriteria->gain_reputation.factionID);
-    #endif
+#endif
                         if (factionEntry && (factionEntry->HasReputation()))
                         {
                             if (FactionState const* state = GetPlayer()->GetReputationMgr().GetState(factionEntry))
@@ -2603,7 +2688,7 @@ namespace cmangos_module
 
                 case ACHIEVEMENT_CRITERIA_TYPE_OWN_RANK:
                 {
-    #if EXPANSION == 0
+#if EXPANSION == 0
                     if (miscValue1 && ((miscValue1 < 4) || (miscValue1 > (HONOR_RANK_COUNT - 1)) || ((miscValue1 - 4) != achievementCriteria->own_rank.rank)))
                         continue;
 
@@ -2613,7 +2698,7 @@ namespace cmangos_module
 
                     if ((highestRank - 4) == achievementCriteria->own_rank.rank)
                         SetCriteriaProgress(achievementCriteria, 1);
-    #endif
+#endif
                     break;
                 }
 
@@ -2663,10 +2748,10 @@ namespace cmangos_module
             if (m_module->IsRealmCompleted(achievement))
                 return false;
 
-    #ifdef ENABLE_PLAYERBOTS
+#ifdef ENABLE_PLAYERBOTS
             if (!m_module->GetConfig()->randomBotsRealmFirst && sRandomPlayerbotMgr.IsFreeBot(m_player))
                 return false;
-    #endif
+#endif
         }
 
         // progress will be deleted after getting the achievement (optimization)
@@ -2992,6 +3077,10 @@ namespace cmangos_module
             case ACHIEVEMENT_CRITERIA_TYPE_FLIGHT_PATHS_TAKEN:
             case ACHIEVEMENT_CRITERIA_TYPE_ACCEPTED_SUMMONINGS:
             case ACHIEVEMENT_CRITERIA_TYPE_PLAY_ARENA:
+            case ACHIEVEMENT_CRITERIA_TYPE_JOINED_GROUP:
+            case ACHIEVEMENT_CRITERIA_TYPE_MAIL_ITEMS:
+            case ACHIEVEMENT_CRITERIA_TYPE_MAIL_GOLD:
+            case ACHIEVEMENT_CRITERIA_TYPE_TRADES_DONE:
             {
                 break;
             }
@@ -3577,10 +3666,10 @@ namespace cmangos_module
         if (!player)
             return false;
 
-    #ifdef ENABLE_PLAYERBOTS
+#ifdef ENABLE_PLAYERBOTS
         if(!player->isRealPlayer())
             return false;
-    #endif
+#endif
 
         const PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
         return playerMgr && playerMgr->IsAddonEnabled();
@@ -3594,10 +3683,10 @@ namespace cmangos_module
         if (!player)
             return;
 
-    #ifdef ENABLE_PLAYERBOTS
+#ifdef ENABLE_PLAYERBOTS
         if (!player->isRealPlayer())
             return;
-    #endif
+#endif
 
         PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
         if (playerMgr)
@@ -3661,10 +3750,10 @@ namespace cmangos_module
         if (!player)
             return;
 
-    #ifdef ENABLE_PLAYERBOTS
+#ifdef ENABLE_PLAYERBOTS
         if (!player->isRealPlayer())
             return;
-    #endif
+#endif
 
         if (version >= GetCurrentVersion())
             return;
@@ -3707,10 +3796,10 @@ namespace cmangos_module
         if (!player)
             return;
 
-    #ifdef ENABLE_PLAYERBOTS
+#ifdef ENABLE_PLAYERBOTS
         if (!player->isRealPlayer())
             return;
-    #endif
+#endif
 
         if (version >= GetCurrentVersion())
             return;
@@ -3772,10 +3861,10 @@ namespace cmangos_module
         if (!player)
             return;
 
-    #ifdef ENABLE_PLAYERBOTS
+#ifdef ENABLE_PLAYERBOTS
         if (!player->isRealPlayer())
             return;
-    #endif
+#endif
 
         if (version >= GetCurrentVersion())
             return;
@@ -3823,10 +3912,10 @@ namespace cmangos_module
         if (!player)
             return;
 
-    #ifdef ENABLE_PLAYERBOTS
+#ifdef ENABLE_PLAYERBOTS
         if (!player->isRealPlayer())
             return;
-    #endif
+#endif
 
         const PlayerAchievementMgr* aMgr = GetPlayerAchievementMgr(player);
         if(aMgr)
@@ -3925,10 +4014,10 @@ namespace cmangos_module
         if (!player)
             return;
 
-    #ifdef ENABLE_PLAYERBOTS
+#ifdef ENABLE_PLAYERBOTS
         if (!player->isRealPlayer())
             return;
-    #endif
+#endif
 
         std::unique_ptr<QueryResult> achievementResult(CharacterDatabase.PQuery("SELECT `achievement`, `date` FROM `character_achievement` WHERE `guid` = '%u'", player->GetGUIDLow()));
         if (achievementResult) 
@@ -4926,11 +5015,11 @@ namespace cmangos_module
         {
             if (player)
             {
-    #ifdef ENABLE_PLAYERBOTS
+#ifdef ENABLE_PLAYERBOTS
                 // Check if randombots can use the achievement system
                 if (!GetConfig()->randomBots && sRandomPlayerbotMgr.IsFreeBot(player))
                     return;
-    #endif
+#endif
                 // Create the player achievement manager
                 const uint32 playerId = player->GetObjectGuid().GetCounter();
                 auto pair = m_playerMgrs.insert(std::make_pair(playerId, PlayerAchievementMgr(player, this)));
@@ -5554,11 +5643,11 @@ namespace cmangos_module
                     playerMgr = &playerMgrIt->second;
                 }
 
-    #ifdef ENABLE_PLAYERBOTS
+#ifdef ENABLE_PLAYERBOTS
                 // Check if randombots can use the achievement system
                 if (!GetConfig()->randomBots && sRandomPlayerbotMgr.IsFreeBot(player))
                     return nullptr;
-    #endif
+#endif
 
                 MANGOS_ASSERT(playerMgr);
                 return playerMgr;
@@ -5582,11 +5671,11 @@ namespace cmangos_module
                     playerMgr = &playerMgrIt->second;
                 }
 
-    #ifdef ENABLE_PLAYERBOTS
+#ifdef ENABLE_PLAYERBOTS
                 // Check if randombots can use the achievement system
                 if (!GetConfig()->randomBots && sRandomPlayerbotMgr.IsFreeBot(playerId))
                     return nullptr;
-    #endif
+#endif
 
                 MANGOS_ASSERT(playerMgr);
                 return playerMgr;
@@ -5645,6 +5734,51 @@ namespace cmangos_module
             {
                 playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_AUCTION_BID, auctionEntry->buyout);
             }
+        }
+    }
+
+    void AchievementsModule::OnActionBidWinning(AuctionEntry* auctionEntry, const ObjectGuid& owner, const ObjectGuid& bidder)
+    {
+        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(sObjectMgr.GetPlayer(bidder));
+        if (playerMgr)
+        {
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WON_AUCTIONS, 1);
+        }
+    }
+
+    void AchievementsModule::OnAddMember(Group* group, Player* player, uint8 method)
+    {
+        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+        if (playerMgr)
+        {
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_JOINED_GROUP, 1);
+        }
+    }
+
+    void AchievementsModule::OnSendMail(const MailDraft& mail, Player* player, const ObjectGuid& receiver, uint32 cost)
+    {
+        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+        if (playerMgr)
+        {
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GOLD_SPENT_FOR_MAIL, cost);
+        }
+    }
+
+    void AchievementsModule::OnMailTakeItem(Mail* mail, Player* player, Item* item, const ObjectGuid& sender)
+    {
+        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+        if (playerMgr)
+        {
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_MAIL_ITEMS, item->GetCount());
+        }
+    }
+
+    void AchievementsModule::OnMailTakeMoney(Mail* mail, Player* player, uint32 amount, const ObjectGuid& sender)
+    {
+        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+        if (playerMgr)
+        {
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_MAIL_GOLD, amount);
         }
     }
 
@@ -5868,21 +6002,27 @@ namespace cmangos_module
         }
     }
 
-    void AchievementsModule::OnSendMail(Player* player, const ObjectGuid& receiver, uint32 cost)
-    {
-        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
-        if (playerMgr)
-        {
-            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GOLD_SPENT_FOR_MAIL, cost);
-        }
-    }
-
     void AchievementsModule::OnAbandonQuest(Player* player, uint32 questId)
     {
         PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
         if (playerMgr)
         {
             playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_QUEST_ABANDONED, 1);
+        }
+    }
+
+    void AchievementsModule::OnTradeAccepted(Player* player, Player* trader, TradeData* playerTrade, TradeData* traderTrade)
+    {
+        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+        if (playerMgr)
+        {
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_TRADES_DONE, 1);
+        }
+
+        playerMgr = GetPlayerAchievementMgr(trader);
+        if (playerMgr)
+        {
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_TRADES_DONE, 1);
         }
     }
 

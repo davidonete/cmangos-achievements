@@ -829,8 +829,8 @@ namespace cmangos_module
         void OnAreaExplored(Player* player, uint32 areaId) override;
         void OnUpdateHonor(Player* player) override;
         void OnGiveLevel(Player* player, uint32 level) override;
-        void OnSendMail(Player* player, const ObjectGuid& receiver, uint32 cost) override;
         void OnAbandonQuest(Player* player, uint32 questId) override;
+        void OnTradeAccepted(Player* player, Player* trader, TradeData* playerTrade, TradeData* traderTrade) override;
 
         // Battleground Hooks
         void OnStartBattleGround(BattleGround* battleground) override;
@@ -858,9 +858,18 @@ namespace cmangos_module
         void OnPlayerWinRoll(Loot* loot, Player* player, uint8 rollType, uint8 rollAmount, uint32 itemSlot, uint8 inventoryResult) override;
         void OnSendGold(Loot* loot, Player* player, uint32 gold, uint8 lootMethod) override;
 
+        // Group Hooks
+        void OnAddMember(Group* group, Player* player, uint8 method) override;
+
         // Auction House Hooks
         void OnSellItem(AuctionEntry* auctionEntry, Player* player) override;
         void OnUpdateBid(AuctionEntry* auctionEntry, Player* player, uint32 newBid) override;
+        void OnActionBidWinning(AuctionEntry* auctionEntry, const ObjectGuid& owner, const ObjectGuid& bidder) override;
+
+        // Mail Hooks
+        void OnSendMail(const MailDraft& mail, Player* player, const ObjectGuid& receiver, uint32 cost);
+        void OnMailTakeItem(Mail* mail, Player* player, Item* item, const ObjectGuid& sender);
+        void OnMailTakeMoney(Mail* mail, Player* player, uint32 amount, const ObjectGuid& sender);
 
         // Player Dump Hooks
         void OnWriteDump(uint32 playerId, std::string& dump) override;
