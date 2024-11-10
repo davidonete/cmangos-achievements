@@ -9940,7 +9940,6 @@ UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Muertes de Halion
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Muertes de Halion (El Sagrario Rubí heroica 10 j.)' WHERE `ID`=13468;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='' WHERE `ID`=13469;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Escarchado' WHERE `ID`=13470;
-UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Escarchado' WHERE `ID`=580;
 
 UPDATE `achievement_category_dbc` SET `Name_Lang_esES`='General' WHERE `ID`=92;
 UPDATE `achievement_category_dbc` SET `Name_Lang_esES`='Arenas' WHERE `ID`=123;
