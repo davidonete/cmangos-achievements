@@ -927,6 +927,8 @@ UPDATE `achievement_dbc` SET `Title_Lang_esES`='Objetos recibidos por correo', `
 UPDATE `achievement_dbc` SET `Title_Lang_esES`='Oro recibido por correo', `Description_Lang_esES`='Oro recibidos por correo' WHERE `ID`=1213;
 UPDATE `achievement_dbc` SET `Title_Lang_esES`='Numero de veces comerciadas', `Description_Lang_esES`='Numero de veces comerciadas' WHERE `ID`=1214;
 UPDATE `achievement_dbc` SET `Title_Lang_esES`='Mejor solo que mal acompañado', `Description_Lang_esES`='Sube al nivel 60 sin morir y sin usar el correo, comerciar con otros o la casa de subastas.' WHERE `ID`=1215;
+UPDATE `achievement_dbc` SET `Title_Lang_esES`='Numero de objetos no fabricados usados', `Description_Lang_esES`='Numero de objetos no fabricados usados' WHERE `ID`=1216;
+UPDATE `achievement_dbc` SET `Title_Lang_esES`='Artesano', `Description_Lang_esES`='Sube al nivel 60 sin morir y solo usando objetos que has fabricado por ti mismo.' WHERE `ID`=1217;
 UPDATE `achievement_dbc` SET `Title_Lang_esES`='Pescador de Terrallende', `Description_Lang_esES`='Pesca un pez en cada uno de los nodos específicos de la lista a continuación.' WHERE `ID`=1225;
 UPDATE `achievement_dbc` SET `Title_Lang_esES`='Revivido por druidas', `Description_Lang_esES`='Revivido por druidas' WHERE `ID`=1229;
 UPDATE `achievement_dbc` SET `Title_Lang_esES`='Muertes de Keristrasza (El Nexo)', `Description_Lang_esES`='Muertes de Keristrasza (El Nexo)' WHERE `ID`=1231;
@@ -3867,6 +3869,8 @@ UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Objetos recibidos
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Oro recibido por correo' WHERE `ID`=2189;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Numero de veces comerciadas' WHERE `ID`=2190;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Sube al nivel 60 sin morir.' WHERE `ID`=2191;
+UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Numero de objetos no fabricados usados' WHERE `ID`=2192;
+UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Sube al nivel 60 sin morir.' WHERE `ID`=2193;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Montañas Filo de la Espada, Sylvanaar' WHERE `ID`=2195;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Montañas Blade\'s Edge, estación de Toshley' WHERE `ID`=2196;
 UPDATE `achievement_criteria_dbc` SET `Description_Lang_esES`='Península del Fuego Infernal, Bastión del Honor' WHERE `ID`=2197;

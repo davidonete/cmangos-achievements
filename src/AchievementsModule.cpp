@@ -179,6 +179,7 @@ namespace cmangos_module
             case ACHIEVEMENT_CRITERIA_DATA_TYPE_NO_DEATH:
             case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_PLAYED_TIME:
             case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_SELF_FOUND:
+            case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_SELF_CRAFTER:
             {
                 return true;
             }
@@ -823,6 +824,26 @@ namespace cmangos_module
                 }
 
                 return noGrouping && noMailboxGold && noMailboxItems && noAuctionHouse && noTrading;
+            }
+
+            case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_SELF_CRAFTER:
+            {
+                bool achieved = true;
+                const AchievementCriteriaEntryList* criteriaList = playerAchievementMgr->GetModule()->GetAchievementCriteriaByType(ACHIEVEMENT_CRITERIA_TYPE_NON_CRAFTED_ITEMS_USED);
+                if (criteriaList)
+                {
+                    const AchievementCriteriaEntry* criteria = criteriaList->front();
+                    if (criteria)
+                    {
+                        const CriteriaProgress* progress = playerAchievementMgr->GetCriteriaProgress(criteria);
+                        if (progress)
+                        {
+                            achieved = progress->counter <= 0;
+                        }
+                    }
+                }
+                
+                return achieved;
             }
 
             default: break;
@@ -2702,6 +2723,27 @@ namespace cmangos_module
                     break;
                 }
 
+                case ACHIEVEMENT_CRITERIA_TYPE_NON_CRAFTED_ITEMS_USED:
+                {
+                    if (miscValue1 > 0)
+                    {
+                        if (const ItemPrototype* proto = sObjectMgr.GetItemPrototype(miscValue1))
+                        {
+                            const bool allowedTypes = proto->Class == ITEM_CLASS_QUEST ||
+                                                      proto->Class == ITEM_CLASS_REAGENT ||
+                                                      proto->Class == ITEM_CLASS_RECIPE ||
+                                                      proto->Class == ITEM_CLASS_KEY;
+
+                            if (!allowedTypes && GetPlayer()->GetObjectGuid().GetCounter() != miscValue2)
+                            {
+                                SetCriteriaProgress(achievementCriteria, 1);
+                            }
+                        }
+                    }
+
+                    break;
+                }
+
                 case ACHIEVEMENT_CRITERIA_TYPE_TOTAL:
                 {
                     break;                                   // Not implemented yet :(
@@ -3081,6 +3123,7 @@ namespace cmangos_module
             case ACHIEVEMENT_CRITERIA_TYPE_MAIL_ITEMS:
             case ACHIEVEMENT_CRITERIA_TYPE_MAIL_GOLD:
             case ACHIEVEMENT_CRITERIA_TYPE_TRADES_DONE:
+            case ACHIEVEMENT_CRITERIA_TYPE_NON_CRAFTED_ITEMS_USED:
             {
                 break;
             }
@@ -5316,8 +5359,20 @@ namespace cmangos_module
                 const uint8 slot = item->GetSlot();
                 playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, itemEntry);
                 playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM, itemEntry, slot);
+                playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_NON_CRAFTED_ITEMS_USED, itemEntry, item->GetGuidValue(ITEM_FIELD_CREATOR));
             }
         }
+    }
+
+    bool AchievementsModule::OnUseItem(Player* player, Item* item)
+    {
+        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+        if (playerMgr && item)
+        {
+            playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_NON_CRAFTED_ITEMS_USED, item->GetEntry(), item->GetGuidValue(ITEM_FIELD_CREATOR));
+        }
+
+        return false;
     }
 
     void AchievementsModule::OnMoveItemToInventory(Player* player, Item* item)
@@ -5902,6 +5957,19 @@ namespace cmangos_module
         if (playerMgr && item)
         {
             playerMgr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_RECEIVE_EPIC_ITEM, item->GetEntry(), item->GetCount());
+        }
+    }
+
+    void AchievementsModule::OnCreateItem(Player* player, Item* item, uint32 amount)
+    {
+        PlayerAchievementMgr* playerMgr = GetPlayerAchievementMgr(player);
+        if (playerMgr && item)
+        {
+            // Save the creator for crafted items for hardcore challenges
+            if (item->GetProto()->Class == ITEM_CLASS_CONSUMABLE)
+            {
+                item->SetGuidValue(ITEM_FIELD_CREATOR, player->GetObjectGuid());
+            }
         }
     }
 

@@ -1047,3 +1047,14 @@ INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Ti
 INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2191', '1215', '5', '0', '60', 'Reach level 60 without dying once.', '0', '1');
 INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2191', '25', '0', '0');
 INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2191', '28', '0', '0');
+
+-- Solo crafter
+-- Tracker achievements
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `Flags`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1216', '-1', '-1', '0', 'Non crafted items used', '16712190', 'Non crafted items used', '16712190', '131', '0', '9', '1', '1', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2192', '1216', '124', '0', '0', '"Non crafted items used', '0', '1');
+
+-- Level to 60
+INSERT INTO `achievement_dbc` (`ID`, `Faction`, `Instance_Id`, `Supercedes`, `Title_Lang_enUS`, `Title_Lang_Mask`, `Description_Lang_enUS`, `Description_Lang_Mask`, `Category`, `Points`, `Ui_Order`, `IconID`, `Reward_Lang_Mask`, `patch`) VALUES ('1217', '-1', '-1', '0', 'Crafter', '16712190', 'Reach level 60 without dying once and by only using items that you crafted.', '16712190', '15065', '10', '8', '162', '16712190', '0');
+INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Asset_Id`, `Quantity`, `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES ('2193', '1217', '5', '0', '60', 'Reach level 60 without dying once.', '0', '1');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2193', '25', '0', '0');
+INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`) VALUES('2193', '29', '0', '0');

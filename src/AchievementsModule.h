@@ -816,6 +816,7 @@ namespace cmangos_module
         void OnUpdateSkill(Player* player, uint16 skillId) override;
         void OnRewardHonor(Player* player, Unit* victim) override;
         void OnEquipItem(Player* player, Item* item);
+        bool OnUseItem(Player* player, Item* item);
         void OnRewardQuest(Player* player, const Quest* quest);
         void OnTaxiFlightRouteStart(Player* player, const Taxi::Tracker& taxiTracker, bool initial) override;
         void OnTaxiFlightRouteEnd(Player* player, const Taxi::Tracker& taxiTracker, bool final) override;
@@ -824,6 +825,7 @@ namespace cmangos_module
         void OnBuyBankSlot(Player* player, uint32 slot, uint32 price) override;
         void OnSellItem(Player* player, Item* item, uint32 money) override;
         void OnBuyBackItem(Player* player, Item* item, uint32 money) override;
+        void OnCreateItem(Player* player, Item* item, uint32 amount) override;
         void OnModifyMoney(Player* player, int32 diff) override;
         void OnSummoned(Player* player, const ObjectGuid& summoner) override;
         void OnAreaExplored(Player* player, uint32 areaId) override;

@@ -183,7 +183,8 @@ namespace cmangos_module
         ACHIEVEMENT_CRITERIA_TYPE_MAIL_ITEMS = 121,
         ACHIEVEMENT_CRITERIA_TYPE_MAIL_GOLD = 122,
         ACHIEVEMENT_CRITERIA_TYPE_TRADES_DONE = 123,
-        ACHIEVEMENT_CRITERIA_TYPE_TOTAL = 124, // 0..123 => 124 criteria types total
+        ACHIEVEMENT_CRITERIA_TYPE_NON_CRAFTED_ITEMS_USED = 124,
+        ACHIEVEMENT_CRITERIA_TYPE_TOTAL = 125, // 0..124 => 125 criteria types total
     };
 
     enum AchievementCategory
@@ -222,10 +223,11 @@ namespace cmangos_module
         ACHIEVEMENT_CRITERIA_DATA_TYPE_NO_DEATH = 25,               // 0              0             must achieve criteria without ever dying
         ACHIEVEMENT_CRITERIA_DATA_TYPE_S_LEVEL = 26,                // max_level      0             max_level of player
         ACHIEVEMENT_CRITERIA_DATA_TYPE_S_PLAYED_TIME = 27,          // max_playtime   0             max_playtime of player
-        ACHIEVEMENT_CRITERIA_DATA_TYPE_S_SELF_FOUND = 28            // 0              0             must achieve criteria without grouping, trading, using mailbox or auction house
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_S_SELF_FOUND = 28,           // 0              0             must achieve criteria without grouping, trading, using mailbox or auction house
+        ACHIEVEMENT_CRITERIA_DATA_TYPE_S_SELF_CRAFTER = 29          // 0              0             must achieve criteria by only using items crafted by the player           
     };
 
-    #define MAX_ACHIEVEMENT_CRITERIA_DATA_TYPE               29     // maximum value in AchievementCriteriaDataType enum
+    #define MAX_ACHIEVEMENT_CRITERIA_DATA_TYPE               30     // maximum value in AchievementCriteriaDataType enum
 
     enum AchievementCommonCategories
     {
