@@ -4789,7 +4789,7 @@ namespace cmangos_module
             Field* fields = result->Fetch();
 
             uint16 achievementId = fields[0].GetUInt16();
-            const AchievementEntry* achievement = GetAchievement(achievementId);
+            const AchievementEntry* achievement = GetAchievement(achievementId, false);
             if (!achievement) 
             {
                 // Remove non existent achievements from all characters
